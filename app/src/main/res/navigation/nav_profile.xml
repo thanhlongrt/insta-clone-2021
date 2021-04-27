@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_profile"
+    app:startDestination="@id/profileFragment">
+
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="com.example.instagram.ui.profile.ProfileFragment"
+        android:label="ProfileFragment"
+        tools:layout="@layout/fragment_profile">
+        <action
+            android:id="@+id/action_profileFragment_to_editProfileFragment"
+            app:destination="@id/editProfileFragment" />
+        <action
+            android:id="@+id/action_profileFragment_to_userPostsFragment"
+            app:destination="@id/userPostsFragment"
+            app:enterAnim="@anim/slide_in_right"
+            />
+        <action
+            android:id="@+id/action_profileFragment_to_createBottomSheetFragment"
+            app:destination="@id/createBottomSheetFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/editProfileFragment"
+        android:name="com.example.instagram.ui.profile.EditProfileFragment"
+        android:label="EditProfileFragment"
+        tools:layout="@layout/fragment_edit_profile" />
+    <fragment
+        android:id="@+id/createNewPostFragment"
+        android:name="com.example.instagram.ui.profile.create_new.CreateNewPostFragment"
+        android:label="NewPostFragment"
+        tools:layout="@layout/fragment_create_new_post">
+        <action
+            android:id="@+id/action_createNewPostFragment_to_profileFragment"
+            app:destination="@id/profileFragment"
+            app:popUpTo="@id/profileFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+    <fragment
+        android:id="@+id/previewImageFragment"
+        android:name="com.example.instagram.ui.profile.create_new.PreviewPhotoFragment"
+        android:label="PreviewImageFragment"
+        tools:layout="@layout/fragment_preview_photo">
+        <action
+            android:id="@+id/action_previewImageFragment_to_createNewPostFragment"
+            app:destination="@id/createNewPostFragment" />
+    </fragment>
+    <fragment
+        tools:layout="@layout/fragment_post_grid_list"
+        android:id="@+id/userPhotoFragment"
+        android:name="com.example.instagram.ui.profile.user_post.PostGridListFragment"
+        android:label="UserPhotoFragment" />
+    <fragment
+        tools:layout="@layout/fragment_post_list"
+        android:id="@+id/userPostsFragment"
+        android:name="com.example.instagram.ui.profile.user_post.PostListFragment"
+        android:label="UserPostsFragment" >
+        <action
+            android:id="@+id/action_userPostsFragment_to_postBottomSheetFragment"
+            app:destination="@id/postBottomSheetFragment" />
+    </fragment>
+    <dialog
+        tools:layout="@layout/fragment_post_bottom_sheet"
+        android:id="@+id/postBottomSheetFragment"
+        android:name="com.example.instagram.ui.profile.user_post.PostBottomSheetFragment"
+        android:label="PostBottomSheetFragment" />
+    <dialog
+        tools:layout="@layout/fragment_create_new_bottom_sheet"
+        android:id="@+id/createBottomSheetFragment"
+        android:name="com.example.instagram.ui.profile.create_new.CreateNewBottomSheetFragment"
+        android:label="CreateBottomSheetFragment" >
+        <action
+            android:id="@+id/action_createBottomSheetFragment_to_previewImageFragment"
+            app:destination="@id/previewImageFragment" />
+        <action
+            android:id="@+id/action_createBottomSheetFragment_to_cameraFragment"
+            app:destination="@id/cameraFragment" />
+        <action
+            android:id="@+id/action_createBottomSheetFragment_to_cameraActivity"
+            app:destination="@id/cameraActivity" />
+    </dialog>
+    <fragment
+        tools:layout="@layout/fragment_camera"
+        android:id="@+id/cameraFragment"
+        android:name="com.example.instagram.ui.story.CameraFragment"
+        android:label="CameraFragment" />
+    <activity
+        tools:layout="@layout/activity_camera"
+        android:id="@+id/cameraActivity"
+        android:name="com.example.instagram.ui.story.CameraActivity"
+        android:label="CameraActivity" />
+</navigation>

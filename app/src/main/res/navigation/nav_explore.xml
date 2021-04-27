@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_explore"
+    app:startDestination="@id/exploreFragment">
+
+    <fragment
+        android:id="@+id/exploreFragment"
+        android:name="com.example.instagram.ui.explore.ExploreFragment"
+        android:label="ExploreFragment"
+        tools:layout="@layout/fragment_explore">
+        <action
+            android:id="@+id/action_exploreFragment_to_searchFragment"
+            app:destination="@id/searchFragment" />
+    </fragment>
+    <fragment
+        tools:layout="@layout/fragment_search"
+        android:id="@+id/searchFragment"
+        android:name="com.example.instagram.ui.explore.search.SearchFragment"
+        android:label="SearchFragment" >
+        <action
+            android:id="@+id/action_searchFragment_to_otherUserFragment"
+            app:destination="@id/otherUserFragment" />
+    </fragment>
+    <fragment
+        tools:layout="@layout/fragment_view_user"
+        android:id="@+id/otherUserFragment"
+        android:name="com.example.instagram.ui.explore.search.ViewUserFragment"
+        android:label="OtherUserFragment" >
+        <action
+            android:id="@+id/action_otherUserFragment_to_otherUserPostsFragment"
+            app:destination="@id/otherUserPostsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/otherUserPostsFragment"
+        android:name="com.example.instagram.ui.explore.search.ViewUserPostListFragment"
+        android:label="OtherUserPostsFragment" />
+</navigation>
