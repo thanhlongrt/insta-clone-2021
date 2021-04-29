@@ -87,5 +87,9 @@ constructor(
     val postDataReference =
         firebaseSource.postDataReference
 
-    val currentUser = firebaseSource.currentFirebaseUser
+    val storyDataReference =
+        firebaseSource.storyDataReference
+
+    val currentUser
+        get() = firebaseSource.currentFirebaseUser
 }

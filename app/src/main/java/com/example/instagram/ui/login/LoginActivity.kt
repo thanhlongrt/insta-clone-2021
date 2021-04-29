@@ -30,7 +30,7 @@ class LoginActivity : AppCompatActivity() {
 
 
         val hostFragment: NavHostFragment =
-            supportFragmentManager.findFragmentById(R.id.nav_login_host_fragment) as NavHostFragment?
+            supportFragmentManager.findFragmentById(R.id.login_nav_host_fragment) as NavHostFragment?
                 ?: return
 
         val navController = hostFragment.navController

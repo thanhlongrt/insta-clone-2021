@@ -8,7 +8,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.instagram.DataState
-import com.example.instagram.model.User
+import com.example.instagram.firebase_model.User
 import com.example.instagram.repository.PostRepository
 import com.example.instagram.repository.UserRepository
 import com.example.instagram.ui.profile.create_new.PostViewModel
@@ -59,6 +59,7 @@ constructor(
                     val user = snapshot.getValue(User::class.java)!!
                     _userLivaData.postValue(DataState.success(user))
                     Log.e(TAG, "onDataChange: getCurrentUserData: Success")
+                    Log.e(TAG, "onDataChange: getCurrentUserData: ${user.uid}", )
                 }
 
                 override fun onCancelled(error: DatabaseError) {

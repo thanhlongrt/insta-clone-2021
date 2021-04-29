@@ -73,4 +73,7 @@ constructor(
     val postDataReference =
         firebaseDatabase.reference.child("Posts")
 
+    val storyDataReference =
+        firebaseDatabase.reference.child("Stories")
+
 }

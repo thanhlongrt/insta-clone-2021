@@ -5,8 +5,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.instagram.DataState
-import com.example.instagram.model.Post
-import com.example.instagram.model.User
+import com.example.instagram.firebase_model.Post
+import com.example.instagram.firebase_model.User
 import com.example.instagram.repository.PostRepository
 import com.example.instagram.repository.UserRepository
 import com.google.firebase.database.DataSnapshot

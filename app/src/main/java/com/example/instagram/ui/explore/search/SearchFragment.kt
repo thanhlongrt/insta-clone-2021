@@ -14,7 +14,7 @@ import com.example.instagram.R
 import com.example.instagram.Status
 import com.example.instagram.databinding.FragmentSearchBinding
 import com.example.instagram.getFragmentNavController
-import com.example.instagram.model.User
+import com.example.instagram.firebase_model.User
 import com.example.instagram.ui.explore.getQueryTextObservable
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers

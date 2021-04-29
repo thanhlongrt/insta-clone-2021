@@ -8,7 +8,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.instagram.DataState
-import com.example.instagram.model.Post
+import com.example.instagram.firebase_model.Post
 import com.example.instagram.repository.PostRepository
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -122,6 +122,7 @@ constructor(
                         photos.add(photo)
                     }
                 }
+                Log.e(TAG, "onDataChange: getPosts: ${postRepository.currentUser?.uid}", )
                 _postLiveData.postValue(DataState.success(photos))
             }
 

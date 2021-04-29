@@ -48,4 +48,9 @@
         <item name="cornerSizeBottomLeft">0dp</item>
     </style>
 
+    <style name="StoryProgressBar" parent="@style/Widget.AppCompat.ProgressBar.Horizontal">
+        <item name="android:progressBackgroundTint">#f2f2f2</item>
+        <item name="android:progressTint">@color/white</item>
+    </style>
+
 </resources>

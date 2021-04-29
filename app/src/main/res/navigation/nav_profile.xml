@@ -74,21 +74,5 @@
         <action
             android:id="@+id/action_createBottomSheetFragment_to_previewImageFragment"
             app:destination="@id/previewImageFragment" />
-        <action
-            android:id="@+id/action_createBottomSheetFragment_to_cameraFragment"
-            app:destination="@id/cameraFragment" />
-        <action
-            android:id="@+id/action_createBottomSheetFragment_to_cameraActivity"
-            app:destination="@id/cameraActivity" />
     </dialog>
-    <fragment
-        tools:layout="@layout/fragment_camera"
-        android:id="@+id/cameraFragment"
-        android:name="com.example.instagram.ui.story.CameraFragment"
-        android:label="CameraFragment" />
-    <activity
-        tools:layout="@layout/activity_camera"
-        android:id="@+id/cameraActivity"
-        android:name="com.example.instagram.ui.story.CameraActivity"
-        android:label="CameraActivity" />
 </navigation>

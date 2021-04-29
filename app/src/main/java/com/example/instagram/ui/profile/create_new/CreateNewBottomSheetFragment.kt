@@ -96,6 +96,7 @@ class CreateNewBottomSheetFragment : BottomSheetDialogFragment() {
                     storyData["photo_url"] = it.data!!
                     storyData["video_url"] = ""
                     storyData["path"] = photoStoragePath
+                    storyData["username"] = profileViewModel.userLiveData.value!!.data!!.username
                     postViewModel.saveStoryData(storyData)
                 }
                 ERROR -> {

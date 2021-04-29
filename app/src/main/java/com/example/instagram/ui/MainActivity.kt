@@ -1,11 +1,12 @@
 package com.example.instagram.ui
 
 import android.content.Context
+import android.os.Build
 import android.os.Bundle
-import android.text.BoringLayout
 import android.util.Log
 import android.util.TypedValue
 import android.view.View
+import android.view.WindowInsets
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import androidx.activity.viewModels
@@ -14,14 +15,12 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.navigation.NavController
 import androidx.navigation.ui.setupActionBarWithNavController
-import com.example.instagram.ImageUtils
 import com.example.instagram.R
 import com.example.instagram.databinding.ActivityMainBinding
 import com.example.instagram.setupWithNavController
 import com.example.instagram.ui.profile.ProfileViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.hilt.android.AndroidEntryPoint
-import org.w3c.dom.Text
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -90,6 +89,11 @@ class MainActivity : AppCompatActivity() {
                     ""
                 }
 
+                if (destination.id == R.id.storyFragment) {
+                    hideUIs()
+                } else {
+                    showUIs()
+                }
 
                 if (destination.id == R.id.exploreFragment) {
                     binding.searchViewHolder.visibility = View.VISIBLE
@@ -118,6 +122,26 @@ class MainActivity : AppCompatActivity() {
         })
         currentNavigationController = controller
 
+    }
+
+    private fun showUIs() {
+        binding.toolBar.visibility = View.VISIBLE
+        binding.bottomNavView.visibility = View.VISIBLE
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            binding.root.windowInsetsController?.show(WindowInsets.Type.statusBars())
+        } else {
+            window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_VISIBLE
+        }
+    }
+
+    private fun hideUIs() {
+        binding.toolBar.visibility = View.GONE
+        binding.bottomNavView.visibility = View.GONE
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            binding.root.windowInsetsController?.hide(WindowInsets.Type.statusBars())
+        } else {
+            window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN
+        }
     }
 
     override fun onSupportNavigateUp(): Boolean {

@@ -1,4 +1,4 @@
-package com.example.instagram.model
+package com.example.instagram.firebase_model
 
 /**
  * Created by Thanh Long Nguyen on 4/14/2021

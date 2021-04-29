@@ -5,8 +5,8 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.instagram.databinding.ItemPostBinding
-import com.example.instagram.model.Post
-import com.example.instagram.model.User
+import com.example.instagram.firebase_model.Post
+import com.example.instagram.firebase_model.User
 
 /**
  * Created by Thanh Long Nguyen on 4/16/2021
