@@ -1,7 +1,6 @@
 package com.example.instagram.ui.home
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,20 +8,14 @@ import android.widget.ProgressBar
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.instagram.R
-import com.example.instagram.Status.*
+import com.example.instagram.Status.SUCCESS
 import com.example.instagram.databinding.FragmentHomeBinding
 import com.example.instagram.getFragmentNavController
-import com.example.instagram.ui.profile.ProfileViewModel
-import com.example.instagram.ui.profile.user_post.PostListAdapter
-import com.example.instagram.ui.profile.user_post.PostListFragment
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 /**
  * Created by Thanh Long Nguyen on 4/12/2021
@@ -33,7 +26,7 @@ class HomeFragment : Fragment() {
 
     private val homeViewModel: HomeViewModel by activityViewModels()
 
-    private lateinit var postListAdapter: PostListAdapter
+    private lateinit var feedListAdapter: FeedListAdapter
     private lateinit var linearLayoutManager: LinearLayoutManager
 
     @ExperimentalCoroutinesApi
@@ -56,37 +49,38 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val storyAdapter = StoryListAdapter(mutableListOf())
-        storyAdapter.onItemClick = { position ->
+//        val storyAdapter = StoryListAdapter(mutableListOf())
+//        storyAdapter.onItemClick = { position ->
+//            val bundle = bundleOf("position" to position)
+//            getFragmentNavController(R.id.nav_host_fragment)?.navigate(
+//                R.id.action_homeFragment_to_storyFragment,
+//                bundle
+//            )
+//        }
+//        binding?.storyRecyclerView?.apply {
+//            layoutManager = LinearLayoutManager(
+//                view.context,
+//                LinearLayoutManager.HORIZONTAL,
+//                false
+//            )
+//            adapter = storyAdapter
+//        }
+
+
+        feedListAdapter =
+            FeedListAdapter(mutableListOf(), mutableListOf())
+
+        feedListAdapter.onStoryClick = { position ->
             val bundle = bundleOf("position" to position)
             getFragmentNavController(R.id.nav_host_fragment)?.navigate(
                 R.id.action_homeFragment_to_storyFragment,
                 bundle
             )
         }
-        binding?.storyRecyclerView?.apply {
-            layoutManager = LinearLayoutManager(
-                view.context,
-                LinearLayoutManager.HORIZONTAL,
-                false
-            )
-            adapter = storyAdapter
-        }
-
-        homeViewModel.storiesLiveData.observe(requireActivity()) {
-            when (it.status) {
-                SUCCESS -> {
-                    storyAdapter.addAll(it.data!!)
-                }
-            }
-        }
-
-        postListAdapter =
-            PostListAdapter(mutableListOf())
-        postListAdapter.onLikeClick = { position, post ->
+        feedListAdapter.onLikeClick = { position, post ->
             val uid = homeViewModel.currentUserUid
             if (post.isLiked) {
-                postListAdapter.unlike(position, uid)
+                feedListAdapter.unlike(position, uid)
                 homeViewModel.getLikeId(uid, post.postId)
             } else {
                 val likeData = HashMap<String, Any>()
@@ -95,7 +89,7 @@ class HomeFragment : Fragment() {
                 likeData["post_id"] = post.postId
                 likeData["comment_id"] = ""
                 homeViewModel.like(likeData)
-                postListAdapter.like(position, uid)
+                feedListAdapter.like(position, uid)
             }
         }
 
@@ -104,28 +98,29 @@ class HomeFragment : Fragment() {
         binding?.postRecyclerView?.apply {
 
             this.layoutManager = linearLayoutManager
-            adapter = postListAdapter
+            adapter = feedListAdapter
             itemAnimator = object : DefaultItemAnimator() {
                 override fun canReuseUpdatedViewHolder(viewHolder: RecyclerView.ViewHolder): Boolean {
                     return true
                 }
             }
-            setHasFixedSize(true)
+//            setHasFixedSize(true)
+        }
+
+        homeViewModel.storiesLiveData.observe(requireActivity()) {
+            when (it.status) {
+                SUCCESS -> {
+                    feedListAdapter.fetchStories(it.data!!)
+                }
+            }
         }
 
         homeViewModel.userPosts.observe(requireActivity(), {
             when (it.status) {
                 SUCCESS -> {
                     displayProgressBar(false)
-                    postListAdapter.addAll(it.data!!.reversed())
+                    feedListAdapter.fetchPosts(it.data!!.reversed())
                 }
-                ERROR -> {
-                    displayProgressBar(false)
-                }
-                LOADING -> {
-                    displayProgressBar(true)
-                }
-                IDLE -> TODO()
             }
         })
 
