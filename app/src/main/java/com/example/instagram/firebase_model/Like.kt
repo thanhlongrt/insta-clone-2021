@@ -6,6 +6,6 @@ package com.example.instagram.firebase_model
 class Like(
     val uid: String = "",
     val like_id: String = "",
-    val photo_id: String = "",
+    val post_id: String = "",
     val comment_id: String = ""
 )

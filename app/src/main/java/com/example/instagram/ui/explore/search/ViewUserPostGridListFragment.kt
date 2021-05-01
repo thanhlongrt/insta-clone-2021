@@ -14,11 +14,13 @@ import com.example.instagram.databinding.FragmentViewUserPostGridListBinding
 import com.example.instagram.getFragmentNavController
 import com.example.instagram.ui.profile.user_post.PostGridListAdapter
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 /**
  * Created by Thanh Long Nguyen on 4/18/2021
  */
 
+@ExperimentalCoroutinesApi
 @AndroidEntryPoint
 class ViewUserPostGridListFragment : Fragment() {
     companion object {
@@ -44,7 +46,7 @@ class ViewUserPostGridListFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         uid = arguments?.getString("uid")
-        searchViewModel.getUserPhotos(uid!!)
+        searchViewModel.getPostById(uid!!)
     }
 
     override fun onCreateView(
@@ -61,7 +63,7 @@ class ViewUserPostGridListFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         postAdapter = PostGridListAdapter(mutableListOf())
         postAdapter.onItemClicked = {
-            val bundle = bundleOf("position" to it)
+            val bundle = bundleOf("position" to it, "uid" to uid)
             getFragmentNavController(R.id.nav_host_fragment)?.navigate(R.id.action_otherUserFragment_to_otherUserPostsFragment, bundle)
         }
         binding?.photoRecyclerView?.apply {

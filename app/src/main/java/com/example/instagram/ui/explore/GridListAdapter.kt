@@ -27,7 +27,7 @@ class GridListAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val post = posts[position]
         Glide.with(holder.itemView.context)
-            .load(post.url)
+            .load(post.photo_url)
             .into(holder.binding.image)
     }
 

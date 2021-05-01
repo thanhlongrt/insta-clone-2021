@@ -67,6 +67,23 @@ constructor(
             .updateChildren(storyData)
     }
 
+    fun generateLikeId() =
+        firebaseDatabase.reference.child("Likes").push().key!!
+
+    fun like(likeData: HashMap<String, Any>): Task<Void> {
+        val id = firebaseDatabase.reference.child("Likes").push().key!!
+        likeData["like_id"] = id
+        return firebaseDatabase.reference.child("Likes")
+            .child(id)
+            .updateChildren(likeData)
+    }
+
+    fun unlike(likeId: String): Task<Void> {
+        return firebaseDatabase.reference.child("Likes")
+            .child(likeId)
+            .removeValue()
+    }
+
 
     val currentFirebaseUser: FirebaseUser? get() = firebaseAuth.currentUser
 
@@ -75,5 +92,8 @@ constructor(
 
     val storyDataReference =
         firebaseDatabase.reference.child("Stories")
+
+    val likeDataReference =
+        firebaseDatabase.reference.child("Likes")
 
 }

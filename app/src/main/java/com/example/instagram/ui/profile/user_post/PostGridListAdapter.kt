@@ -5,13 +5,13 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.instagram.databinding.ItemGridPhotoBinding
-import com.example.instagram.firebase_model.Post
+import com.example.instagram.model.PostItem
 
 /**
  * Created by Thanh Long Nguyen on 4/14/2021
  */
 class PostGridListAdapter(
-    private val photosUrls: List<Post>
+    private val photosUrls: List<PostItem>
 ) : RecyclerView.Adapter<PostGridListAdapter.PhotoViewHolder>() {
 
     var onItemClicked: ((Int) -> Unit)? = null
@@ -26,9 +26,9 @@ class PostGridListAdapter(
     }
 
     override fun onBindViewHolder(holder: PhotoViewHolder, position: Int) {
-        val photo = photosUrls[position]
+        val postItem = photosUrls[position]
         Glide.with(holder.itemView.context)
-            .load(photo.url)
+            .load(postItem.photoUrl)
             .into(holder.binding.image)
 
         holder.itemView.setOnClickListener {
@@ -41,7 +41,7 @@ class PostGridListAdapter(
         return photosUrls.size
     }
 
-    fun addAll(urls: List<Post>?) {
+    fun addAll(urls: List<PostItem>?) {
 
         urls?.let {
             (photosUrls as MutableList).clear()

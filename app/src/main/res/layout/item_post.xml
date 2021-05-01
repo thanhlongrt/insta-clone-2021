@@ -5,15 +5,15 @@
     android:orientation="vertical">
 
     <LinearLayout
-        android:layout_marginStart="12dp"
-        android:layout_marginEnd="12dp"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="12dp"
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
         <de.hdodenhof.circleimageview.CircleImageView
-            android:id="@+id/profileImage"
+            android:id="@+id/avatar"
             android:layout_width="36dp"
             android:layout_height="36dp"
             android:src="@mipmap/ic_launcher_round" />
@@ -49,13 +49,14 @@
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
-        <ImageView
+        <CheckBox
             android:id="@+id/like"
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:layout_marginStart="12dp"
             android:layout_marginEnd="18dp"
-            android:src="@drawable/ic_04_heart" />
+            android:background="@drawable/button_like"
+            android:button="@null" />
 
         <ImageView
             android:id="@+id/comment"
@@ -85,7 +86,7 @@
     </LinearLayout>
 
     <TextView
-        android:id="@+id/likeAmount"
+        android:id="@+id/likeCount"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="12dp"
@@ -110,10 +111,10 @@
 
         <TextView
             android:id="@+id/caption"
-            android:maxLines="1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
+            android:maxLines="1"
             android:text="Caption"
             android:textColor="@color/black"
             android:textSize="14sp" />
@@ -122,11 +123,11 @@
     </LinearLayout>
 
     <TextView
-        android:text="01-01-2021"
-        android:layout_marginStart="12dp"
         android:id="@+id/date_created"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:text="01-01-2021" />
 
 
 </LinearLayout>

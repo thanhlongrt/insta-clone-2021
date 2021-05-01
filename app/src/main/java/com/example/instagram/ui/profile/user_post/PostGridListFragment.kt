@@ -14,10 +14,12 @@ import com.example.instagram.Status
 import com.example.instagram.databinding.FragmentPostGridListBinding
 import com.example.instagram.getFragmentNavController
 import com.example.instagram.ui.profile.create_new.PostViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 /**
  * Created by Thanh Long Nguyen on 4/12/2021
  */
+@ExperimentalCoroutinesApi
 class PostGridListFragment : Fragment() {
     private var binding: FragmentPostGridListBinding? = null
 
@@ -33,7 +35,7 @@ class PostGridListFragment : Fragment() {
             type = it.getInt("type")
         }
 
-        postViewModel.getPosts()
+        postViewModel.getPostById(postViewModel.currentUserUid)
     }
 
     override fun onCreateView(
@@ -71,7 +73,7 @@ class PostGridListFragment : Fragment() {
             }
         }
 
-        postViewModel.postLiveData.observe(requireActivity(), {
+        postViewModel.userPosts.observe(requireActivity(), {
             when (it.status) {
                 Status.LOADING -> {
                     displayProgressBar(true)

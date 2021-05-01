@@ -62,7 +62,7 @@ class CreateNewPostFragment : Fragment() {
             when (it.status) {
                 Status.SUCCESS -> {
                     val user = it.data!!
-                    binding?.profileImage?.let { imageView ->
+                    binding?.avatar?.let { imageView ->
                         Glide.with(view.context)
                             .load(user.profile_photo)
                             .into(imageView)
@@ -91,7 +91,9 @@ class CreateNewPostFragment : Fragment() {
                 Status.SUCCESS -> {
                     val photoData = HashMap<String, Any>()
                     photoData["uid"] = profileViewModel.userLiveData.value!!.data!!.uid
-                    photoData["url"] = it.data!!
+                    photoData["avatar_url"] = profileViewModel.userLiveData.value!!.data!!.profile_photo
+                    photoData["user_name"] = profileViewModel.userLiveData.value!!.data!!.username
+                    photoData["photo_url"] = it.data!!
                     photoData["date_created"] = System.currentTimeMillis()
                     photoData["caption"] = binding?.captionEditText?.text.toString()
                     photoData["tags"] = 0

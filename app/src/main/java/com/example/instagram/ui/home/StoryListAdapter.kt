@@ -5,13 +5,13 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.instagram.databinding.ItemStoryBinding
-import com.example.instagram.model.UserStory
+import com.example.instagram.model.StoryItem
 
 /**
  * Created by Thanh Long Nguyen on 4/28/2021
  */
 class StoryListAdapter(
-    private val stories: List<UserStory>
+    private val storyItems: List<StoryItem>
 ) : RecyclerView.Adapter<StoryListAdapter.ViewHolder>() {
 
     var onItemClick: ((Int) -> Unit)? = null
@@ -26,7 +26,7 @@ class StoryListAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val story = stories[position]
+        val story = storyItems[position]
         Glide.with(holder.itemView.context)
             .load(story.stories[0].photo_url)
             .into(holder.binding.storyImage)
@@ -37,12 +37,12 @@ class StoryListAdapter(
     }
 
     override fun getItemCount(): Int {
-        return stories.size
+        return storyItems.size
     }
 
-    fun addAll(stories: List<UserStory>) {
-        (this.stories as MutableList).clear()
-        this.stories.addAll(stories)
+    fun addAll(storyItems: List<StoryItem>) {
+        (this.storyItems as MutableList).clear()
+        this.storyItems.addAll(storyItems)
         notifyDataSetChanged()
     }
 

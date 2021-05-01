@@ -10,7 +10,9 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.instagram.R
 import com.example.instagram.Status.*
 import com.example.instagram.databinding.FragmentPostListBinding
@@ -18,6 +20,7 @@ import com.example.instagram.getFragmentNavController
 import com.example.instagram.ui.profile.ProfileViewModel
 import com.example.instagram.ui.profile.create_new.PostViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -25,6 +28,7 @@ import kotlinx.coroutines.launch
  * Created by Thanh Long Nguyen on 4/16/2021
  */
 
+@ExperimentalCoroutinesApi
 @AndroidEntryPoint
 class PostListFragment : Fragment() {
 
@@ -35,7 +39,6 @@ class PostListFragment : Fragment() {
     private var binding: FragmentPostListBinding? = null
 
     private val postViewModel: PostViewModel by activityViewModels()
-    private val profileViewModel: ProfileViewModel by activityViewModels()
     private lateinit var postListAdapter: PostListAdapter
     private lateinit var linearLayoutManager: LinearLayoutManager
 
@@ -59,16 +62,32 @@ class PostListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        postListAdapter = PostListAdapter(profileViewModel.userLiveData.value!!.data!!, mutableListOf())
+        postListAdapter =
+            PostListAdapter(mutableListOf())
         postListAdapter.onOptionClick = {
             val bundle = bundleOf(
                 "photo_path" to it.path,
-                "photo_id" to it.post_id
+                "photo_id" to it.postId
             )
             getFragmentNavController(R.id.nav_host_fragment)?.navigate(
                 R.id.action_userPostsFragment_to_postBottomSheetFragment,
                 bundle
             )
+        }
+        postListAdapter.onLikeClick = { position, post ->
+            val uid = postViewModel.currentUserUid
+            if (post.isLiked) {
+                postListAdapter.unlike(position, uid)
+                postViewModel.getLikeId(uid, post.postId)
+            } else {
+                val likeData = HashMap<String, Any>()
+                likeData["uid"] = uid
+                likeData["like_id"] = ""
+                likeData["post_id"] = post.postId
+                likeData["comment_id"] = ""
+                postViewModel.like(likeData)
+                postListAdapter.like(position, uid)
+            }
         }
 
         linearLayoutManager = LinearLayoutManager(view.context)
@@ -77,11 +96,15 @@ class PostListFragment : Fragment() {
 
             this.layoutManager = linearLayoutManager
             adapter = postListAdapter
+            itemAnimator = object : DefaultItemAnimator() {
+                override fun canReuseUpdatedViewHolder(viewHolder: RecyclerView.ViewHolder): Boolean {
+                    return true
+                }
+            }
+            setHasFixedSize(true)
         }
 
-        Log.e(TAG, "onViewCreated: ")
-
-        postViewModel.postLiveData.observe(requireActivity(), {
+        postViewModel.userPosts.observe(requireActivity(), {
             when (it.status) {
                 SUCCESS -> {
                     displayProgressBar(false)
@@ -104,13 +127,14 @@ class PostListFragment : Fragment() {
             }
         })
 
-        postViewModel.deletePostResult.observe(requireActivity(), {
-            when (it.status) {
+        postViewModel.likeIdToDelete.observe(requireActivity()) {
+            when(it.status){
                 SUCCESS -> {
-                    postViewModel.getPosts()
+                    postViewModel.unlike(it.data!!)
                 }
             }
-        })
+        }
+
     }
 
     private fun displayProgressBar(isDisplayed: Boolean) {

@@ -14,11 +14,13 @@ import com.example.instagram.ui.profile.ProfileViewPagerAdapter
 import com.example.instagram.ui.profile.user_post.PostGridListFragment
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 /**
  * Created by Thanh Long Nguyen on 4/18/2021
  */
 
+@ExperimentalCoroutinesApi
 @AndroidEntryPoint
 class ViewUserFragment : Fragment() {
     companion object {

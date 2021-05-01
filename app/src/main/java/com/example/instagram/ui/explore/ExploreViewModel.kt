@@ -4,13 +4,16 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.instagram.DataState
-import com.example.instagram.firebase_model.Post
+import com.example.instagram.model.PostItem
 import com.example.instagram.repository.PostRepository
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.ValueEventListener
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
@@ -28,28 +31,70 @@ constructor(
         private const val TAG = "ExploreViewModel"
     }
 
-    private val _postsLiveData = MutableLiveData<DataState<List<Post>>>()
-    val postsLiveData: LiveData<DataState<List<Post>>> = _postsLiveData
+    private val _postsLiveData = MutableLiveData<DataState<List<PostItem>>>()
+    val postsLiveData: LiveData<DataState<List<PostItem>>> = _postsLiveData
 
-    fun getPosts() {
+    @ExperimentalCoroutinesApi
+    fun getAllPosts() {
         _postsLiveData.postValue(DataState.loading())
-        Log.e(TAG, "getPosts: Loading", )
-        postRepository.postDataReference.addListenerForSingleValueEvent(object :
-            ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val posts = mutableListOf<Post>()
-                for (item in snapshot.children) {
-                    val post = item.getValue(Post::class.java)!!
-                    posts.add(post)
-                }
-                _postsLiveData.postValue(DataState.success(posts))
-                Log.e(TAG, "getPosts: Success: ${posts.size}", )
-            }
+        Log.e(TAG, "getAllPosts: Loading", )
+        viewModelScope.launch {
+            postRepository.getAllPosts()
+                .combine(postRepository.getAllLikes()) { postResult, likeResult ->
 
-            override fun onCancelled(error: DatabaseError) {
-                _postsLiveData.postValue(DataState.error(null, error.message))
-                Log.e(TAG, "getPosts: Error: ${error.message}", )
-            }
-        })
+                    val likeByPost = likeResult.data!!.groupBy { it.post_id }
+                    val posts = postResult.data!!
+                    val postItems = posts.map { post ->
+                        PostItem(
+                            postId = post.post_id,
+                            uid = post.uid,
+                            avatarUrl = post.avatar_url,
+                            photoUrl = post.photo_url,
+                            date = post.date_created,
+                            caption = post.caption,
+                            path = post.path,
+                            likes = likeByPost[post.post_id] ?: mutableListOf()
+                        )
+                    }
+                    postItems
+                }.catch { e ->
+                    _postsLiveData.postValue(DataState.error(null, e.message!!))
+                    Log.e(TAG, "getAllPosts: Error: ${e.message}")
+                }
+                .collect {
+                    _postsLiveData.postValue(DataState.success(it))
+                    Log.e(TAG, "getAllPosts: Success: ${it.size}", )
+                }
+        }
     }
+    @ExperimentalCoroutinesApi
+    fun getAllPostsWithoutLike() {
+        _postsLiveData.postValue(DataState.loading())
+        Log.e(TAG, "getAllPosts: Loading", )
+        viewModelScope.launch {
+            postRepository.getAllPosts()
+                .catch { e ->
+                    _postsLiveData.postValue(DataState.error(null, e.message!!))
+                    Log.e(TAG, "getAllPostsWithoutLike: Error: ${e.message}")
+                }
+                .collect { postResult ->
+                    val posts = postResult.data!!
+                    val postItems = posts.map { post ->
+                        PostItem(
+                            postId = post.post_id,
+                            uid = post.uid,
+                            avatarUrl = post.avatar_url,
+                            photoUrl = post.photo_url,
+                            date = post.date_created,
+                            caption = post.caption,
+                            path = post.path,
+                            likes = mutableListOf()
+                        )
+                    }
+                    _postsLiveData.postValue(DataState.success(postItems))
+                    Log.e(TAG, "getAllPostsWithoutLike: Success: ${postItems.size}", )
+                }
+        }
+    }
+
 }

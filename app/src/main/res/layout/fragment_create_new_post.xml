@@ -17,13 +17,14 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <de.hdodenhof.circleimageview.CircleImageView
-            android:id="@+id/profileImage"
+            android:id="@+id/avatar"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_margin="12dp"
-            android:src="@drawable/ic_05_user" />
+            android:src="@mipmap/ic_launcher_round" />
 
         <EditText
+            android:layout_marginEnd="12dp"
             android:id="@+id/captionEditText"
             android:layout_width="0dp"
             android:layout_height="wrap_content"

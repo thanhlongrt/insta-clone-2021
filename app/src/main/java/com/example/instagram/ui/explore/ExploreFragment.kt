@@ -1,6 +1,7 @@
 package com.example.instagram.ui.explore
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,13 +13,19 @@ import com.example.instagram.Status.*
 import com.example.instagram.databinding.FragmentExploreBinding
 import com.example.instagram.ui.profile.user_post.PostGridListAdapter
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 /**
  * Created by Thanh Long Nguyen on 4/12/2021
  */
 
+@ExperimentalCoroutinesApi
 @AndroidEntryPoint
 class ExploreFragment : Fragment() {
+
+    companion object{
+        private const val TAG = "ExploreFragment"
+    }
 
     private var binding: FragmentExploreBinding? = null
 
@@ -26,9 +33,13 @@ class ExploreFragment : Fragment() {
 
     private lateinit var adapter: PostGridListAdapter
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        exploreViewModel.getAllPosts()
+    }
     override fun onStart() {
         super.onStart()
-        exploreViewModel.getPosts()
+
     }
 
     override fun onCreateView(

@@ -29,7 +29,7 @@ class SearchResultAdapter(
         val user = users[position]
         Glide.with(holder.itemView.context)
             .load(user.profile_photo)
-            .into(holder.binding.profileImage)
+            .into(holder.binding.avatar)
         holder.binding.username.text = user.username
         holder.binding.displayName.text = user.display_name
         holder.itemView.setOnClickListener {

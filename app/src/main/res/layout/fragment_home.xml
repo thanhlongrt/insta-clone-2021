@@ -5,25 +5,23 @@
     android:layout_height="match_parent">
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/storyList"
+        android:id="@+id/storyRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent" />
 
     <View
-        android:background="@drawable/lighter_gray_rounded_corner"
+        android:id="@+id/view"
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        app:layout_constraintTop_toBottomOf="@id/storyList"/>
+        android:background="@drawable/lighter_gray_rounded_corner"
+        app:layout_constraintTop_toBottomOf="@id/storyRecyclerView" />
 
-    <Button
-        android:id="@+id/storyButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Stories"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/postRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/view" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

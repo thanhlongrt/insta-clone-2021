@@ -4,20 +4,27 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.instagram.DataState
-import com.example.instagram.firebase_model.Post
 import com.example.instagram.firebase_model.User
+import com.example.instagram.model.PostItem
 import com.example.instagram.repository.PostRepository
 import com.example.instagram.repository.UserRepository
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.zip
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
  * Created by Thanh Long Nguyen on 4/18/2021
  */
+@ExperimentalCoroutinesApi
 @HiltViewModel
 class SearchViewModel
 @Inject
@@ -35,31 +42,45 @@ constructor(
     private val _otherUserLiveData = MutableLiveData<DataState<User>>()
     val otherUserLiveData: LiveData<DataState<User>> = _otherUserLiveData
 
-    private val _otherUserPosts = MutableLiveData<DataState<List<Post>>>()
-    val otherUserPosts: LiveData<DataState<List<Post>>> = _otherUserPosts
+    private val _otherUserPosts = MutableLiveData<DataState<List<PostItem>>>()
+    val otherUserPosts: LiveData<DataState<List<PostItem>>> = _otherUserPosts
 
-    fun getUserPhotos(uid: String) {
+    private val _likeId = MutableLiveData<DataState<String>>()
+    val likeIdToDelete : LiveData<DataState<String>> = _likeId
+
+    @ExperimentalCoroutinesApi
+    fun getPostById(uid: String) {
         _otherUserPosts.postValue(DataState.loading())
-        Log.e(TAG, "onDataChange: getUserPhotos: Loading")
-        postRepository.postDataReference.addListenerForSingleValueEvent(object :
-            ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val photos = mutableListOf<Post>()
-                for (item in snapshot.children) {
-                    val photo = item.getValue(Post::class.java)!!
-                    if (photo.uid == uid) {
-                        photos.add(photo)
-                    }
-                }
-                _otherUserPosts.postValue(DataState.success(photos))
-                Log.e(TAG, "onDataChange: getUserPhotos: Success")
-            }
+        Log.e(TAG, "getPostById: Loading", )
+        viewModelScope.launch {
+            postRepository.getPostsById(uid)
+                .zip(postRepository.getAllLikes()) { postResult, likeResult ->
 
-            override fun onCancelled(error: DatabaseError) {
-                _otherUserPosts.postValue(DataState.error(null, error.message))
-                Log.e(TAG, "onDataChange: getUserPhotos: Error")
-            }
-        })
+                    val likeByPost = likeResult.data!!.groupBy { it.post_id }
+                    val posts = postResult.data!!
+                    val postItems = posts.map { post ->
+                        PostItem(
+                            postId = post.post_id,
+                            uid = post.uid,
+                            avatarUrl = post.avatar_url,
+                            userName = post.user_name,
+                            photoUrl = post.photo_url,
+                            date = post.date_created,
+                            caption = post.caption,
+                            path = post.path,
+                            likes = likeByPost[post.post_id] ?: mutableListOf()
+                        )
+                    }
+                    postItems
+                }.catch { e ->
+                    _otherUserPosts.postValue(DataState.error(null, e.message!!))
+                    Log.e(TAG, "getPostById: Error: ${e.message}")
+                }
+                .collect {
+                    _otherUserPosts.postValue(DataState.success(it))
+                    Log.e(TAG, "getPostById: Success", )
+                }
+        }
     }
 
     fun getUserData(uid: String) {
@@ -106,6 +127,38 @@ constructor(
                 }
             })
         return searchUserResult
+    }
+
+    fun getLikeId(uid: String, postId: String){
+        _likeId.postValue(DataState.loading())
+        Log.e(TAG, "getLikeById: ", )
+        viewModelScope.launch {
+            postRepository.getLikeById(uid, postId)
+                .catch { e ->
+                    Log.e(TAG, "getLikeId: ${e.message}", )
+                }
+                .collect { result ->
+                    if (result.data!!.isNotEmpty()){
+                        _likeId.postValue(DataState.success(result.data[0].like_id))
+                        Log.e(TAG, "getLikeId: Success", )
+                    } else {
+                        _likeId.postValue(DataState.error(null, "Not found"))
+                    }
+                }
+        }
+    }
+
+    fun like(likeData: HashMap<String, Any>) {
+        postRepository.like(likeData).addOnCompleteListener {
+            if (it.isSuccessful) {
+                Log.e(TAG, "like: Success: ${likeData["like_id"]}")
+            }
+        }
+    }
+
+    fun unlike(likeId: String) {
+        Log.e(TAG, "unlike: $likeId")
+        postRepository.unlike(likeId)
     }
 
 }
