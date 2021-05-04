@@ -3,9 +3,16 @@ package com.example.instagram.repository
 import android.content.Context
 import android.net.Uri
 import com.example.instagram.DataState
-import com.example.instagram.ImageUtils
-import com.example.instagram.firebase_model.Like
-import com.example.instagram.firebase_model.Post
+import com.example.instagram.Status
+import com.example.instagram.model.LikeItem
+import com.example.instagram.model.PostItem
+import com.example.instagram.network.FirebaseSource
+import com.example.instagram.network.entity.Like
+import com.example.instagram.network.entity.LikeNetWorkMapper
+import com.example.instagram.network.entity.Post
+import com.example.instagram.network.entity.PostNetworkMapper
+import com.example.instagram.room.dao.PostDao
+import com.example.instagram.room.entity.PostCacheMapper
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.database.DataSnapshot
@@ -14,8 +21,7 @@ import com.google.firebase.database.ValueEventListener
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.channels.sendBlocking
-import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 
 
@@ -23,185 +29,223 @@ import javax.inject.Inject
  * Created by Thanh Long Nguyen on 4/14/2021
  */
 
+@ExperimentalCoroutinesApi
 class PostRepository
 @Inject
 constructor(
-    private val firebaseSource: FirebaseSource
+    private val firebaseSource: FirebaseSource,
+    private val postDao: PostDao,
+    private val postNetworkMapper: PostNetworkMapper,
+    private val postCacheMapper: PostCacheMapper,
+    private val likeNetWorkMapper: LikeNetWorkMapper
 ) {
 
-    val profileImageStorage =
-        firebaseSource.profileImageStorage
-
-//    private val dbSource = TaskCompletionSource<Unit>()
-//    private val dbTask = dbSource.task
-//
-//    private val storageSource = TaskCompletionSource<Unit>()
-//    private val storageTask = storageSource.task
-
-    private fun deletePostData(id: String) =
-        firebaseSource.postDataReference.child(id).removeValue()
-            .addOnCompleteListener {
-//            dbSource.setResult(Unit)
-            }
-
-    private fun deletePhoto(path: String) =
-        firebaseSource.photoStorage.child(path).delete()
-            .addOnCompleteListener {
-//            storageSource.setResult(Unit)
-            }
-
-
-    fun delete(id: String, photoPath: String): Task<Void> {
-        val deletePhotoDataTask = deletePostData(id)
-        val deletePhotoTask = deletePhoto(photoPath)
-        return Tasks.whenAll(deletePhotoDataTask, deletePhotoTask)
+    fun deletePost(id: String, photoPath: String): Task<Void> {
+        val deletePostDataTask = firebaseSource.postDataReference.child(id).removeValue()
+        val deletePhotoTask = firebaseSource.photoStorage.child(photoPath).delete()
+        return Tasks.whenAll(deletePostDataTask, deletePhotoTask)
     }
 
+    suspend fun uploadPhoto(context: Context, uri: Uri, path: String): Flow<DataState<String>> =
+        flow {
+            val photoUrl = firebaseSource.uploadPhoto(context, uri, path)
+            emit(DataState.success(photoUrl))
+        }.catch { e ->
+            emit(DataState.error(null, e.message))
+        }.onStart {
+            emit(DataState.loading())
+        }
 
-    suspend fun uploadPhoto(context: Context, uri: Uri, path: String): String {
-
-        val imageSize = ImageUtils.getImageSize(context, uri)
-
-        val data = if (imageSize > 1 * 1024 * 1024) {
-            ImageUtils.compress(context, uri)
-        } else
-            ImageUtils.readBytes(context, uri)!!
-
-
-        return firebaseSource.photoStorage
-            .child(path)
-            .putBytes(data)
-            .await()
-            .storage
-            .downloadUrl
-            .await()
-            .toString()
-    }
-
-    @ExperimentalCoroutinesApi
-    fun getAllPosts() = callbackFlow<DataState<List<Post>>> {
-        val postListener = object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val posts = snapshot.children
-                    .map { it.getValue(Post::class.java)!! }
-                this@callbackFlow.sendBlocking(DataState.success(posts))
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-                this@callbackFlow.sendBlocking(DataState.error(null, error.message))
+    suspend fun savePostData(
+        context: Context,
+        uri: Uri,
+        path: String,
+        postData: HashMap<String, Any>
+    ) =
+        uploadPhoto(context, uri, path).collect { photoUrlResult ->
+            if (photoUrlResult.status == Status.SUCCESS) {
+                postData["photo_url"] = photoUrlResult.data!!
+                firebaseSource.savePostData(postData)
             }
         }
 
-        postDataReference.addValueEventListener(postListener)
+    fun getFeedPostsWithLikes(): Flow<DataState<List<PostItem>>> =
+        getFeedPostsFromFirebase().combine(getLikes()) { postItems, likeItems ->
+            val likesByPost = mutableMapOf<String, MutableList<LikeItem>>()
+            likeItems.groupByTo(likesByPost) { it.postId }
+            postItems.forEach { postItem ->
+                var isliked = false
+                likesByPost[postItem.postId]?.filter { likeItem ->
+                    likeItem.uid == currentUser!!.uid && likeItem.postId == postItem.postId
+                }?.size?.let {
+                    isliked = it > 0
+                }
+                postItem.isLiked = isliked
+                postItem.likes = likesByPost[postItem.postId] ?: mutableListOf()
+                postItem.likeCount = likesByPost[postItem.postId]?.size?.toLong() ?: 0
+            }
+
+            val postCache = postItems.map {
+                postCacheMapper.fromModel(it)
+            }.takeLast(3)
+            postCache.forEach {
+                it.isFeedPost = true
+            }
+            postDao.insertFeedPosts(postCache)
+            return@combine DataState.success(postItems)
+        }.catch { e ->
+            emit(DataState.error(null, e.message!!))
+        }.onStart {
+            emit(DataState.loading())
+            emit(getFeedPostsFromCache())
+        }
+
+    fun getPostsByUserWithLikes(uid: String): Flow<DataState<List<PostItem>>> =
+        getPostsByUserFromFirebase(uid).combine(getLikes()) { postItems, likeItems ->
+            val likesByPost = mutableMapOf<String, MutableList<LikeItem>>()
+            likeItems.groupByTo(likesByPost) { it.postId }
+            postItems.forEach { postItem ->
+                var isLiked = false
+                likesByPost[postItem.postId]?.filter { likeItem ->
+                    likeItem.uid == currentUser!!.uid && likeItem.postId == postItem.postId
+                }?.size?.let {
+                    isLiked = it > 0
+                }
+                postItem.isLiked = isLiked
+                postItem.likes = likesByPost[postItem.postId] ?: mutableListOf()
+                postItem.likeCount = likesByPost[postItem.postId]?.size?.toLong() ?: 0
+            }
+
+            val postCache = postItems.map {
+                postCacheMapper.fromModel(it)
+            }
+
+            postCache.forEach {
+                it.isFeedPost = false
+            }
+            postDao.insertPosts(postCache)
+
+            return@combine DataState.success(postItems)
+        }.catch { e ->
+            emit(DataState.error(null, e.message!!))
+        }.onStart {
+            emit(DataState.loading())
+            emit(getPostsByIdFromCache(uid))
+        }
+
+    private suspend fun getFeedPostsFromCache() =
+        postDao.getFeedPosts()?.let { feedPosts ->
+            DataState.success(feedPosts.map { postCacheMapper.fromEntity(it) })
+        } ?: DataState.error(null, "getFeedPostsFromCache: Error")
+
+    private fun getFeedPostsFromFirebase() = callbackFlow<List<PostItem>> {
+        val postListener = object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val networkPosts = snapshot.children
+                    .map { it.getValue(Post::class.java)!! }
+                    .filter { it.uid != currentUser!!.uid }
+                val postItems = networkPosts.map { postNetworkMapper.fromEntity(it) }
+                this@callbackFlow.sendBlocking(postItems)
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                this@callbackFlow.sendBlocking(listOf())
+            }
+        }
+
+        postDataReference.addListenerForSingleValueEvent(postListener)
 
         awaitClose {
             postDataReference.removeEventListener(postListener)
         }
     }
 
-    @ExperimentalCoroutinesApi
-    fun getPostsById(uid: String) = callbackFlow<DataState<List<Post>>> {
+    private suspend fun getPostsByIdFromCache(uid: String) =
+        postDao.getPostsBy(uid)?.let { posts ->
+            DataState.success(posts.map { postCacheMapper.fromEntity(it) })
+        } ?: DataState.error(null, "getPostsByIdFromCache: Error")
+
+    private fun getPostsByUserFromFirebase(uid: String) = callbackFlow<List<PostItem>> {
         val postListener = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                val posts = snapshot.children
-                    .map { it.getValue(Post::class.java)!! }
+                val networkPosts = snapshot.children
+                    .mapNotNull { it.getValue(Post::class.java)!! }
                     .filter { it.uid == uid }
-                this@callbackFlow.sendBlocking(DataState.success(posts))
+                val postItems = networkPosts.map { postNetworkMapper.fromEntity(it) }
+                this@callbackFlow.sendBlocking(postItems)
             }
 
             override fun onCancelled(error: DatabaseError) {
-                this@callbackFlow.sendBlocking(DataState.error(null, error.message))
+                this@callbackFlow.sendBlocking(listOf())
             }
         }
 
-        postDataReference.addValueEventListener(postListener)
+        if (uid == currentUser!!.uid) {
+            postDataReference.addValueEventListener(postListener)
+        } else {
+            postDataReference.addListenerForSingleValueEvent(postListener)
+        }
 
         awaitClose {
             postDataReference.removeEventListener(postListener)
         }
     }
 
-    @ExperimentalCoroutinesApi
-    fun getAllLikes() = callbackFlow<DataState<List<Like>>> {
+    private fun getLikes() = callbackFlow<List<LikeItem>> {
         val likeListener = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                val likes = snapshot.children.map {
+                val networkLikes = snapshot.children.mapNotNull {
                     it.getValue(Like::class.java)
                 }
-                this@callbackFlow.sendBlocking(DataState.success(likes.filterNotNull()))
+                val likeItems = networkLikes.map { likeNetWorkMapper.fromEntity(it) }
+                this@callbackFlow.sendBlocking(likeItems)
             }
 
             override fun onCancelled(error: DatabaseError) {
-                this@callbackFlow.sendBlocking(DataState.error(null, error.message))
+                this@callbackFlow.sendBlocking(listOf())
             }
         }
-
         likeDataReference.addListenerForSingleValueEvent(likeListener)
-
         awaitClose {
             likeDataReference.removeEventListener(likeListener)
         }
 
     }
 
-    @ExperimentalCoroutinesApi
-    fun getLikeById(uid: String, postId: String) = callbackFlow<DataState<List<Like>>> {
+    suspend fun like(likeData: HashMap<String, Any>) {
+        firebaseSource.like(likeData)
+    }
+
+    suspend fun unlike(uid: String, postId: String) {
+        getLikeById(uid, postId).collect {
+            it?.let { likeItem -> firebaseSource.unlike(likeItem.likeId) }
+        }
+    }
+
+    private fun getLikeById(uid: String, postId: String) = callbackFlow<LikeItem?> {
         val likeListener = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                val likes = snapshot.children.map {
+                val networkLike = snapshot.children.mapNotNull {
                     it.getValue(Like::class.java)
-                }
-                this@callbackFlow.sendBlocking(DataState.success(likes.filterNotNull().filter {
-                    it.uid == uid && it.post_id == postId
-                }))
+                }.first { it.uid == uid && it.post_id == postId }
+                val likeItem = likeNetWorkMapper.fromEntity(networkLike)
+                this@callbackFlow.sendBlocking(likeItem)
             }
 
             override fun onCancelled(error: DatabaseError) {
-                this@callbackFlow.sendBlocking(DataState.error(null, error.message))
+                this@callbackFlow.sendBlocking(null)
             }
         }
-
         likeDataReference.addListenerForSingleValueEvent(likeListener)
-
         awaitClose {
             likeDataReference.removeEventListener(likeListener)
         }
-
     }
 
-
-    val photosStorage =
-        firebaseSource.photoStorage
-
-    fun generatePostId() =
-        firebaseSource.generatePostId()
-
-    fun savePostData(id: String, data: HashMap<String, Any>) =
-        firebaseSource.savePostData(id, data)
-
-    fun generateStoryId() =
-        firebaseSource.generateStoryId()
-
-    fun saveStoryData(storyId: String, storyData: HashMap<String, Any>) =
-        firebaseSource.saveStoryData(storyId, storyData)
-
-    fun generateLikeId() =
-        firebaseSource.generateLikeId()
-
-    fun like(likeData: HashMap<String, Any>): Task<Void> {
-        return firebaseSource.like(likeData)
-    }
-
-    fun unlike(likeId: String): Task<Void> {
-        return firebaseSource.unlike(likeId)
-    }
-
-    val postDataReference =
+    private val postDataReference =
         firebaseSource.postDataReference
 
-    val storyDataReference =
-        firebaseSource.storyDataReference
-    val likeDataReference =
+    private val likeDataReference =
         firebaseSource.likeDataReference
 
     val currentUser

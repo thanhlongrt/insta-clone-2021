@@ -1,12 +1,25 @@
 package com.example.instagram.di
 
-import com.example.instagram.repository.FirebaseSource
+import com.example.instagram.network.FirebaseSource
+import com.example.instagram.network.entity.LikeNetWorkMapper
+import com.example.instagram.network.entity.PostNetworkMapper
+import com.example.instagram.network.entity.StoryNetworkMapper
+import com.example.instagram.network.entity.UserNetworkMapper
 import com.example.instagram.repository.PostRepository
+import com.example.instagram.repository.StoryRepository
 import com.example.instagram.repository.UserRepository
+import com.example.instagram.room.dao.PostDao
+import com.example.instagram.room.dao.StoryDao
+import com.example.instagram.room.dao.StringKeyValueDao
+import com.example.instagram.room.dao.UserDao
+import com.example.instagram.room.entity.PostCacheMapper
+import com.example.instagram.room.entity.UserCacheMapper
+import com.example.instagram.room.entity.UserStoryCacheMapper
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import javax.inject.Singleton
 
 /**
@@ -14,6 +27,7 @@ import javax.inject.Singleton
  */
 
 
+@ExperimentalCoroutinesApi
 @Module
 @InstallIn(SingletonComponent::class)
 object RepositoryModule {
@@ -21,17 +35,52 @@ object RepositoryModule {
     @Singleton
     @Provides
     fun provideUserRepository(
-        firebaseSource: FirebaseSource
+        firebaseSource: FirebaseSource,
+        stringKeyValueDao: StringKeyValueDao,
+        userDao: UserDao,
+        userNetworkMapper: UserNetworkMapper,
+        userCacheMapper: UserCacheMapper
     ): UserRepository {
-        return UserRepository(firebaseSource)
+        return UserRepository(
+            firebaseSource,
+            stringKeyValueDao,
+            userDao,
+            userNetworkMapper,
+            userCacheMapper
+        )
     }
 
     @Singleton
     @Provides
-    fun providePhotoRepository(
-        firebaseSource: FirebaseSource
+    fun providePostRepository(
+        firebaseSource: FirebaseSource,
+        postDao: PostDao,
+        postNetworkMapper: PostNetworkMapper,
+        postCacheMapper: PostCacheMapper,
+        likeNetWorkMapper: LikeNetWorkMapper
     ): PostRepository {
-        return PostRepository(firebaseSource)
+        return PostRepository(
+            firebaseSource,
+            postDao,
+            postNetworkMapper,
+            postCacheMapper,
+            likeNetWorkMapper
+        )
     }
 
+    @Singleton
+    @Provides
+    fun provideStoryRepository(
+        firebaseSource: FirebaseSource,
+        storyNetworkMapper: StoryNetworkMapper,
+        storyDao: StoryDao,
+        userStoryCacheMapper: UserStoryCacheMapper,
+    ): StoryRepository {
+        return StoryRepository(
+            firebaseSource,
+            storyNetworkMapper,
+            storyDao,
+            userStoryCacheMapper
+        )
+    }
 }

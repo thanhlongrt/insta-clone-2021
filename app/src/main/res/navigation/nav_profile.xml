@@ -16,8 +16,7 @@
         <action
             android:id="@+id/action_profileFragment_to_userPostsFragment"
             app:destination="@id/userPostsFragment"
-            app:enterAnim="@anim/slide_in_right"
-            />
+            app:enterAnim="@anim/slide_in_right" />
         <action
             android:id="@+id/action_profileFragment_to_createBottomSheetFragment"
             app:destination="@id/createBottomSheetFragment" />
@@ -29,7 +28,7 @@
         tools:layout="@layout/fragment_edit_profile" />
     <fragment
         android:id="@+id/createNewPostFragment"
-        android:name="com.example.instagram.ui.profile.create_new.CreateNewPostFragment"
+        android:name="com.example.instagram.ui.create.CreateNewPostFragment"
         android:label="NewPostFragment"
         tools:layout="@layout/fragment_create_new_post">
         <action
@@ -40,7 +39,7 @@
     </fragment>
     <fragment
         android:id="@+id/previewImageFragment"
-        android:name="com.example.instagram.ui.profile.create_new.PreviewPhotoFragment"
+        android:name="com.example.instagram.ui.create.PreviewPhotoFragment"
         android:label="PreviewImageFragment"
         tools:layout="@layout/fragment_preview_photo">
         <action
@@ -48,31 +47,45 @@
             app:destination="@id/createNewPostFragment" />
     </fragment>
     <fragment
-        tools:layout="@layout/fragment_post_grid_list"
         android:id="@+id/userPhotoFragment"
-        android:name="com.example.instagram.ui.profile.user_post.PostGridListFragment"
-        android:label="UserPhotoFragment" />
+        android:name="com.example.instagram.ui.profile.PostGridListFragment"
+        android:label="UserPhotoFragment"
+        tools:layout="@layout/fragment_post_grid_list" />
     <fragment
-        tools:layout="@layout/fragment_post_list"
         android:id="@+id/userPostsFragment"
-        android:name="com.example.instagram.ui.profile.user_post.PostListFragment"
-        android:label="UserPostsFragment" >
+        android:name="com.example.instagram.ui.profile.PostListFragment"
+        android:label="UserPostsFragment"
+        tools:layout="@layout/fragment_post_list">
         <action
             android:id="@+id/action_userPostsFragment_to_postBottomSheetFragment"
             app:destination="@id/postBottomSheetFragment" />
     </fragment>
     <dialog
-        tools:layout="@layout/fragment_post_bottom_sheet"
         android:id="@+id/postBottomSheetFragment"
-        android:name="com.example.instagram.ui.profile.user_post.PostBottomSheetFragment"
-        android:label="PostBottomSheetFragment" />
+        android:name="com.example.instagram.ui.profile.PostBottomSheetFragment"
+        android:label="PostBottomSheetFragment"
+        tools:layout="@layout/fragment_post_bottom_sheet" />
     <dialog
-        tools:layout="@layout/fragment_create_new_bottom_sheet"
         android:id="@+id/createBottomSheetFragment"
-        android:name="com.example.instagram.ui.profile.create_new.CreateNewBottomSheetFragment"
-        android:label="CreateBottomSheetFragment" >
+        android:name="com.example.instagram.ui.create.CreateBottomSheetFragment"
+        android:label="CreateBottomSheetFragment"
+        tools:layout="@layout/fragment_create_new_bottom_sheet">
         <action
             android:id="@+id/action_createBottomSheetFragment_to_previewImageFragment"
             app:destination="@id/previewImageFragment" />
+        <action
+            android:id="@+id/action_createBottomSheetFragment_to_addNewStoryFragment"
+            app:destination="@id/addNewStoryFragment" />
     </dialog>
+    <fragment
+        android:id="@+id/addNewStoryFragment"
+        android:name="com.example.instagram.ui.create.AddNewStoryFragment"
+        android:label="AddNewStoryFragment"
+        tools:layout="@layout/fragment_add_new_story">
+        <action
+            android:id="@+id/action_addNewStoryFragment_to_profileFragment"
+            app:destination="@id/profileFragment"
+            app:popUpTo="@id/profileFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
 </navigation>

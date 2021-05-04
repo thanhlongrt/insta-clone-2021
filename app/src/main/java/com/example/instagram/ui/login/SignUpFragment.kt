@@ -18,11 +18,13 @@ import com.example.instagram.databinding.FragmentSignUpBinding
 import com.example.instagram.ui.MainActivity
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 /**
  * Created by Thanh Long Nguyen on 4/12/2021
  */
 
+@ExperimentalCoroutinesApi
 @AndroidEntryPoint
 class SignUpFragment : Fragment() {
 

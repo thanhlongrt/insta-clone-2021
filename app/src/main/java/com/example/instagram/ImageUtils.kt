@@ -32,7 +32,7 @@ object ImageUtils {
 
         val baos = ByteArrayOutputStream()
 
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 25, baos)
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 50, baos)
 
         return baos.toByteArray()
 

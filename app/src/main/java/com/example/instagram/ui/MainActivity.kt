@@ -18,10 +18,11 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import com.example.instagram.R
 import com.example.instagram.databinding.ActivityMainBinding
 import com.example.instagram.setupWithNavController
-import com.example.instagram.ui.profile.ProfileViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
+@ExperimentalCoroutinesApi
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
@@ -33,22 +34,21 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
 
-    private val profileViewModel: ProfileViewModel by viewModels()
+    private val mainViewModel: MainViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+//        mainViewModel.getCurrentUserData()
+        mainViewModel.getCurrentUser()
+
         setSupportActionBar(binding.toolBar)
 
         if (savedInstanceState == null) {
             setupBottomNavigationBar()
         }
-
-
-//        Log.e(TAG, "onCreate: screen width: ${ImageUtils.getScreenWidth(this)}")
-//        Log.e(TAG, "onCreate: screen height: ${ImageUtils.getScreenHeight(this)}")
 
     }
 

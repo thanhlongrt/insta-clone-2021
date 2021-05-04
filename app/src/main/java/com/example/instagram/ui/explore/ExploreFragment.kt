@@ -1,7 +1,6 @@
 package com.example.instagram.ui.explore
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,7 +10,7 @@ import androidx.fragment.app.viewModels
 import com.example.instagram.R
 import com.example.instagram.Status.*
 import com.example.instagram.databinding.FragmentExploreBinding
-import com.example.instagram.ui.profile.user_post.PostGridListAdapter
+import com.example.instagram.ui.profile.PostGridListAdapter
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
@@ -36,10 +35,6 @@ class ExploreFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         exploreViewModel.getAllPosts()
-    }
-    override fun onStart() {
-        super.onStart()
-
     }
 
     override fun onCreateView(
@@ -70,7 +65,7 @@ class ExploreFragment : Fragment() {
 //        adapter = PostGridListAdapter(mutableListOf())
 
 
-        exploreViewModel.postsLiveData.observe(viewLifecycleOwner) {
+        exploreViewModel.feedPosts.observe(viewLifecycleOwner) {
             when (it.status) {
                 SUCCESS -> {
                     displayProgressBar(false)

@@ -19,15 +19,13 @@ import com.example.instagram.Status.*
 import com.example.instagram.databinding.FragmentStoryBinding
 import com.example.instagram.getFragmentNavController
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 
 /**
  * Created by Thanh Long Nguyen on 4/27/2021
  */
 
+@ExperimentalCoroutinesApi
 @AndroidEntryPoint
 class StoryFragment : Fragment() {
     companion object {
@@ -62,18 +60,17 @@ class StoryFragment : Fragment() {
 
         val screenWidth = ImageUtils.getScreenWidth(requireActivity())
 
-        homeViewModel.storiesLiveData.observe(requireActivity()) {
+        homeViewModel.stories.observe(requireActivity()) {
             when (it.status) {
                 SUCCESS -> {
                     val userStory = it.data!![position!!]
 
                     for (story in userStory.stories) {
                         Glide.with(view.context)
-                            .load(story.photo_url)
+                            .load(story.photoUrl)
                             .preload()
                     }
 
-                    var index = 0
                     val progressBarList = ArrayList<ProgressBar>()
 
                     val numberOfStories = userStory.stories.size
@@ -83,14 +80,14 @@ class StoryFragment : Fragment() {
                         withContext(Dispatchers.Main) {
                             for (i in 0 until numberOfStories) {
                                 Glide.with(view.context)
-                                    .load(userStory.stories[i].photo_url)
+                                    .load(userStory.stories[i].photoUrl)
                                     .into(binding?.imageView!!)
                                 while (progressBarList[i].progress < STORY_DURATION) {
                                     delay(1)
                                     progressBarList[i].incrementProgressBy(1)
                                 }
 
-                                if (i == numberOfStories - 1 && progressBarList[i].progress == STORY_DURATION){
+                                if (i == numberOfStories - 1 && progressBarList[i].progress == STORY_DURATION) {
                                     getFragmentNavController(R.id.nav_host_fragment)?.navigateUp()
                                 }
 

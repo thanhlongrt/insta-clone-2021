@@ -8,15 +8,13 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.instagram.DataState
-import com.example.instagram.firebase_model.User
+import com.example.instagram.model.PostItem
 import com.example.instagram.repository.PostRepository
 import com.example.instagram.repository.UserRepository
-import com.example.instagram.ui.profile.create_new.PostViewModel
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.ValueEventListener
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -24,6 +22,7 @@ import javax.inject.Inject
  * Created by Thanh Long Nguyen on 4/13/2021
  */
 
+@ExperimentalCoroutinesApi
 @HiltViewModel
 class ProfileViewModel
 @Inject
@@ -38,69 +37,64 @@ constructor(
 
     }
 
-    private val _userLivaData = MutableLiveData<DataState<User>>()
-    val userLiveData: LiveData<DataState<User>> = _userLivaData
-
     private val _saveUserDataResult = MutableLiveData<DataState<Boolean>>()
     val saveUserDataResult: LiveData<DataState<Boolean>> = _saveUserDataResult
 
     private val _uploadResult = MutableLiveData<DataState<String>>()
     val uploadResult: LiveData<DataState<String>> = _uploadResult
 
+    private val _userPosts = MutableLiveData<DataState<List<PostItem>>>()
+    val userPosts: LiveData<DataState<List<PostItem>>> get() = _userPosts
+
+    private val _likeId = MutableLiveData<DataState<String>>()
+    val likeIdToDelete: LiveData<DataState<String>> get() = _likeId
+
+    val currentUserUid = postRepository.currentUser!!.uid
+
     fun logout() {
         userRepository.logout()
     }
 
-    fun getCurrentUserData() {
-        Log.e(TAG, "getCurrentUserData: Loading", )
-        userRepository.userDataReference(userRepository.currentFirebaseUser?.uid!!)
-            .addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    val user = snapshot.getValue(User::class.java)!!
-                    _userLivaData.postValue(DataState.success(user))
-                    Log.e(TAG, "onDataChange: getCurrentUserData: Success")
-                    Log.e(TAG, "onDataChange: getCurrentUserData: ${user.uid}", )
-                }
-
-                override fun onCancelled(error: DatabaseError) {
-                    _userLivaData.postValue(DataState.error(null, error.message))
-                    Log.e(TAG, "onCancelled: getCurrentUserData: Error")
-                }
-            })
-    }
-
-    fun saveUserData(userData: HashMap<String, Any>) {
-        _saveUserDataResult.postValue(DataState.loading())
-        Log.e(TAG, "saveUserData: Loading...")
-
-        val uid = userRepository.currentFirebaseUser!!.uid
-
-        userRepository.saveUserData(uid, userData).addOnCompleteListener {
-            if (it.isSuccessful) {
-                _saveUserDataResult.postValue(DataState.success(true))
-                Log.e(TAG, "saveUserData: Success")
-            } else {
-                _saveUserDataResult.postValue(DataState.error(false, it.exception?.message!!))
-                Log.e(TAG, "saveUserData: Error")
+    fun updateUserData(userData: HashMap<String, Any>) {
+        viewModelScope.launch {
+            userRepository.updateUserData(userData).collect {
+                _saveUserDataResult.value = it
+                Log.e(TAG, "updateUserData: ${it.status}")
             }
         }
     }
 
     fun upload(photoUri: Uri, path: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            Log.e(TAG, "upload: Loading...")
-            _uploadResult.postValue(DataState.loading())
-            try {
-                val url = postRepository.uploadPhoto(getApplication(), photoUri, path)
-                Log.e(TAG, "upload: Success")
-                Log.e(TAG, "upload: url: $url")
-                _uploadResult.postValue(DataState.success(url))
-            } catch (e: Exception) {
-                Log.e(PostViewModel.TAG, "upload: Error: ${e.message.toString()}")
-                _uploadResult.postValue(DataState.error(null, e.message.toString()))
+            postRepository.uploadPhoto(getApplication(), photoUri, path).collect {
+                _uploadResult.postValue(it)
+                Log.e(TAG, "upload: ${it.status}")
             }
         }
     }
 
+    fun getPostById(uid: String) {
+        viewModelScope.launch {
+            postRepository.getPostsByUserWithLikes(uid)
+                .collect {
+                    _userPosts.value = it
+                    Log.e(TAG, "getPostById: ${it.status}")
+                }
+        }
+    }
+
+    fun like(likeData: HashMap<String, Any>) {
+        Log.e(TAG, "like:")
+        viewModelScope.launch(Dispatchers.IO) {
+            postRepository.like(likeData)
+        }
+    }
+
+    fun unlike(uid: String, postId: String) {
+        Log.e(TAG, "unlike:")
+        viewModelScope.launch(Dispatchers.IO) {
+            postRepository.unlike(uid, postId)
+        }
+    }
 
 }

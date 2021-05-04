@@ -1,6 +1,5 @@
 package com.example.instagram.ui.profile
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.*
@@ -11,15 +10,17 @@ import com.bumptech.glide.Glide
 import com.example.instagram.R
 import com.example.instagram.Status
 import com.example.instagram.databinding.FragmentProfileBinding
+import com.example.instagram.ui.MainViewModel
 import com.example.instagram.ui.login.LoginActivity
-import com.example.instagram.ui.profile.user_post.PostGridListFragment
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 /**
  * Created by Thanh Long Nguyen on 4/12/2021
  */
 
+@ExperimentalCoroutinesApi
 @AndroidEntryPoint
 class ProfileFragment : Fragment() {
     companion object {
@@ -30,14 +31,12 @@ class ProfileFragment : Fragment() {
 
     private val profileViewModel: ProfileViewModel by activityViewModels()
 
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        profileViewModel.getCurrentUserData()
-    }
+    private val mainViewModel: MainViewModel by activityViewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
+        profileViewModel.getPostById(profileViewModel.currentUserUid)
     }
 
     override fun onCreateView(
@@ -71,7 +70,7 @@ class ProfileFragment : Fragment() {
             PostGridListFragment.newInstance(PostGridListFragment.UPLOADED_PHOTOS_FRAGMENT),
             PostGridListFragment.newInstance(PostGridListFragment.TAGGED_PHOTOS_FRAGMENT),
         )
-        binding?.viewPager2?.adapter = ProfileViewPagerAdapter(this, fragments)
+        binding?.viewPager2?.adapter = ViewPagerAdapter(this, fragments)
         TabLayoutMediator(binding?.tabLayout!!, binding?.viewPager2!!) { tab, position ->
             when (position) {
                 0 -> {
@@ -85,37 +84,39 @@ class ProfileFragment : Fragment() {
     }
 
     private fun configObservers(view: View) {
-        profileViewModel.saveUserDataResult.observe(requireActivity(), {
-            when (it.status) {
-                Status.SUCCESS -> {
-                    profileViewModel.getCurrentUserData()
-                }
-            }
-        })
+//        profileViewModel.saveUserDataResult.observe(requireActivity(), {
+//            when (it.status) {
+//                Status.SUCCESS -> {
+//                    mainViewModel.getCurrentUser()
+//                }
+//            }
+//        })
 
-        profileViewModel.userLiveData.observe(requireActivity(), {
+        mainViewModel.userLiveData.observe(requireActivity(), {
             when (it.status) {
                 Status.SUCCESS -> {
                     val user = it.data!!
-                    if (user.profile_photo != "") {
+                    if (user.avatarUrl != "") {
                         binding?.circleImageView?.let { it1 ->
                             Glide.with(view.context)
-                                .load(user.profile_photo)
+                                .load(user.avatarUrl)
                                 .into(it1)
                         }
                     }
-
-                    binding?.displayNameTextView?.text = user.display_name
+                    binding?.displayNameTextView?.text = user.displayName
                     binding?.bioTextView?.text = user.bio
                     binding?.websiteTextView?.text = user.website
-                    binding?.postTextView?.text = user.posts.toString()
-                    binding?.followersTextView?.text = user.followers.toString()
-                    binding?.followingTextView?.text = user.following.toString()
-
-
                 }
             }
         })
+
+        profileViewModel.userPosts.observe(requireActivity()) {
+            when(it.status){
+                Status.SUCCESS -> {
+                    binding?.postCount?.text = it.data!!.size.toString()
+                }
+            }
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -133,8 +134,6 @@ class ProfileFragment : Fragment() {
             R.id.action_add -> {
 
                 findNavController().navigate(R.id.action_profileFragment_to_createBottomSheetFragment)
-
-//                getMedia.launch(Unit)
                 true
             }
 
@@ -143,18 +142,6 @@ class ProfileFragment : Fragment() {
             }
         }
     }
-
-//    private val getMedia =
-//        registerForActivityResult(TakePhotoFromCameraOrGallery()) { uri ->
-//            Log.e(TAG, "getMedia: uri: $uri")
-//            uri?.let {
-//                val bundle = bundleOf("uri" to it)
-//                findNavController().navigate(
-//                    R.id.action_profileFragment_to_previewImageFragment,
-//                    bundle
-//                )
-//            }
-//        }
 
     private fun logout() {
         profileViewModel.logout()

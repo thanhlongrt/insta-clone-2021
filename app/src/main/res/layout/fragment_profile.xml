@@ -54,35 +54,38 @@
         app:layout_constraintStart_toEndOf="@+id/circleImageView" />
 
     <TextView
-        android:id="@+id/postTextView"
+        android:id="@+id/postCount"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:text="0"
         android:textColor="@color/black"
-        android:textSize="20sp"
+        android:textSize="18sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@+id/posts"
         app:layout_constraintEnd_toEndOf="@+id/posts"
         app:layout_constraintStart_toStartOf="@+id/posts" />
 
     <TextView
-        android:id="@+id/followersTextView"
+        android:id="@+id/followerCount"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:text="0"
         android:textColor="@color/black"
-        android:textSize="20sp"
+        android:textSize="18sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@+id/postTextView"
+        app:layout_constraintBottom_toBottomOf="@+id/postCount"
         app:layout_constraintEnd_toEndOf="@+id/followers"
         app:layout_constraintStart_toStartOf="@+id/followers" />
 
     <TextView
-        android:id="@+id/followingTextView"
+        android:id="@+id/followingCount"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:text="0"
         android:textColor="@color/black"
-        android:textSize="20sp"
+        android:textSize="18sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@+id/postTextView"
+        app:layout_constraintBottom_toBottomOf="@+id/postCount"
         app:layout_constraintEnd_toEndOf="@+id/following"
         app:layout_constraintStart_toStartOf="@+id/following" />
 
