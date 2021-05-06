@@ -7,6 +7,7 @@ import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ServerValue
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
@@ -60,35 +61,37 @@ constructor(
     }
 
     fun savePostData(postData: HashMap<String, Any>): Task<Void> {
-        val postId = firebaseDatabase.reference.child("Posts").push().key!!
+        val postId = postDataReference.push().key!!
         postData["post_id"] = postId
-        return firebaseDatabase.reference.child("Posts")
+        return postDataReference
             .child(postId)
             .updateChildren(postData)
     }
 
     fun saveStoryData(storyData: HashMap<String, Any>): Task<Void> {
-        val storyId = firebaseDatabase.reference.child("Stories").push().key!!
+        val storyId = storyDataReference.push().key!!
         storyData["story_id"] = storyId
-        return firebaseDatabase.reference.child("Stories")
+        return storyDataReference
             .child(storyId)
             .updateChildren(storyData)
     }
 
-    fun like(likeData: HashMap<String, Any>): Task<Void> {
-        val id = firebaseDatabase.reference.child("Likes").push().key!!
-        likeData["like_id"] = id
-        return firebaseDatabase.reference.child("Likes")
-            .child(id)
-            .updateChildren(likeData)
-    }
+    fun saveCommentData(commentData: HashMap<String, Any>) {
+        val commentId =
+            firebaseDatabase.reference
+                .child("Comments")
+                .child(commentData["postId"].toString())
+                .push().key!!
+        commentData["comment_id"] = commentId
+        commentDataReference
+            .child(commentData["post_id"].toString())
+            .child(commentId)
+            .updateChildren(commentData)
 
-    fun unlike(likeId: String): Task<Void> {
-        return firebaseDatabase.reference.child("Likes")
-            .child(likeId)
-            .removeValue()
+//        postDataReference.child(commentData["post_id"].toString())
+//            .child("comment_count")
+//            .setValue(ServerValue.increment(1))
     }
-
 
     val currentFirebaseUser: FirebaseUser? get() = firebaseAuth.currentUser
 
@@ -98,7 +101,6 @@ constructor(
     val storyDataReference =
         firebaseDatabase.reference.child("Stories")
 
-    val likeDataReference =
-        firebaseDatabase.reference.child("Likes")
-
+    val commentDataReference =
+        firebaseDatabase.reference.child("Comments")
 }

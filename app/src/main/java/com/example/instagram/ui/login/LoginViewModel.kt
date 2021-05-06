@@ -141,12 +141,10 @@ constructor(
         }
     }
 
-    // A placeholder username validation check
     private fun isEmailValid(email: String): Boolean {
         return Patterns.EMAIL_ADDRESS.matcher(email).matches()
     }
 
-    // A placeholder password validation check
     private fun isPasswordValid(password: String): Boolean {
         return !TextUtils.isEmpty(password)
     }

@@ -9,7 +9,7 @@ import javax.inject.Inject
  * Created by Thanh Long Nguyen on 5/3/2021
  */
 @Entity(tableName = "users", primaryKeys = ["uid"])
-class UserCache(
+data class UserCache(
     val uid: String = "",
     val email: String = "",
     val username: String = "",

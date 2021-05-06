@@ -2,7 +2,6 @@ package com.example.instagram.di
 
 import android.content.Context
 import androidx.room.Room
-import com.example.instagram.room.MyTypeConverters
 import com.example.instagram.room.dao.PostDao
 import com.example.instagram.room.dao.StoryDao
 import com.example.instagram.room.dao.StringKeyValueDao

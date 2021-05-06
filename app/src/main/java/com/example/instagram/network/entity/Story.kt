@@ -7,7 +7,7 @@ import javax.inject.Inject
 /**
  * Created by Thanh Long Nguyen on 4/19/2021
  */
-class Story(
+data class Story(
     val uid: String = "",
     val username: String = "",
     val story_id: String = "",

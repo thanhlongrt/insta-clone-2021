@@ -10,7 +10,6 @@ import com.example.instagram.model.PostItem
 import com.example.instagram.model.UserStoryItem
 import com.example.instagram.repository.PostRepository
 import com.example.instagram.repository.StoryRepository
-import com.google.firebase.database.ValueEventListener
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -55,7 +54,7 @@ constructor(
 
     fun getAllPosts() {
         viewModelScope.launch {
-            postRepository.getFeedPostsWithLikes()
+            postRepository.getFeedPosts()
                 .collect {
                     _feedPosts.value = it
                     Log.e(TAG, "getAllPosts: ${it.status}")
@@ -63,17 +62,10 @@ constructor(
         }
     }
 
-    fun like(likeData: HashMap<String, Any>) {
-        Log.e(TAG, "like: ${likeData["like_id"]}")
+    fun clickLike(postId: String) {
+        Log.e(TAG, "like: ")
         viewModelScope.launch(Dispatchers.IO) {
-            postRepository.like(likeData)
-        }
-    }
-
-    fun unlike(uid: String, postId: String) {
-        Log.e(TAG, "unlike:")
-        viewModelScope.launch(Dispatchers.IO) {
-            postRepository.unlike(uid, postId)
+            postRepository.onLikeClick(postId)
         }
     }
 }

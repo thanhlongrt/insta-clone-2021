@@ -46,9 +46,6 @@ constructor(
     private val _userPosts = MutableLiveData<DataState<List<PostItem>>>()
     val userPosts: LiveData<DataState<List<PostItem>>> get() = _userPosts
 
-    private val _likeId = MutableLiveData<DataState<String>>()
-    val likeIdToDelete: LiveData<DataState<String>> get() = _likeId
-
     val currentUserUid = postRepository.currentUser!!.uid
 
     fun logout() {
@@ -73,9 +70,9 @@ constructor(
         }
     }
 
-    fun getPostById(uid: String) {
+    fun getPostByUser(uid: String) {
         viewModelScope.launch {
-            postRepository.getPostsByUserWithLikes(uid)
+            postRepository.getPostsByUser(uid)
                 .collect {
                     _userPosts.value = it
                     Log.e(TAG, "getPostById: ${it.status}")
@@ -83,17 +80,10 @@ constructor(
         }
     }
 
-    fun like(likeData: HashMap<String, Any>) {
-        Log.e(TAG, "like:")
+    fun clickLike(postId: String) {
+        Log.e(TAG, "like: ")
         viewModelScope.launch(Dispatchers.IO) {
-            postRepository.like(likeData)
-        }
-    }
-
-    fun unlike(uid: String, postId: String) {
-        Log.e(TAG, "unlike:")
-        viewModelScope.launch(Dispatchers.IO) {
-            postRepository.unlike(uid, postId)
+            postRepository.onLikeClick(postId)
         }
     }
 

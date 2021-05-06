@@ -14,10 +14,18 @@
             android:id="@+id/action_homeFragment_to_storyFragment"
             app:destination="@id/storyFragment"
             app:enterAnim="@anim/slide_in_right"/>
+        <action
+            android:id="@+id/action_homeFragment_to_commentFragment"
+            app:destination="@id/commentFragment" />
     </fragment>
     <fragment
         tools:layout="@layout/fragment_story"
         android:id="@+id/storyFragment"
         android:name="com.example.instagram.ui.home.StoryFragment"
         android:label="StoryFragment" />
+    <fragment
+        tools:layout="@layout/fragment_comment"
+        android:id="@+id/commentFragment"
+        android:name="com.example.instagram.ui.comment.CommentFragment"
+        android:label="CommentFragment" />
 </navigation>

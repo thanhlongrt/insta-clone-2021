@@ -118,6 +118,9 @@ class MainActivity : AppCompatActivity() {
                     binding.searchView.visibility = View.GONE
                 }
 
+                binding.bottomNavView.visibility =
+                    if (destination.id == R.id.commentFragment) View.GONE else View.VISIBLE
+                
             }
         })
         currentNavigationController = controller

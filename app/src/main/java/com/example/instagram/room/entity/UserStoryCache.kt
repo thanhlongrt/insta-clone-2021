@@ -12,7 +12,7 @@ import javax.inject.Inject
  */
 
 @Entity(tableName = "user_stories", primaryKeys = ["uid"])
-class UserStoryCache(
+data class UserStoryCache(
     val uid: String = "",
     val username: String = "",
     val avatarUrl: String = "",

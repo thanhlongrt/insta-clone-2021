@@ -1,12 +1,10 @@
 package com.example.instagram.ui.profile
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.instagram.databinding.ItemPostBinding
-import com.example.instagram.model.LikeItem
 import com.example.instagram.model.PostItem
 
 /**
@@ -23,7 +21,7 @@ class PostListAdapter(
     var onAvatarClick: ((PostItem) -> Unit)? = null
     var onOptionClick: ((PostItem) -> Unit)? = null
     var onLikeClick: ((Int, PostItem) -> Unit)? = null
-    var onCommentClick: ((PostItem) -> Unit)? = null
+    var onCommentClick: ((String) -> Unit)? = null
     var onSendClick: ((PostItem) -> Unit)? = null
 
     class PostViewHolder(val binding: ItemPostBinding) : RecyclerView.ViewHolder(binding.root)
@@ -69,6 +67,9 @@ class PostListAdapter(
             onLikeClick?.invoke(position, postItem)
 
         }
+        binding.comment.setOnClickListener {
+            onCommentClick?.invoke(postItem.postId)
+        }
     }
 
     override fun getItemCount(): Int {
@@ -81,21 +82,20 @@ class PostListAdapter(
         notifyDataSetChanged()
     }
 
-    fun like(position: Int, uid: String) {
+    fun clickLike(position: Int) {
         val postItem = posts[position]
+        if (postItem.isLiked){
+            postItem.likeCount--
+        } else {
+            postItem.likeCount++
+        }
         postItem.isLiked = !postItem.isLiked
-//        (postItem.likes as MutableList).add(LikeItem(uid = uid))
-        postItem.likeCount++
         notifyItemChanged(position)
     }
 
-    fun unlike(position: Int, uid: String) {
+    fun unlike(position: Int) {
         val postItem = posts[position]
         postItem.isLiked = !postItem.isLiked
-//        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-//            (postItem.likes as MutableList).removeIf { it.uid == uid }
-//        }
-        postItem.likeCount--
         notifyItemChanged(position)
     }
 }

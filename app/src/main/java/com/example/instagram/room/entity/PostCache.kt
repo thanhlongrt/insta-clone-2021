@@ -9,7 +9,7 @@ import javax.inject.Inject
  * Created by Thanh Long Nguyen on 5/3/2021
  */
 @Entity(tableName = "posts", primaryKeys = ["postId"])
-class PostCache(
+data class PostCache(
     val postId: String = "",
     val uid: String = "",
     val avatarUrl: String = "",
@@ -38,7 +38,6 @@ class PostCacheMapper @Inject constructor(): EntityMapper<PostCache, PostItem> {
             likeCount = entity.likeCount,
             commentCount = entity.commentCount,
             likes = mutableListOf(),
-            comments = mutableListOf(),
             path = entity.path,
             isLiked = entity.isLiked
         )
@@ -53,8 +52,8 @@ class PostCacheMapper @Inject constructor(): EntityMapper<PostCache, PostItem> {
             photoUrl = model.photoUrl,
             date = model.date,
             caption = model.caption,
-            likeCount = model.likes.size.toLong(),
-            commentCount = model.comments.size.toLong(),
+            likeCount = model.likeCount,
+            commentCount = model.commentCount,
             path = model.path,
             isLiked = model.isLiked
         )

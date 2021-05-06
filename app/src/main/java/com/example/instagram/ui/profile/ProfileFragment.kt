@@ -36,7 +36,7 @@ class ProfileFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
-        profileViewModel.getPostById(profileViewModel.currentUserUid)
+        profileViewModel.getPostByUser(profileViewModel.currentUserUid)
     }
 
     override fun onCreateView(

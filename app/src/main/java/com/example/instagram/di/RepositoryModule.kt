@@ -1,10 +1,10 @@
 package com.example.instagram.di
 
 import com.example.instagram.network.FirebaseSource
-import com.example.instagram.network.entity.LikeNetWorkMapper
 import com.example.instagram.network.entity.PostNetworkMapper
 import com.example.instagram.network.entity.StoryNetworkMapper
 import com.example.instagram.network.entity.UserNetworkMapper
+import com.example.instagram.repository.CommentRepository
 import com.example.instagram.repository.PostRepository
 import com.example.instagram.repository.StoryRepository
 import com.example.instagram.repository.UserRepository
@@ -57,14 +57,12 @@ object RepositoryModule {
         postDao: PostDao,
         postNetworkMapper: PostNetworkMapper,
         postCacheMapper: PostCacheMapper,
-        likeNetWorkMapper: LikeNetWorkMapper
     ): PostRepository {
         return PostRepository(
             firebaseSource,
             postDao,
             postNetworkMapper,
             postCacheMapper,
-            likeNetWorkMapper
         )
     }
 
@@ -81,6 +79,16 @@ object RepositoryModule {
             storyNetworkMapper,
             storyDao,
             userStoryCacheMapper
+        )
+    }
+
+    @Singleton
+    @Provides
+    fun provideCommentRepository(
+        firebaseSource: FirebaseSource
+    ): CommentRepository {
+        return CommentRepository(
+            firebaseSource
         )
     }
 }

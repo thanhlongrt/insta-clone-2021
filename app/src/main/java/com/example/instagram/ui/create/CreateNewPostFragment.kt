@@ -78,54 +78,6 @@ class CreateNewPostFragment : Fragment() {
             }
         })
 
-//        createViewModel.uploadResult.observe(viewLifecycleOwner, {
-//            when (it.status) {
-//                Status.LOADING -> {
-//                    displayProgressBar(true)
-//                }
-//                Status.ERROR -> {
-//                    Snackbar.make(view, it.message!!, 5000).show()
-//                }
-//                Status.SUCCESS -> {
-//                    displayProgressBar(false)
-//                    if (isDone) {
-//                        val photoData = HashMap<String, Any>()
-//                        photoData["uid"] = mainViewModel.userLiveData.value!!.data!!.uid
-//                        photoData["avatar_url"] = mainViewModel.userLiveData.value!!.data!!.avatarUrl
-//                        photoData["user_name"] = mainViewModel.userLiveData.value!!.data!!.username
-//                        photoData["photo_url"] = it.data!!
-//                        photoData["date_created"] = System.currentTimeMillis()
-//                        photoData["caption"] = binding?.captionEditText?.text.toString()
-//                        photoData["path"] = storagePath
-//                        createViewModel.savePostData(photoData)
-//                        getFragmentNavController(R.id.nav_host_fragment)?.navigate(R.id.action_createNewPostFragment_to_profileFragment)
-//                    }
-//                }
-//                Status.IDLE -> {
-//
-//                }
-//            }
-//        })
-
-//        createViewModel.savePostDataResult.observe(requireActivity(), {
-//            when (it.status) {
-//                Status.LOADING -> {
-//                    displayProgressBar(true)
-//                }
-//                Status.ERROR -> {
-//                    displayProgressBar(false)
-//                    Snackbar.make(view, it.message!!, 5000).show()
-//                }
-//                Status.SUCCESS -> {
-//                    displayProgressBar(false)
-//
-//                }
-//                Status.IDLE -> {
-//
-//                }
-//            }
-//        })
-
         binding?.imageView?.let {
             Glide.with(view.context)
                 .load(uri)
@@ -158,6 +110,8 @@ class CreateNewPostFragment : Fragment() {
                     photoData["date_created"] = System.currentTimeMillis()
                     photoData["caption"] = binding?.captionEditText?.text.toString()
                     photoData["path"] = storagePath
+                    photoData["like_count"] = 0
+                    photoData["comment_count"] = 0
                     createViewModel.savePostData(uri, storagePath, photoData)
 
                     getFragmentNavController(R.id.nav_host_fragment)?.navigate(R.id.action_createNewPostFragment_to_profileFragment)

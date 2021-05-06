@@ -50,7 +50,7 @@ constructor(
     @ExperimentalCoroutinesApi
     fun getPostById(uid: String) {
         viewModelScope.launch {
-            postRepository.getPostsByUserWithLikes(uid)
+            postRepository.getPostsByUser(uid)
                 .collect {
                     _otherUserPosts.value = it
                     Log.e(TAG, "getPostById: ${it.status}")
@@ -98,17 +98,10 @@ constructor(
         return searchUserResult
     }
 
-    fun like(likeData: HashMap<String, Any>) {
+    fun clickLike(postId: String) {
         Log.e(TAG, "like: ")
         viewModelScope.launch(Dispatchers.IO) {
-            postRepository.like(likeData)
-        }
-    }
-
-    fun unlike(uid: String, postId: String) {
-        Log.e(TAG, "unlike:")
-        viewModelScope.launch(Dispatchers.IO) {
-            postRepository.unlike(uid, postId)
+            postRepository.onLikeClick(postId)
         }
     }
 

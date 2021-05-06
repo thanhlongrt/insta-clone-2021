@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- First we have to create the line color (Black: #000000 and
+       Set position to 0 from all sides, this will allow us
+       even to to determine border size in any side (top,
+       right, bottom, left) -->
+
+    <item
+        android:bottom="0dp"
+        android:left="0dp"
+        android:right="0dp"
+        android:top="0dp">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/light_grey" />
+        </shape>
+    </item>
+
+    <!-- Here we fill the content with our color, and I will
+         push 1dp from the top so this size (top = 1dp) will
+         keep the previous color and it will look like the border
+         -->
+
+    <item
+        android:bottom="0dp"
+        android:left="0dp"
+        android:right="0dp"
+        android:top="1dp">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/white"></solid>
+        </shape>
+    </item>
+</layer-list>

@@ -32,9 +32,6 @@ constructor(
         const val TAG = "PostViewModel"
     }
 
-    private val _uploadResult = MutableLiveData<DataState<String>>()
-    val uploadResult: LiveData<DataState<String>> = _uploadResult
-
     private val _savePostDataResult = MutableLiveData<DataState<Boolean>>()
     val savePostDataResult: LiveData<DataState<Boolean>> = _savePostDataResult
 
@@ -56,20 +53,6 @@ constructor(
         Log.e(TAG, "savePostData: Loading...")
         viewModelScope.launch(Dispatchers.IO) {
             postRepository.savePostData(getApplication(), uri, storagePath, data)
-        }
-    }
-
-    fun like(likeData: HashMap<String, Any>) {
-        viewModelScope.launch(Dispatchers.IO) {
-            postRepository.like(likeData)
-            Log.e(TAG, "like: ")
-        }
-    }
-
-    fun unlike(uid: String, postId: String) {
-        viewModelScope.launch(Dispatchers.IO) {
-            postRepository.unlike(uid, postId)
-            Log.e(TAG, "unlike:")
         }
     }
 

@@ -38,8 +38,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Instagram">
         <activity
-            android:name=".ui.login.LoginActivity"
-            android:label="@string/title_activity_login">
+            android:name=".ui.login.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -48,8 +47,9 @@
         </activity>
         <activity
             android:name=".ui.MainActivity"
-            android:theme="@style/Theme.Instagram.NoActionBar"
-            android:windowSoftInputMode="adjustNothing"></activity>
+            android:theme="@style/Theme.Instagram.NoActionBar">
+
+        </activity>
 
         <provider
             android:name="androidx.core.content.FileProvider"

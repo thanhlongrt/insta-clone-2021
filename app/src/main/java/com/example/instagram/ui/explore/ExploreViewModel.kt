@@ -36,7 +36,7 @@ constructor(
     fun getAllPosts() {
         _feedPosts.postValue(DataState.loading())
         viewModelScope.launch {
-            postRepository.getFeedPostsWithLikes()
+            postRepository.getFeedPosts()
                 .collect {
                     _feedPosts.value = it
                     Log.e(TAG, "getAllPosts: ${it.status}")

@@ -72,19 +72,16 @@ class PostListFragment : Fragment() {
             )
         }
         postListAdapter.onLikeClick = { position, post ->
-            val uid = profileViewModel.currentUserUid
-            if (post.isLiked) {
-                postListAdapter.unlike(position, uid)
-                profileViewModel.unlike(uid, post.postId)
-            } else {
-                val likeData = HashMap<String, Any>()
-                likeData["uid"] = uid
-                likeData["like_id"] = ""
-                likeData["post_id"] = post.postId
-                likeData["comment_id"] = ""
-                profileViewModel.like(likeData)
-                postListAdapter.like(position, uid)
-            }
+            profileViewModel.clickLike(post.postId)
+            postListAdapter.clickLike(position)
+        }
+
+        postListAdapter.onCommentClick = { postId ->
+            val bundle = bundleOf("postId" to postId)
+            getFragmentNavController(R.id.nav_host_fragment)?.navigate(
+                R.id.action_homeFragment_to_commentFragment,
+                bundle
+            )
         }
 
         linearLayoutManager = LinearLayoutManager(view.context)

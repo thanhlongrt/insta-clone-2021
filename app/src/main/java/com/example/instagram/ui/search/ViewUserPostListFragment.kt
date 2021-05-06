@@ -5,14 +5,17 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.instagram.R
 import com.example.instagram.Status.*
 import com.example.instagram.databinding.FragmentViewUserPostListBinding
+import com.example.instagram.getFragmentNavController
 import com.example.instagram.ui.profile.PostListAdapter
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -64,20 +67,19 @@ class ViewUserPostListFragment : Fragment() {
 
         postListAdapter =
             PostListAdapter(mutableListOf())
+        postListAdapter = PostListAdapter(mutableListOf())
+
         postListAdapter.onLikeClick = { position, post ->
-//            val uid = searchViewModel.userLiveData.value!!.data!!.uid
-            if (post.isLiked) {
-                postListAdapter.unlike(position, uid!!)
-                searchViewModel.unlike(uid!!, post.postId)
-            } else {
-                val likeData = HashMap<String, Any>()
-                likeData["uid"] = uid!!
-                likeData["like_id"] = ""
-                likeData["post_id"] = post.postId
-                likeData["comment_id"] = ""
-                searchViewModel.like(likeData)
-                postListAdapter.like(position, uid!!)
-            }
+            searchViewModel.clickLike(post.postId)
+            postListAdapter.clickLike(position)
+        }
+
+        postListAdapter.onCommentClick = { postId ->
+            val bundle = bundleOf("postId" to postId)
+            getFragmentNavController(R.id.nav_host_fragment)?.navigate(
+                R.id.action_homeFragment_to_commentFragment,
+                bundle
+            )
         }
 
         val linearLayoutManager = LinearLayoutManager(view.context)

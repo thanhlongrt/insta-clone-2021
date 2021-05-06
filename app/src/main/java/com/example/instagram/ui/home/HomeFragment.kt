@@ -65,40 +65,20 @@ class HomeFragment : Fragment() {
                 bundle
             )
         }
-//        binding?.storyRecyclerView?.apply {
-//            layoutManager = LinearLayoutManager(
-//                view.context,
-//                LinearLayoutManager.HORIZONTAL,
-//                false
-//            )
-//            adapter = storyAdapter
-//        }
 
+        postListAdapter = PostListAdapter(mutableListOf())
 
-        postListAdapter =
-            PostListAdapter(mutableListOf())
-
-//        postListAdapter.onStoryClick = { position ->
-//            val bundle = bundleOf("position" to position)
-//            getFragmentNavController(R.id.nav_host_fragment)?.navigate(
-//                R.id.action_homeFragment_to_storyFragment,
-//                bundle
-//            )
-//        }
         postListAdapter.onLikeClick = { position, post ->
-            val uid = homeViewModel.currentUserUid
-            if (post.isLiked) {
-                postListAdapter.unlike(position, uid)
-                homeViewModel.unlike(uid, post.postId)
-            } else {
-                val likeData = HashMap<String, Any>()
-                likeData["uid"] = uid
-                likeData["like_id"] = ""
-                likeData["post_id"] = post.postId
-                likeData["comment_id"] = ""
-                homeViewModel.like(likeData)
-                postListAdapter.like(position, uid)
-            }
+            homeViewModel.clickLike(post.postId)
+            postListAdapter.clickLike(position)
+        }
+
+        postListAdapter.onCommentClick = { postId ->
+            val bundle = bundleOf("postId" to postId)
+            getFragmentNavController(R.id.nav_host_fragment)?.navigate(
+                R.id.action_homeFragment_to_commentFragment,
+                bundle
+            )
         }
 
         concatAdapter = ConcatAdapter(HorizontalAdapter(storyListAdapter), postListAdapter)
@@ -128,19 +108,11 @@ class HomeFragment : Fragment() {
         homeViewModel.feedPosts.observe(requireActivity(), {
             when (it.status) {
                 SUCCESS -> {
-                    displayProgressBar(false)
                     postListAdapter.addAll(it.data!!.reversed())
                 }
             }
         })
 
-    }
-
-    private fun displayProgressBar(isDisplayed: Boolean) {
-        activity?.let {
-            it.findViewById<ProgressBar>(R.id.progressBar).visibility =
-                if (isDisplayed) View.VISIBLE else View.GONE
-        }
     }
 
     override fun onDestroy() {

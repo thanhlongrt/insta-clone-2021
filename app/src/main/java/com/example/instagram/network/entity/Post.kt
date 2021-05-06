@@ -7,7 +7,7 @@ import javax.inject.Inject
 /**
  * Created by Thanh Long Nguyen on 4/14/2021
  */
-class Post(
+data class Post(
     val uid: String = "",
     val post_id: String = "",
     val avatar_url: String = "",
@@ -15,7 +15,10 @@ class Post(
     val photo_url: String = "",
     val date_created: Long = 0,
     val caption: String = "",
-    val path: String = ""
+    val path: String = "",
+    var like_count: Long = 0,
+    val comment_count: Long = 0,
+    var likes: MutableMap<String, Boolean> = HashMap(),
 ) {
 }
 
@@ -31,6 +34,9 @@ class PostNetworkMapper @Inject constructor() : EntityMapper<Post, PostItem> {
             date = entity.date_created,
             caption = entity.caption,
             path = entity.path,
+            likeCount = entity.like_count,
+            commentCount = entity.comment_count,
+            likes = entity.likes.keys.toMutableList(),
         )
     }
 
@@ -44,7 +50,8 @@ class PostNetworkMapper @Inject constructor() : EntityMapper<Post, PostItem> {
             date_created = model.date,
             caption = model.caption,
             path = model.path,
+            like_count = model.likeCount,
+            comment_count = model.commentCount,
         )
     }
-
 }
