@@ -13,6 +13,7 @@ import com.bumptech.glide.Glide
 import com.example.instagram.Status
 import com.example.instagram.databinding.FragmentCommentBinding
 import com.example.instagram.model.UserItem
+import com.example.instagram.network.entity.Notification
 import com.example.instagram.ui.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -35,7 +36,7 @@ class CommentFragment : Fragment() {
 
     private val commentViewModel: CommentViewModel by viewModels()
 
-    private val userData: UserItem by lazy { mainViewModel.userLiveData.value!!.data!! }
+    private val userData: UserItem by lazy { mainViewModel.currentUser.value!!.data!! }
 
     private var postId: String? = null
 
@@ -60,7 +61,7 @@ class CommentFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         Glide.with(view.context)
-            .load(mainViewModel.userLiveData.value!!.data!!.avatarUrl)
+            .load(mainViewModel.currentUser.value!!.data!!.avatarUrl)
             .into(binding?.avatar!!)
 
         commentAdapter = CommentAdapter(mutableListOf())
@@ -87,6 +88,17 @@ class CommentFragment : Fragment() {
                 commentData["date_created"] = System.currentTimeMillis()
 
                 commentViewModel.addComment(commentData)
+
+//                val notification = Notification(
+//                    uid = post.uid,
+//                    post_id = post.postId,
+//                    title = "Instagram",
+//                    body = "${post.userName}: ${it.username} liked your post",
+//                    date = System.currentTimeMillis(),
+//                    sender_avatar = it.avatarUrl,
+//                    seen = false
+//                )
+//                commentViewModel.sendPushNotification()
 
                 binding?.commentEditText?.setText("")
             }

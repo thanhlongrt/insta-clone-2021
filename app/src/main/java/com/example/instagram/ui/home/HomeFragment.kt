@@ -4,10 +4,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ProgressBar
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -16,8 +16,13 @@ import com.example.instagram.R
 import com.example.instagram.Status.SUCCESS
 import com.example.instagram.databinding.FragmentHomeBinding
 import com.example.instagram.getFragmentNavController
+import com.example.instagram.model.PostItem
+import com.example.instagram.network.entity.Notification
+import com.example.instagram.ui.MainViewModel
 import com.example.instagram.ui.profile.PostListAdapter
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 /**
  * Created by Thanh Long Nguyen on 4/12/2021
@@ -29,6 +34,8 @@ class HomeFragment : Fragment() {
 
     private val homeViewModel: HomeViewModel by activityViewModels()
 
+    private val mainViewModel: MainViewModel by activityViewModels()
+
     private lateinit var postListAdapter: PostListAdapter
 
     private lateinit var storyListAdapter: StoryListAdapter
@@ -37,7 +44,6 @@ class HomeFragment : Fragment() {
 
     private lateinit var linearLayoutManager: LinearLayoutManager
 
-    @ExperimentalCoroutinesApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         homeViewModel.getStoryData()
@@ -69,6 +75,9 @@ class HomeFragment : Fragment() {
         postListAdapter = PostListAdapter(mutableListOf())
 
         postListAdapter.onLikeClick = { position, post ->
+            if (!post.isLiked && post.uid!= mainViewModel.currentUser.value?.data?.uid ?: false) {
+                sendLikePushNotification(post)
+            }
             homeViewModel.clickLike(post.postId)
             postListAdapter.clickLike(position)
         }
@@ -98,21 +107,37 @@ class HomeFragment : Fragment() {
         }
 
         homeViewModel.stories.observe(requireActivity()) {
-            when (it.status) {
-                SUCCESS -> {
-                    storyListAdapter.addAll(it.data!!)
-                }
+            if (it.status == SUCCESS) {
+                storyListAdapter.addAll(it.data!!)
             }
         }
 
         homeViewModel.feedPosts.observe(requireActivity(), {
-            when (it.status) {
-                SUCCESS -> {
-                    postListAdapter.addAll(it.data!!.reversed())
-                }
+            if (it.status == SUCCESS) {
+                postListAdapter.addAll(it.data!!.reversed())
             }
         })
 
+    }
+
+    private fun sendLikePushNotification(post: PostItem) {
+        lifecycleScope.launch {
+            delay(3000)
+            if (!post.isLiked) {
+                mainViewModel.currentUser.value?.data?.let {
+                    val notification = Notification(
+                        uid = post.uid,
+                        post_id = post.postId,
+                        title = "Instagram",
+                        body = "${post.userName}: ${it.username} liked your post",
+                        date = System.currentTimeMillis(),
+                        sender_avatar = it.avatarUrl,
+                        seen = false
+                    )
+                    homeViewModel.sendPushNotification(notification)
+                }
+            }
+        }
     }
 
     override fun onDestroy() {

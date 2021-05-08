@@ -6,7 +6,7 @@ import com.example.instagram.DataState
 import com.example.instagram.Status
 import com.example.instagram.model.StoryItem
 import com.example.instagram.model.UserStoryItem
-import com.example.instagram.network.FirebaseSource
+import com.example.instagram.network.firebase.FirebaseService
 import com.example.instagram.network.entity.Story
 import com.example.instagram.network.entity.StoryNetworkMapper
 import com.example.instagram.room.dao.StoryDao
@@ -28,7 +28,7 @@ import javax.inject.Inject
 class StoryRepository
 @Inject
 constructor(
-    private val firebaseSource: FirebaseSource,
+    private val firebaseService: FirebaseService,
     private val storyNetworkMapper: StoryNetworkMapper,
     private val storyDao: StoryDao,
     private val userStoryCacheMapper: UserStoryCacheMapper
@@ -76,9 +76,9 @@ constructor(
                 this@callbackFlow.sendBlocking(DataState.error(null, error.message))
             }
         }
-        firebaseSource.storyDataReference.addValueEventListener(storyListener)
+        firebaseService.storyDataReference.addValueEventListener(storyListener)
         awaitClose {
-            firebaseSource.storyDataReference.removeEventListener(storyListener)
+            firebaseService.storyDataReference.removeEventListener(storyListener)
         }
     }
 
@@ -88,7 +88,7 @@ constructor(
         path: String
     ): Flow<DataState<String>> =
         flow {
-            val photoUrl = firebaseSource.uploadPhoto(context, uri, path)
+            val photoUrl = firebaseService.uploadPhoto(context, uri, path)
             emit(DataState.success(photoUrl))
         }.catch { e ->
             emit(DataState.error(null, e.message))
@@ -105,7 +105,7 @@ constructor(
         uploadPhoto(context, uri, path).collect { downloadUrlResult ->
             if (downloadUrlResult.status == Status.SUCCESS) {
                 storyData["photo_url"] = downloadUrlResult.data!!
-                firebaseSource.saveStoryData(storyData)
+                firebaseService.saveStoryData(storyData)
             }
         }
 }

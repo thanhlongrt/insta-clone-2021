@@ -92,7 +92,7 @@ class ProfileFragment : Fragment() {
 //            }
 //        })
 
-        mainViewModel.userLiveData.observe(requireActivity(), {
+        mainViewModel.currentUser.observe(requireActivity(), {
             when (it.status) {
                 Status.SUCCESS -> {
                     val user = it.data!!

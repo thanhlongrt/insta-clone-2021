@@ -1,13 +1,11 @@
 package com.example.instagram.di
 
-import com.example.instagram.network.FirebaseSource
+import com.example.instagram.network.firebase.FirebaseService
 import com.example.instagram.network.entity.PostNetworkMapper
 import com.example.instagram.network.entity.StoryNetworkMapper
 import com.example.instagram.network.entity.UserNetworkMapper
-import com.example.instagram.repository.CommentRepository
-import com.example.instagram.repository.PostRepository
-import com.example.instagram.repository.StoryRepository
-import com.example.instagram.repository.UserRepository
+import com.example.instagram.network.retrofit.FcmService
+import com.example.instagram.repository.*
 import com.example.instagram.room.dao.PostDao
 import com.example.instagram.room.dao.StoryDao
 import com.example.instagram.room.dao.StringKeyValueDao
@@ -35,14 +33,14 @@ object RepositoryModule {
     @Singleton
     @Provides
     fun provideUserRepository(
-        firebaseSource: FirebaseSource,
+        firebaseService: FirebaseService,
         stringKeyValueDao: StringKeyValueDao,
         userDao: UserDao,
         userNetworkMapper: UserNetworkMapper,
         userCacheMapper: UserCacheMapper
     ): UserRepository {
         return UserRepository(
-            firebaseSource,
+            firebaseService,
             stringKeyValueDao,
             userDao,
             userNetworkMapper,
@@ -53,13 +51,13 @@ object RepositoryModule {
     @Singleton
     @Provides
     fun providePostRepository(
-        firebaseSource: FirebaseSource,
+        firebaseService: FirebaseService,
         postDao: PostDao,
         postNetworkMapper: PostNetworkMapper,
         postCacheMapper: PostCacheMapper,
     ): PostRepository {
         return PostRepository(
-            firebaseSource,
+            firebaseService,
             postDao,
             postNetworkMapper,
             postCacheMapper,
@@ -69,13 +67,13 @@ object RepositoryModule {
     @Singleton
     @Provides
     fun provideStoryRepository(
-        firebaseSource: FirebaseSource,
+        firebaseService: FirebaseService,
         storyNetworkMapper: StoryNetworkMapper,
         storyDao: StoryDao,
         userStoryCacheMapper: UserStoryCacheMapper,
     ): StoryRepository {
         return StoryRepository(
-            firebaseSource,
+            firebaseService,
             storyNetworkMapper,
             storyDao,
             userStoryCacheMapper
@@ -85,10 +83,24 @@ object RepositoryModule {
     @Singleton
     @Provides
     fun provideCommentRepository(
-        firebaseSource: FirebaseSource
+        firebaseService: FirebaseService
     ): CommentRepository {
         return CommentRepository(
-            firebaseSource
+            firebaseService
+        )
+    }
+
+    @Singleton
+    @Provides
+    fun provideNotificationRepository(
+        firebaseService: FirebaseService,
+        stringKeyValueDao: StringKeyValueDao,
+        fcmService: FcmService,
+    ): NotificationRepository {
+        return NotificationRepository(
+            firebaseService,
+            stringKeyValueDao,
+            fcmService
         )
     }
 }

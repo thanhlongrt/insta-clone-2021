@@ -8,6 +8,8 @@ import androidx.lifecycle.viewModelScope
 import com.example.instagram.DataState
 import com.example.instagram.model.PostItem
 import com.example.instagram.model.UserStoryItem
+import com.example.instagram.network.entity.Notification
+import com.example.instagram.repository.NotificationRepository
 import com.example.instagram.repository.PostRepository
 import com.example.instagram.repository.StoryRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -27,7 +29,8 @@ class HomeViewModel
 @Inject
 constructor(
     private val postRepository: PostRepository,
-    private val storyRepository: StoryRepository
+    private val storyRepository: StoryRepository,
+    private val notificationRepository: NotificationRepository
 ) : ViewModel() {
     companion object {
         private const val TAG = "HomeViewModel"
@@ -66,6 +69,12 @@ constructor(
         Log.e(TAG, "like: ")
         viewModelScope.launch(Dispatchers.IO) {
             postRepository.onLikeClick(postId)
+        }
+    }
+
+    fun sendPushNotification(notification: Notification) {
+        viewModelScope.launch(Dispatchers.IO) {
+            notificationRepository.sendPushNotification(notification)
         }
     }
 }

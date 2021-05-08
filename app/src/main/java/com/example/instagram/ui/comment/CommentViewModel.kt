@@ -7,7 +7,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.instagram.DataState
 import com.example.instagram.network.entity.Comment
+import com.example.instagram.network.entity.Notification
 import com.example.instagram.repository.CommentRepository
+import com.example.instagram.repository.NotificationRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -24,7 +26,8 @@ import javax.inject.Inject
 class CommentViewModel
 @Inject
 constructor(
-    private val commentRepository: CommentRepository
+    private val commentRepository: CommentRepository,
+    private val notificationRepository: NotificationRepository
 ) : ViewModel() {
 
     companion object {
@@ -47,6 +50,12 @@ constructor(
                 _comments.postValue(it)
                 Log.e(TAG, "getCommentsByPost: ${it.status}")
             }
+        }
+    }
+
+    fun sendPushNotification(notification: Notification) {
+        viewModelScope.launch(Dispatchers.IO) {
+            notificationRepository.sendPushNotification(notification)
         }
     }
 

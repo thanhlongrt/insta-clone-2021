@@ -16,6 +16,9 @@ import com.example.instagram.R
 import com.example.instagram.Status.*
 import com.example.instagram.databinding.FragmentViewUserPostListBinding
 import com.example.instagram.getFragmentNavController
+import com.example.instagram.model.PostItem
+import com.example.instagram.network.entity.Notification
+import com.example.instagram.ui.MainViewModel
 import com.example.instagram.ui.profile.PostListAdapter
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -37,6 +40,8 @@ class ViewUserPostListFragment : Fragment() {
     private var binding: FragmentViewUserPostListBinding? = null
 
     private val searchViewModel: SearchViewModel by activityViewModels()
+
+    private val mainViewModel: MainViewModel by activityViewModels()
 
     private var position: Int? = null
 
@@ -70,6 +75,9 @@ class ViewUserPostListFragment : Fragment() {
         postListAdapter = PostListAdapter(mutableListOf())
 
         postListAdapter.onLikeClick = { position, post ->
+            if (!post.isLiked && post.uid != mainViewModel.currentUser.value?.data?.uid ?: false) {
+                sendLikePushNotification(post)
+            }
             searchViewModel.clickLike(post.postId)
             postListAdapter.clickLike(position)
         }
@@ -113,6 +121,26 @@ class ViewUserPostListFragment : Fragment() {
                 }
             }
         })
+    }
+
+    private fun sendLikePushNotification(post: PostItem) {
+        lifecycleScope.launch {
+            delay(3000)
+            if (!post.isLiked) {
+                mainViewModel.currentUser.value?.data?.let {
+                    val notification = Notification(
+                        uid = post.uid,
+                        post_id = post.postId,
+                        title = "Instagram",
+                        body = "${post.userName}: ${it.username} liked your post",
+                        date = System.currentTimeMillis(),
+                        sender_avatar = it.avatarUrl,
+                        seen = false
+                    )
+                    searchViewModel.sendPushNotification(notification)
+                }
+            }
+        }
     }
 
     override fun onDestroyView() {

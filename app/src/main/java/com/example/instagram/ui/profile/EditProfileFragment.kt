@@ -52,7 +52,7 @@ class EditProfileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        mainViewModel.userLiveData.observe(requireActivity(), {
+        mainViewModel.currentUser.observe(requireActivity(), {
             when (it.status) {
                 Status.SUCCESS -> {
                     val user = it.data!!

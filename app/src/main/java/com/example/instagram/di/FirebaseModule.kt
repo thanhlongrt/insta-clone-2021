@@ -1,6 +1,6 @@
 package com.example.instagram.di
 
-import com.example.instagram.network.FirebaseSource
+import com.example.instagram.network.firebase.FirebaseService
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
@@ -42,8 +42,8 @@ object FirebaseModule {
         firebaseAuth: FirebaseAuth,
         firebaseDatabase: FirebaseDatabase,
         firebaseStorage: FirebaseStorage
-    ): FirebaseSource {
-        return FirebaseSource(firebaseAuth, firebaseDatabase, firebaseStorage)
+    ): FirebaseService {
+        return FirebaseService(firebaseAuth, firebaseDatabase, firebaseStorage)
     }
 
 }

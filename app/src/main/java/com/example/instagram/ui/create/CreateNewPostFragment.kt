@@ -56,7 +56,7 @@ class CreateNewPostFragment : Fragment() {
 
         val uri = arguments?.getParcelable<Uri>("uri")
 
-        mainViewModel.userLiveData.observe(requireActivity(), {
+        mainViewModel.currentUser.observe(requireActivity(), {
             when (it.status) {
                 Status.SUCCESS -> {
                     val user = it.data!!
@@ -104,9 +104,9 @@ class CreateNewPostFragment : Fragment() {
                 photoUri?.let { uri ->
                     val storagePath = "IMG_${System.currentTimeMillis()}.jpg"
                     val photoData = HashMap<String, Any>()
-                    photoData["uid"] = mainViewModel.userLiveData.value!!.data!!.uid
-                    photoData["avatar_url"] = mainViewModel.userLiveData.value!!.data!!.avatarUrl
-                    photoData["user_name"] = mainViewModel.userLiveData.value!!.data!!.username
+                    photoData["uid"] = mainViewModel.currentUser.value!!.data!!.uid
+                    photoData["avatar_url"] = mainViewModel.currentUser.value!!.data!!.avatarUrl
+                    photoData["user_name"] = mainViewModel.currentUser.value!!.data!!.username
                     photoData["date_created"] = System.currentTimeMillis()
                     photoData["caption"] = binding?.captionEditText?.text.toString()
                     photoData["path"] = storagePath

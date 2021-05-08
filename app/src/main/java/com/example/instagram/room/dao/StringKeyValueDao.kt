@@ -6,6 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.example.instagram.room.entity.StringKeyValuePair
+import kotlinx.coroutines.flow.Flow
 
 /**
  * Created by Thanh Long Nguyen on 5/2/2021
@@ -19,4 +20,6 @@ interface StringKeyValueDao {
     @Query("SELECT * FROM value_pairs WHERE `key` = :key LIMIT 1")
     suspend fun get(@NonNull key: String): StringKeyValuePair?
 
+    @Query("SELECT * FROM value_pairs WHERE `key` = :key LIMIT 1")
+    fun getTokenFlow(@NonNull key: String): Flow<StringKeyValuePair?>
 }

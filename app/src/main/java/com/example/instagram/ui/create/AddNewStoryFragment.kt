@@ -64,9 +64,9 @@ class AddNewStoryFragment : Fragment() {
                 storyUri?.let {
                     val storagePath = "IMG_${System.currentTimeMillis()}.jpg"
                     val storyData = HashMap<String, Any>()
-                    storyData["uid"] = mainViewModel.userLiveData.value!!.data!!.uid
-                    storyData["username"] = mainViewModel.userLiveData.value!!.data!!.username
-                    storyData["avatar_url"] = mainViewModel.userLiveData.value!!.data!!.avatarUrl
+                    storyData["uid"] = mainViewModel.currentUser.value!!.data!!.uid
+                    storyData["username"] = mainViewModel.currentUser.value!!.data!!.username
+                    storyData["avatar_url"] = mainViewModel.currentUser.value!!.data!!.avatarUrl
                     storyData["video_url"] = ""
                     storyData["path"] = storagePath
 

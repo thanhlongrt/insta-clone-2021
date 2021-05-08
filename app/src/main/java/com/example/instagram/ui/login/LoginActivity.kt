@@ -8,8 +8,10 @@ import androidx.navigation.fragment.NavHostFragment
 import com.example.instagram.R
 import com.example.instagram.ui.MainActivity
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 
+@ExperimentalCoroutinesApi
 @AndroidEntryPoint
 class LoginActivity : AppCompatActivity() {
 

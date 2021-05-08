@@ -1,7 +1,7 @@
 package com.example.instagram.repository
 
 import com.example.instagram.DataState
-import com.example.instagram.network.FirebaseSource
+import com.example.instagram.network.firebase.FirebaseService
 import com.example.instagram.network.entity.Comment
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -20,11 +20,11 @@ import javax.inject.Inject
 class CommentRepository
 @Inject
 constructor(
-    private val firebaseSource: FirebaseSource
+    private val firebaseService: FirebaseService
 ) {
 
     fun addComment(commentData: HashMap<String, Any>) {
-        firebaseSource.saveCommentData(commentData)
+        firebaseService.saveCommentData(commentData)
     }
 
     fun getCommentsFromFirebaseByPost(postId: String): Flow<DataState<List<Comment>>> =
@@ -40,7 +40,7 @@ constructor(
                     this@callbackFlow.sendBlocking(DataState.error(null, error.message))
                 }
             }
-            val commentRef = firebaseSource.commentDataReference.child(postId)
+            val commentRef = firebaseService.commentDataReference.child(postId)
             commentRef.addListenerForSingleValueEvent(commentListener)
             awaitClose { commentRef.removeEventListener(commentListener) }
         }

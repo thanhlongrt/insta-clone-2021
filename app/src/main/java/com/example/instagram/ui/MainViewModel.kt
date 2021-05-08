@@ -37,7 +37,7 @@ constructor(
     }
 
     private val _userLivaData = MutableLiveData<DataState<UserItem>>()
-    val userLiveData: LiveData<DataState<UserItem>> = _userLivaData
+    val currentUser: LiveData<DataState<UserItem>> = _userLivaData
 
     fun getCurrentUser() {
         viewModelScope.launch {

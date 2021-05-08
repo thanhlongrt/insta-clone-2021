@@ -6,7 +6,7 @@ import android.util.Log
 import com.example.instagram.DataState
 import com.example.instagram.Status
 import com.example.instagram.model.PostItem
-import com.example.instagram.network.FirebaseSource
+import com.example.instagram.network.firebase.FirebaseService
 import com.example.instagram.network.entity.Post
 import com.example.instagram.network.entity.PostNetworkMapper
 import com.example.instagram.room.dao.PostDao
@@ -29,7 +29,7 @@ import javax.inject.Inject
 class PostRepository
 @Inject
 constructor(
-    private val firebaseSource: FirebaseSource,
+    private val firebaseService: FirebaseService,
     private val postDao: PostDao,
     private val postNetworkMapper: PostNetworkMapper,
     private val postCacheMapper: PostCacheMapper,
@@ -39,14 +39,14 @@ constructor(
     }
 
     fun deletePost(id: String, photoPath: String): Task<Void> {
-        val deletePostDataTask = firebaseSource.postDataReference.child(id).removeValue()
-        val deletePhotoTask = firebaseSource.photoStorage.child(photoPath).delete()
+        val deletePostDataTask = firebaseService.postDataReference.child(id).removeValue()
+        val deletePhotoTask = firebaseService.photoStorage.child(photoPath).delete()
         return Tasks.whenAll(deletePostDataTask, deletePhotoTask)
     }
 
     suspend fun uploadPhoto(context: Context, uri: Uri, path: String): Flow<DataState<String>> =
         flow {
-            val photoUrl = firebaseSource.uploadPhoto(context, uri, path)
+            val photoUrl = firebaseService.uploadPhoto(context, uri, path)
             emit(DataState.success(photoUrl))
         }.catch { e ->
             emit(DataState.error(null, e.message))
@@ -63,7 +63,7 @@ constructor(
         uploadPhoto(context, uri, path).collect { photoUrlResult ->
             if (photoUrlResult.status == Status.SUCCESS) {
                 postData["photo_url"] = photoUrlResult.data!!
-                firebaseSource.savePostData(postData)
+                firebaseService.savePostData(postData)
             }
         }
 
@@ -187,8 +187,8 @@ constructor(
     }
 
     private val postDataReference =
-        firebaseSource.postDataReference
+        firebaseService.postDataReference
 
     val currentUser
-        get() = firebaseSource.currentFirebaseUser
+        get() = firebaseService.currentFirebaseUser
 }

@@ -2,7 +2,7 @@ package com.example.instagram.repository
 
 import com.example.instagram.DataState
 import com.example.instagram.model.UserItem
-import com.example.instagram.network.FirebaseSource
+import com.example.instagram.network.firebase.FirebaseService
 import com.example.instagram.network.entity.User
 import com.example.instagram.network.entity.UserNetworkMapper
 import com.example.instagram.room.dao.StringKeyValueDao
@@ -22,7 +22,7 @@ import javax.inject.Inject
 class UserRepository
 @Inject
 constructor(
-    private val firebaseSource: FirebaseSource,
+    private val firebaseService: FirebaseService,
     private val stringKeyValueDao: StringKeyValueDao,
     private val userDao: UserDao,
     private val userNetworkMapper: UserNetworkMapper,
@@ -30,23 +30,23 @@ constructor(
 ) {
     private val cacheThresholdInMillis = 5 * 60 * 1000L
 
-    fun logout() = firebaseSource.logout()
+    fun logout() = firebaseService.logout()
 
     val currentFirebaseUser
-        get() = firebaseSource.currentFirebaseUser
+        get() = firebaseService.currentFirebaseUser
 
 
     fun createUser(email: String, password: String) =
-        firebaseSource.createUser(email, password)
+        firebaseService.createUser(email, password)
 
     fun login(email: String, password: String) =
-        firebaseSource.login(email, password)
+        firebaseService.login(email, password)
 
     fun saveUserData(uid: String, userData: HashMap<String, Any>) =
-        firebaseSource.saveUserData(uid, userData)
+        firebaseService.saveUserData(uid, userData)
 
     fun allUserDataReference() =
-        firebaseSource.allUsersDataReference()
+        firebaseService.allUsersDataReference()
 
     fun getUser(uid: String): Flow<DataState<UserItem>> = flow {
         emit(getUserFromCache())
@@ -77,16 +77,16 @@ constructor(
 
         }
 
-        firebaseSource.userDataReference(uid).addValueEventListener(userListener)
+        firebaseService.userDataReference(uid).addValueEventListener(userListener)
 
         awaitClose {
-            firebaseSource.userDataReference(uid).removeEventListener(userListener)
+            firebaseService.userDataReference(uid).removeEventListener(userListener)
         }
     }
 
 
     fun updateUserData(userData: HashMap<String, Any>): Flow<DataState<Boolean>> = channelFlow {
-        firebaseSource.saveUserData(currentFirebaseUser!!.uid, userData)
+        firebaseService.saveUserData(currentFirebaseUser!!.uid, userData)
             .addOnCompleteListener {
                 if (it.isSuccessful) {
                     this.sendBlocking(DataState.success(true))

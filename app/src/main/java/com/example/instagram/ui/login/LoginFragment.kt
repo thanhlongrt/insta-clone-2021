@@ -58,13 +58,6 @@ class LoginFragment : Fragment() {
 
             binding?.login?.isEnabled = loginFormState.data!!
 
-//            if (loginFormState.emailError != null) {
-//                binding?.email?.error = loginFormState.emailError
-//            }
-//            if (loginFormState.passwordError != null) {
-//                binding?.password?.error = loginFormState.passwordError
-//            }
-
         })
 
         binding?.email?.apply {

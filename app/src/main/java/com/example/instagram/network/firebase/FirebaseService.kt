@@ -1,13 +1,14 @@
-package com.example.instagram.network
+package com.example.instagram.network.firebase
 
 import android.content.Context
 import android.net.Uri
 import com.example.instagram.ImageUtils
+import com.example.instagram.network.entity.Notification
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ServerValue
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
@@ -15,7 +16,7 @@ import javax.inject.Inject
 /**
  * Created by Thanh Long Nguyen on 4/12/2021
  */
-class FirebaseSource
+class FirebaseService
 @Inject
 constructor(
     private val firebaseAuth: FirebaseAuth,
@@ -93,6 +94,31 @@ constructor(
 //            .setValue(ServerValue.increment(1))
     }
 
+    fun uploadFcmToken(token: String): Task<Void>? {
+        currentFirebaseUser?.let {
+            val data = hashMapOf<String, Any>("token" to token)
+            return tokenReference.child(it.uid).updateChildren(data)
+        }
+        return null
+    }
+
+    fun userFcmTokenReference(uid: String): DatabaseReference {
+        return tokenReference.child(uid)
+    }
+
+    fun saveNotification(notification: Notification): Task<Void> {
+        val notificationId = notificationReference.child(notification.uid).push().key!!
+        val data = notification.toMap()
+        data["notification_id"] = notificationId
+        return notificationReference.child(notification.uid).child(notificationId)
+            .updateChildren(data)
+    }
+
+    fun getNotification(): DatabaseReference? {
+        currentFirebaseUser?.let { return notificationReference.child(it.uid) }
+        return null
+    }
+
     val currentFirebaseUser: FirebaseUser? get() = firebaseAuth.currentUser
 
     val postDataReference =
@@ -103,4 +129,10 @@ constructor(
 
     val commentDataReference =
         firebaseDatabase.reference.child("Comments")
+
+    val tokenReference =
+        firebaseDatabase.reference.child("FCM Tokens")
+
+    val notificationReference =
+        firebaseDatabase.reference.child("Notifications")
 }
