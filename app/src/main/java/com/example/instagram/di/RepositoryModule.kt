@@ -1,15 +1,12 @@
 package com.example.instagram.di
 
-import com.example.instagram.network.firebase.FirebaseService
 import com.example.instagram.network.entity.PostNetworkMapper
 import com.example.instagram.network.entity.StoryNetworkMapper
 import com.example.instagram.network.entity.UserNetworkMapper
+import com.example.instagram.network.firebase.FirebaseService
 import com.example.instagram.network.retrofit.FcmService
 import com.example.instagram.repository.*
-import com.example.instagram.room.dao.PostDao
-import com.example.instagram.room.dao.StoryDao
-import com.example.instagram.room.dao.StringKeyValueDao
-import com.example.instagram.room.dao.UserDao
+import com.example.instagram.room.dao.*
 import com.example.instagram.room.entity.PostCacheMapper
 import com.example.instagram.room.entity.UserCacheMapper
 import com.example.instagram.room.entity.UserStoryCacheMapper
@@ -96,11 +93,13 @@ object RepositoryModule {
         firebaseService: FirebaseService,
         stringKeyValueDao: StringKeyValueDao,
         fcmService: FcmService,
+        notificationDao: NotificationDao
     ): NotificationRepository {
         return NotificationRepository(
             firebaseService,
             stringKeyValueDao,
-            fcmService
+            fcmService,
+            notificationDao
         )
     }
 }

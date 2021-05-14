@@ -6,9 +6,9 @@ import android.util.Log
 import com.example.instagram.DataState
 import com.example.instagram.Status
 import com.example.instagram.model.PostItem
-import com.example.instagram.network.firebase.FirebaseService
 import com.example.instagram.network.entity.Post
 import com.example.instagram.network.entity.PostNetworkMapper
+import com.example.instagram.network.firebase.FirebaseService
 import com.example.instagram.room.dao.PostDao
 import com.example.instagram.room.entity.PostCacheMapper
 import com.google.android.gms.tasks.Task
@@ -57,15 +57,20 @@ constructor(
     suspend fun savePostData(
         context: Context,
         uri: Uri,
-        path: String,
-        postData: HashMap<String, Any>
-    ) =
-        uploadPhoto(context, uri, path).collect { photoUrlResult ->
-            if (photoUrlResult.status == Status.SUCCESS) {
-                postData["photo_url"] = photoUrlResult.data!!
-                firebaseService.savePostData(postData)
+        post: Post
+    ) {
+        if (post.is_video) {
+
+        } else {
+            uploadPhoto(context, uri, post.path).collect { photoUrlResult ->
+                if (photoUrlResult.status == Status.SUCCESS) {
+                    val postData = post.toMap()
+                    postData["photo_url"] = photoUrlResult.data!!
+                    firebaseService.savePostData(postData)
+                }
             }
         }
+    }
 
     fun getFeedPosts(): Flow<DataState<List<PostItem>>> = flow {
         getFeedPostsFromFirebase().collect { feedPost ->
@@ -97,7 +102,7 @@ constructor(
 
     private suspend fun getFeedPostsFromCache() =
         postDao.getFeedPosts()?.let { feedPosts ->
-            DataState.success(feedPosts.map { postCacheMapper.fromEntity(it) })
+            DataState.success(feedPosts.reversed().map { postCacheMapper.fromEntity(it) })
         } ?: DataState.error(null, "getFeedPostsFromCache: Error")
 
     private fun getFeedPostsFromFirebase() = callbackFlow<List<PostItem>> {
@@ -106,13 +111,11 @@ constructor(
                 val networkPosts = snapshot.children
                     .map { it.getValue(Post::class.java)!! }
                     .filter { it.uid != currentUser!!.uid }
-                Log.e(TAG, "onDataChange: ${networkPosts.size}")
 
                 val postItems = networkPosts.map { postNetworkMapper.fromEntity(it) }
                 postItems.forEach {
                     it.isLiked = it.likes.contains(currentUser!!.uid)
                 }
-                Log.e(TAG, "onDataChange: ${postItems.size}")
                 this@callbackFlow.sendBlocking(postItems)
             }
 

@@ -53,7 +53,7 @@
         tools:layout="@layout/fragment_post_grid_list" />
     <fragment
         android:id="@+id/userPostsFragment"
-        android:name="com.example.instagram.ui.profile.PostListFragment"
+        android:name="com.example.instagram.ui.profile.view_posts.PostListFragment"
         android:label="UserPostsFragment"
         tools:layout="@layout/fragment_post_list">
         <action
@@ -62,7 +62,7 @@
     </fragment>
     <dialog
         android:id="@+id/postBottomSheetFragment"
-        android:name="com.example.instagram.ui.profile.PostBottomSheetFragment"
+        android:name="com.example.instagram.ui.profile.view_posts.PostOptionsBottomSheet"
         android:label="PostBottomSheetFragment"
         tools:layout="@layout/fragment_post_bottom_sheet" />
     <dialog
@@ -76,6 +76,9 @@
         <action
             android:id="@+id/action_createBottomSheetFragment_to_addNewStoryFragment"
             app:destination="@id/addNewStoryFragment" />
+        <action
+            android:id="@+id/action_createBottomSheetFragment_to_previewVideoFragment"
+            app:destination="@id/previewVideoFragment" />
     </dialog>
     <fragment
         android:id="@+id/addNewStoryFragment"
@@ -87,5 +90,14 @@
             app:destination="@id/profileFragment"
             app:popUpTo="@id/profileFragment"
             app:popUpToInclusive="true" />
+    </fragment>
+    <fragment
+        tools:layout="@layout/fragment_preview_video"
+        android:id="@+id/previewVideoFragment"
+        android:name="com.example.instagram.ui.create.PreviewVideoFragment"
+        android:label="PreviewVideoFragment" >
+        <action
+            android:id="@+id/action_previewVideoFragment_to_createNewPostFragment"
+            app:destination="@id/createNewPostFragment" />
     </fragment>
 </navigation>

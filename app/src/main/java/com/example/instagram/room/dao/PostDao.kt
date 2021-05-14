@@ -22,7 +22,7 @@ interface PostDao {
     @Query("DELETE FROM posts WHERE postId = :postId")
     suspend fun deletePostById(postId: String)
 
-    @Query("SELECT * FROM posts WHERE isFeedPost = 1 ORDER BY date ASC LIMIT 3")
+    @Query("SELECT * FROM posts WHERE isFeedPost = 1 ORDER BY date DESC LIMIT 3")
     suspend fun getFeedPosts(): List<PostCache>?
 
     @Query("DELETE FROM  posts WHERE isFeedPost = 1")

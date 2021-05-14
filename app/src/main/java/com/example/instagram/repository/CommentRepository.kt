@@ -1,8 +1,9 @@
 package com.example.instagram.repository
 
+import android.util.Log
 import com.example.instagram.DataState
-import com.example.instagram.network.firebase.FirebaseService
 import com.example.instagram.network.entity.Comment
+import com.example.instagram.network.firebase.FirebaseService
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
@@ -22,6 +23,9 @@ class CommentRepository
 constructor(
     private val firebaseService: FirebaseService
 ) {
+    companion object{
+        private const val TAG = "CommentRepository"
+    }
 
     fun addComment(commentData: HashMap<String, Any>) {
         firebaseService.saveCommentData(commentData)
@@ -31,7 +35,7 @@ constructor(
         callbackFlow {
             val commentListener = object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
-                    val comments = snapshot.children.map { it.getValue(Comment::class.java) }
+                    val comments = snapshot.children.mapNotNull { it.getValue(Comment::class.java) }
 
                     this@callbackFlow.sendBlocking(DataState.success(comments))
                 }

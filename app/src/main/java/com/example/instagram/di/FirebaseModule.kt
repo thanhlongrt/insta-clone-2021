@@ -38,7 +38,7 @@ object FirebaseModule {
 
     @Singleton
     @Provides
-    fun provideFirebaseSource(
+    fun provideFirebaseService(
         firebaseAuth: FirebaseAuth,
         firebaseDatabase: FirebaseDatabase,
         firebaseStorage: FirebaseStorage

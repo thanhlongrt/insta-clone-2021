@@ -16,6 +16,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.channels.sendBlocking
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onStart
 import javax.inject.Inject
@@ -78,7 +79,6 @@ constructor(
     private fun saveNotification(
         notification: Notification
     ) {
-        val notificationData = HashMap<String, Any>()
         firebaseService.saveNotification(notification)
     }
 
@@ -87,17 +87,22 @@ constructor(
         val tokenListener = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val token = snapshot.getValue(FcmToken::class.java)!!
+                Log.e(TAG, "onDataChange: ")
                 this@callbackFlow.sendBlocking(token.token)
             }
 
             override fun onCancelled(error: DatabaseError) {
+                Log.e(TAG, "onCancelled: ")
                 this@callbackFlow.sendBlocking(null)
             }
         }
 
         tokenRef.addListenerForSingleValueEvent(tokenListener)
         awaitClose {
+            tokenRef.removeEventListener(tokenListener)
         }
+    }.catch {
+        Log.e(TAG, "getUserFcmToken: failed: ${it.message}")
     }
 
     fun getNotification() = callbackFlow<DataState<List<Notification>>> {
@@ -120,6 +125,8 @@ constructor(
         }
     }.onStart {
         getNotificationCache()?.let { emit(it) }
+    }.catch {
+        emit(DataState.error(null, it.message))
     }
 
     private suspend fun getNotificationCache() =
@@ -129,6 +136,6 @@ constructor(
             } ?: DataState.error(null, "getNotificationCache: Error")
         }
 
-    private val currentUserUid = firebaseService.currentFirebaseUser?.uid
+    private val currentUserUid get() = firebaseService.currentFirebaseUser?.uid
 
 }

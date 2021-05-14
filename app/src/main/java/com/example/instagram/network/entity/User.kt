@@ -1,11 +1,7 @@
 package com.example.instagram.network.entity
 
-import android.text.TextUtils
-import androidx.databinding.BindingAdapter
-import com.bumptech.glide.Glide
 import com.example.instagram.EntityMapper
 import com.example.instagram.model.UserItem
-import de.hdodenhof.circleimageview.CircleImageView
 import javax.inject.Inject
 
 /**
@@ -23,19 +19,6 @@ data class User(
     var following: Long = 0,
     var posts: Long = 0
 ) {
-
-    companion object {
-        @JvmStatic
-        @BindingAdapter("imageUrl")
-        fun loadImage(view: CircleImageView, url: String?) {
-            if (!TextUtils.isEmpty(url)) {
-                Glide.with(view.context)
-                    .load(url)
-                    .into(view)
-            }
-
-        }
-    }
 
     override fun toString(): String {
         return username

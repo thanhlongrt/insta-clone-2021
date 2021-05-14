@@ -19,7 +19,7 @@ interface NotificationDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertNotifications(notifications: List<Notification>)
 
-    @Query("SELECT * FROM notification WHERE uid = :uid")
+    @Query("SELECT * FROM notifications WHERE uid = :uid")
     suspend fun getNotificationsByUser(uid: String): List<Notification>?
 
 }

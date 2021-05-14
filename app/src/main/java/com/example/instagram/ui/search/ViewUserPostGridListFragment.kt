@@ -74,7 +74,7 @@ class ViewUserPostGridListFragment : Fragment() {
         searchViewModel.otherUserPosts.observe(requireActivity(), {
             when (it.status) {
                 SUCCESS -> {
-                    postAdapter.addAll(it.data!!)
+                    postAdapter.addAll(it.data!!.reversed())
                 }
                 ERROR -> {}
                 LOADING -> {}

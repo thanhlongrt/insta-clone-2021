@@ -19,16 +19,32 @@ import com.example.instagram.getFragmentNavController
 import com.example.instagram.model.PostItem
 import com.example.instagram.network.entity.Notification
 import com.example.instagram.ui.MainViewModel
-import com.example.instagram.ui.profile.PostListAdapter
+import com.example.instagram.ui.profile.view_posts.CacheDataSourceFactory
+import com.example.instagram.ui.profile.view_posts.PostListAdapter
+import com.google.android.exoplayer2.DefaultLoadControl
+import com.google.android.exoplayer2.MediaItem
+import com.google.android.exoplayer2.Player
+import com.google.android.exoplayer2.SimpleExoPlayer
+import com.google.android.exoplayer2.source.ProgressiveMediaSource
+import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
+import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
+import com.google.android.exoplayer2.ui.PlayerView
+import com.google.android.exoplayer2.util.MimeTypes
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 /**
  * Created by Thanh Long Nguyen on 4/12/2021
  */
 @ExperimentalCoroutinesApi
+@AndroidEntryPoint
 class HomeFragment : Fragment() {
+    companion object {
+        private const val TAG = "HomeFragment"
+    }
 
     private var binding: FragmentHomeBinding? = null
 
@@ -43,6 +59,9 @@ class HomeFragment : Fragment() {
     private lateinit var concatAdapter: ConcatAdapter
 
     private lateinit var linearLayoutManager: LinearLayoutManager
+
+    @Inject
+    lateinit var cacheDataSourceFactory: CacheDataSourceFactory
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -73,21 +92,32 @@ class HomeFragment : Fragment() {
         }
 
         postListAdapter = PostListAdapter(mutableListOf())
-
-        postListAdapter.onLikeClick = { position, post ->
-            if (!post.isLiked && post.uid!= mainViewModel.currentUser.value?.data?.uid ?: false) {
-                sendLikePushNotification(post)
+        postListAdapter.apply {
+            onLikeClick = { position, post ->
+                if (!post.isLiked && post.uid != mainViewModel.currentUser.value?.data?.uid ?: false) {
+                    sendLikePushNotification(post)
+                }
+                homeViewModel.clickLike(post.postId)
+                onLikeClick(position)
             }
-            homeViewModel.clickLike(post.postId)
-            postListAdapter.clickLike(position)
-        }
 
-        postListAdapter.onCommentClick = { postId ->
-            val bundle = bundleOf("postId" to postId)
-            getFragmentNavController(R.id.nav_host_fragment)?.navigate(
-                R.id.action_homeFragment_to_commentFragment,
-                bundle
-            )
+            onCommentClick = { postId ->
+                val bundle = bundleOf("postId" to postId)
+                getFragmentNavController(R.id.nav_host_fragment)?.navigate(
+                    R.id.action_homeFragment_to_commentFragment,
+                    bundle
+                )
+            }
+
+            onViewAttachToWindow = { playerView, url ->
+                if (player == null) {
+                    this@HomeFragment.initPlayer(playerView, url)
+                }
+            }
+
+            onViewDetachedFromWindow = { playerView, url ->
+                this@HomeFragment.releasePlayer()
+            }
         }
 
         concatAdapter = ConcatAdapter(HorizontalAdapter(storyListAdapter), postListAdapter)
@@ -95,7 +125,6 @@ class HomeFragment : Fragment() {
         linearLayoutManager = LinearLayoutManager(view.context)
 
         binding?.postRecyclerView?.apply {
-
             this.layoutManager = linearLayoutManager
             adapter = concatAdapter
             itemAnimator = object : DefaultItemAnimator() {
@@ -103,7 +132,6 @@ class HomeFragment : Fragment() {
                     return true
                 }
             }
-//            setHasFixedSize(true)
         }
 
         homeViewModel.stories.observe(requireActivity()) {
@@ -123,7 +151,7 @@ class HomeFragment : Fragment() {
     private fun sendLikePushNotification(post: PostItem) {
         lifecycleScope.launch {
             delay(3000)
-            if (!post.isLiked) {
+            if (post.isLiked) {
                 mainViewModel.currentUser.value?.data?.let {
                     val notification = Notification(
                         uid = post.uid,
@@ -134,7 +162,7 @@ class HomeFragment : Fragment() {
                         sender_avatar = it.avatarUrl,
                         seen = false
                     )
-                    homeViewModel.sendPushNotification(notification)
+                    mainViewModel.sendPushNotification(notification)
                 }
             }
         }
@@ -143,5 +171,47 @@ class HomeFragment : Fragment() {
     override fun onDestroy() {
         super.onDestroy()
         binding = null
+    }
+
+    private var player: SimpleExoPlayer? = null
+    private fun initPlayer(playerView: PlayerView, videoUrl: String) {
+        val context = playerView.context
+        player = SimpleExoPlayer.Builder(
+            context,
+        )
+            .setLoadControl(DefaultLoadControl())
+            .setTrackSelector(DefaultTrackSelector(context))
+            .build()
+
+
+        playerView.setKeepContentOnPlayerReset(true)
+        playerView.useController = true
+        playerView.player = this.player
+        playerView.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_ZOOM
+        val mediaItem =
+            MediaItem.Builder()
+                .setUri(videoUrl)
+                .setMimeType(MimeTypes.VIDEO_MP4)
+                .build()
+
+
+        val mediaSource = ProgressiveMediaSource.Factory(
+            cacheDataSourceFactory
+        ).createMediaSource(mediaItem)
+
+        player?.apply {
+            playWhenReady = true
+            repeatMode = Player.REPEAT_MODE_ONE
+
+            setMediaSource(mediaSource)
+            prepare()
+        }
+    }
+
+    private fun releasePlayer() {
+        player?.let { player ->
+            player.release()
+            this.player = null
+        }
     }
 }

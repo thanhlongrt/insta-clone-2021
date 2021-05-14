@@ -2,17 +2,18 @@ package com.example.instagram.di
 
 import android.content.Context
 import androidx.room.Room
-import com.example.instagram.room.dao.PostDao
-import com.example.instagram.room.dao.StoryDao
-import com.example.instagram.room.dao.StringKeyValueDao
-import com.example.instagram.room.dao.UserDao
+import com.example.instagram.room.dao.*
 import com.example.instagram.room.db.InstaDatabase
+import com.google.android.exoplayer2.database.ExoDatabaseProvider
+import com.google.android.exoplayer2.upstream.cache.LeastRecentlyUsedCacheEvictor
+import com.google.android.exoplayer2.upstream.cache.SimpleCache
 import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import java.io.File
 import javax.inject.Singleton
 
 /**
@@ -58,8 +59,14 @@ object RoomModule {
 
     @Singleton
     @Provides
-    fun provideStoryDao(database: InstaDatabase): StoryDao{
+    fun provideStoryDao(database: InstaDatabase): StoryDao {
         return database.storyDao()
+    }
+
+    @Singleton
+    @Provides
+    fun provideNotificationDao(database: InstaDatabase): NotificationDao {
+        return database.notificationDao()
     }
 
 //    @Singleton

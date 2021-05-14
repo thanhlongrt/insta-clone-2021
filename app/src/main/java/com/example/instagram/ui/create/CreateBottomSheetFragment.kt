@@ -1,5 +1,7 @@
 package com.example.instagram.ui.create
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -7,18 +9,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowInsetsController
-import android.widget.ProgressBar
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import com.example.instagram.ui.MainViewModel
 import com.example.instagram.R
-import com.example.instagram.Status.*
-import com.example.instagram.TakePhotoFromCameraOrGalleryContract
 import com.example.instagram.databinding.FragmentCreateNewBottomSheetBinding
 import com.example.instagram.getFragmentNavController
+import com.example.instagram.ui.MainViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
@@ -42,7 +42,7 @@ class CreateBottomSheetFragment : BottomSheetDialogFragment() {
     private lateinit var storagePath: String
 
     private val newPost =
-        registerForActivityResult(TakePhotoFromCameraOrGalleryContract()) { uri ->
+        registerForActivityResult(TakePhotoContract()) { uri ->
             Log.e(TAG, "getMedia: uri: $uri")
             uri?.let {
                 val bundle = bundleOf("uri" to it)
@@ -56,7 +56,7 @@ class CreateBottomSheetFragment : BottomSheetDialogFragment() {
         }
 
     private val newStory =
-        registerForActivityResult(TakePhotoFromCameraOrGalleryContract()) { uri ->
+        registerForActivityResult(TakePhotoContract()) { uri ->
             Log.e(TAG, "newStory: uri: $uri")
             uri?.let {
 
@@ -67,17 +67,55 @@ class CreateBottomSheetFragment : BottomSheetDialogFragment() {
                     R.id.action_createBottomSheetFragment_to_addNewStoryFragment,
                     bundle
                 )
-
-//                storagePath = "IMG_${System.currentTimeMillis()}.jpg"
-//                val storyData = HashMap<String, Any>()
-//                storyData["uid"] = mainViewModel.userLiveData.value!!.data!!.uid
-//                storyData["video_url"] = ""
-//                storyData["path"] = storagePath
-//                storyData["username"] = mainViewModel.userLiveData.value!!.data!!.username
-//                createViewModel.saveStoryData(it, storagePath, storyData)
-
             }
         }
+
+    private val newVideo =
+        registerForActivityResult(TakeVideoContract()) { uri ->
+            Log.e(TAG, "New Video: uri: $uri")
+            uri?.let {
+                val bundle = bundleOf("uri" to uri)
+                getFragmentNavController(R.id.nav_host_fragment)?.navigate(
+                    R.id.action_createBottomSheetFragment_to_previewVideoFragment,
+                    bundle
+                )
+            }
+        }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        askPermissions()
+    }
+
+    private fun askPermissions() {
+        val permissions = arrayOf(
+            Manifest.permission.CAMERA,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.READ_EXTERNAL_STORAGE
+        )
+        val notGrantedPermissions = arrayListOf<String>()
+        permissions.forEach { permission ->
+            if (ContextCompat.checkSelfPermission(
+                    requireContext(),
+                    permission
+                ) == PackageManager.PERMISSION_DENIED
+            ) {
+                notGrantedPermissions.add(permission)
+            }
+        }
+
+        if (notGrantedPermissions.isNotEmpty()){
+            val requestPermissionLauncher =
+                registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { result ->
+                    for (entry in result){
+                        if (!entry.value){
+                            getFragmentNavController(R.id.nav_host_fragment)?.navigateUp()
+                        }
+                    }
+                }
+            requestPermissionLauncher.launch(notGrantedPermissions.toTypedArray())
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -101,64 +139,14 @@ class CreateBottomSheetFragment : BottomSheetDialogFragment() {
         }
 
         binding?.reel?.setOnClickListener {
-
+            newVideo.launch(Unit)
         }
 
-//        createViewModel.uploadResult.observe(viewLifecycleOwner, {
-//            when (it.status) {
-//                SUCCESS -> {
-//                    val storyData = HashMap<String, Any>()
-//                    storyData["uid"] = mainViewModel.userLiveData.value!!.data!!.uid
-//                    storyData["photo_url"] = it.data!!
-//                    storyData["video_url"] = ""
-//                    storyData["path"] = storagePath
-//                    storyData["username"] = mainViewModel.userLiveData.value!!.data!!.username
-//                    createViewModel.saveStoryData(storyData)
-//                }
-//                ERROR -> {
-//
-//                }
-//                LOADING -> {
-//                    displayProgressBar(true)
-//                }
-//                IDLE -> {
-//
-//                }
-//            }
-//        })
-
-//        createViewModel.saveStoryDataResult.observe(viewLifecycleOwner, {
-//            when (it.status) {
-//                SUCCESS -> {
-//                    displayProgressBar(false)
-//                    getFragmentNavController(R.id.nav_host_fragment)?.navigateUp()
-//                }
-//                ERROR -> {
-//                    displayProgressBar(false)
-//                    Snackbar.make(view, it.message!!, 5000).show()
-//                }
-//                LOADING -> {
-//                }
-//                IDLE -> {
-//                }
-//            }
-//        })
-    }
-
-    private fun displayProgressBar(isDisplayed: Boolean) {
-        activity?.let {
-            it.findViewById<ProgressBar>(R.id.progressBar).visibility =
-                if (isDisplayed) View.VISIBLE else View.GONE
-        }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         binding = null
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-//        super.onSaveInstanceState(outState)
     }
 
     private fun adjustNavigationBarIconsColor(view: View) {

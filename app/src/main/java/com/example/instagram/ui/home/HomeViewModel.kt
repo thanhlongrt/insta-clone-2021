@@ -30,7 +30,6 @@ class HomeViewModel
 constructor(
     private val postRepository: PostRepository,
     private val storyRepository: StoryRepository,
-    private val notificationRepository: NotificationRepository
 ) : ViewModel() {
     companion object {
         private const val TAG = "HomeViewModel"
@@ -50,18 +49,17 @@ constructor(
         viewModelScope.launch(Dispatchers.IO) {
             storyRepository.getUserStories().collect {
                 _stories.postValue(it)
-                Log.e(TAG, "getStoryData: ${it.status}: ${it.message}")
+//                Log.e(TAG, "getStoryData: ${it.status}: ${it.message}")
             }
         }
     }
 
     fun getAllPosts() {
-        viewModelScope.launch {
-            postRepository.getFeedPosts()
-                .collect {
-                    _feedPosts.value = it
-                    Log.e(TAG, "getAllPosts: ${it.status}")
-                }
+        viewModelScope.launch(Dispatchers.IO) {
+            postRepository.getFeedPosts().collect {
+                _feedPosts.postValue(it)
+//                Log.e(TAG, "getAllPosts: ${it.status}")
+            }
         }
     }
 
@@ -69,12 +67,6 @@ constructor(
         Log.e(TAG, "like: ")
         viewModelScope.launch(Dispatchers.IO) {
             postRepository.onLikeClick(postId)
-        }
-    }
-
-    fun sendPushNotification(notification: Notification) {
-        viewModelScope.launch(Dispatchers.IO) {
-            notificationRepository.sendPushNotification(notification)
         }
     }
 }

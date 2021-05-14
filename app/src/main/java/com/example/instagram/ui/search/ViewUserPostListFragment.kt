@@ -19,11 +19,22 @@ import com.example.instagram.getFragmentNavController
 import com.example.instagram.model.PostItem
 import com.example.instagram.network.entity.Notification
 import com.example.instagram.ui.MainViewModel
-import com.example.instagram.ui.profile.PostListAdapter
+import com.example.instagram.ui.profile.view_posts.CacheDataSourceFactory
+import com.example.instagram.ui.profile.view_posts.PostListAdapter
+import com.google.android.exoplayer2.DefaultLoadControl
+import com.google.android.exoplayer2.MediaItem
+import com.google.android.exoplayer2.Player
+import com.google.android.exoplayer2.SimpleExoPlayer
+import com.google.android.exoplayer2.source.ProgressiveMediaSource
+import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
+import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
+import com.google.android.exoplayer2.ui.PlayerView
+import com.google.android.exoplayer2.util.MimeTypes
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 /**
  * Created by Thanh Long Nguyen on 4/18/2021
@@ -49,6 +60,9 @@ class ViewUserPostListFragment : Fragment() {
 
     private lateinit var postListAdapter: PostListAdapter
 
+    @Inject
+    lateinit var cacheDataSourceFactory: CacheDataSourceFactory
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -70,24 +84,31 @@ class ViewUserPostListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        postListAdapter =
-            PostListAdapter(mutableListOf())
         postListAdapter = PostListAdapter(mutableListOf())
-
-        postListAdapter.onLikeClick = { position, post ->
-            if (!post.isLiked && post.uid != mainViewModel.currentUser.value?.data?.uid ?: false) {
-                sendLikePushNotification(post)
+        postListAdapter.apply {
+            onLikeClick = { position, post ->
+                if (!post.isLiked) {
+                    sendLikePushNotification(post)
+                }
+                searchViewModel.clickLike(post.postId)
+                postListAdapter.onLikeClick(position)
             }
-            searchViewModel.clickLike(post.postId)
-            postListAdapter.clickLike(position)
-        }
+            onCommentClick = { postId ->
+                val bundle = bundleOf("postId" to postId)
+                getFragmentNavController(R.id.nav_host_fragment)?.navigate(
+                    R.id.action_homeFragment_to_commentFragment,
+                    bundle
+                )
+            }
+            onViewAttachToWindow = { playerView, url ->
+                if (player == null) {
+                    this@ViewUserPostListFragment.initPlayer(playerView, url)
+                }
+            }
 
-        postListAdapter.onCommentClick = { postId ->
-            val bundle = bundleOf("postId" to postId)
-            getFragmentNavController(R.id.nav_host_fragment)?.navigate(
-                R.id.action_homeFragment_to_commentFragment,
-                bundle
-            )
+            onViewDetachedFromWindow = { playerView, url ->
+                this@ViewUserPostListFragment.releasePlayer()
+            }
         }
 
         val linearLayoutManager = LinearLayoutManager(view.context)
@@ -126,7 +147,7 @@ class ViewUserPostListFragment : Fragment() {
     private fun sendLikePushNotification(post: PostItem) {
         lifecycleScope.launch {
             delay(3000)
-            if (!post.isLiked) {
+            if (post.isLiked) {
                 mainViewModel.currentUser.value?.data?.let {
                     val notification = Notification(
                         uid = post.uid,
@@ -137,7 +158,7 @@ class ViewUserPostListFragment : Fragment() {
                         sender_avatar = it.avatarUrl,
                         seen = false
                     )
-                    searchViewModel.sendPushNotification(notification)
+                    mainViewModel.sendPushNotification(notification)
                 }
             }
         }
@@ -146,6 +167,47 @@ class ViewUserPostListFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         binding = null
+    }
+
+    private var player: SimpleExoPlayer? = null
+    private fun initPlayer(playerView: PlayerView, videoUrl: String) {
+        val context = playerView.context
+        player = SimpleExoPlayer.Builder(
+            context,
+        )
+            .setLoadControl(DefaultLoadControl())
+            .setTrackSelector(DefaultTrackSelector(context))
+            .build()
+
+
+        playerView.setKeepContentOnPlayerReset(true)
+        playerView.useController = true
+        playerView.player = this.player
+        playerView.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_ZOOM
+        val mediaItem =
+            MediaItem.Builder()
+                .setUri(videoUrl)
+                .setMimeType(MimeTypes.VIDEO_MP4)
+                .build()
+
+        val mediaSource = ProgressiveMediaSource.Factory(
+            cacheDataSourceFactory
+        ).createMediaSource(mediaItem)
+
+        player?.apply {
+            playWhenReady = true
+            repeatMode = Player.REPEAT_MODE_ONE
+
+            setMediaSource(mediaSource)
+            prepare()
+        }
+    }
+
+    private fun releasePlayer() {
+        player?.let { player ->
+            player.release()
+            this.player = null
+        }
     }
 
 }

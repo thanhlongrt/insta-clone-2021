@@ -10,6 +10,7 @@ import com.bumptech.glide.Glide
 import com.example.instagram.*
 import com.example.instagram.databinding.FragmentEditProfileBinding
 import com.example.instagram.ui.MainViewModel
+import com.example.instagram.ui.create.TakePhotoContract
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -159,7 +160,7 @@ class EditProfileFragment : Fragment() {
     }
 
     private val takePhoto =
-        registerForActivityResult(TakePhotoFromCameraOrGalleryContract()) { uri ->
+        registerForActivityResult(TakePhotoContract()) { uri ->
             uri?.let {
                 Log.e(TAG, "takePhoto: uri: $it ")
                 Glide.with(requireActivity())

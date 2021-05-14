@@ -1,6 +1,5 @@
 package com.example.instagram.ui.explore
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -36,11 +35,10 @@ constructor(
     fun getAllPosts() {
         _feedPosts.postValue(DataState.loading())
         viewModelScope.launch {
-            postRepository.getFeedPosts()
-                .collect {
-                    _feedPosts.value = it
-                    Log.e(TAG, "getAllPosts: ${it.status}")
-                }
+            postRepository.getFeedPosts().collect {
+                _feedPosts.value = it
+//                    Log.e(TAG, "getAllPosts: ${it.status}")
+            }
         }
     }
 }

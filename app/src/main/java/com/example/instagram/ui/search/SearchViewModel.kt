@@ -33,7 +33,6 @@ class SearchViewModel
 constructor(
     private val userRepository: UserRepository,
     private val postRepository: PostRepository,
-    private val notificationRepository: NotificationRepository
 ) : ViewModel() {
     companion object {
         private const val TAG = "SearchViewModel"
@@ -53,22 +52,20 @@ constructor(
     @ExperimentalCoroutinesApi
     fun getPostById(uid: String) {
         viewModelScope.launch {
-            postRepository.getPostsByUser(uid)
-                .collect {
-                    _otherUserPosts.value = it
-                    Log.e(TAG, "getPostById: ${it.status}")
-                }
+            postRepository.getPostsByUser(uid).collect {
+                _otherUserPosts.value = it
+//                Log.e(TAG, "getPostById: ${it.status}")
+            }
         }
     }
 
     fun getUserData(uid: String) {
         _otherUserLiveData.postValue(DataState.loading())
         viewModelScope.launch {
-            userRepository.getUser(uid)
-                .collect {
-                    _otherUserLiveData.value = it
-                    Log.e(TAG, "getUserData: ${it.status}")
-                }
+            userRepository.getUser(uid).collect {
+                _otherUserLiveData.value = it
+//                Log.e(TAG, "getUserData: ${it.status}")
+            }
         }
 
     }
@@ -107,11 +104,4 @@ constructor(
             postRepository.onLikeClick(postId)
         }
     }
-
-    fun sendPushNotification(notification: Notification) {
-        viewModelScope.launch(Dispatchers.IO) {
-            notificationRepository.sendPushNotification(notification)
-        }
-    }
-
 }

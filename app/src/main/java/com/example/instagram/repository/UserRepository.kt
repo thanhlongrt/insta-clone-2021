@@ -1,10 +1,11 @@
 package com.example.instagram.repository
 
+import android.util.Log
 import com.example.instagram.DataState
 import com.example.instagram.model.UserItem
-import com.example.instagram.network.firebase.FirebaseService
 import com.example.instagram.network.entity.User
 import com.example.instagram.network.entity.UserNetworkMapper
+import com.example.instagram.network.firebase.FirebaseService
 import com.example.instagram.room.dao.StringKeyValueDao
 import com.example.instagram.room.dao.UserDao
 import com.example.instagram.room.entity.UserCacheMapper
@@ -28,6 +29,10 @@ constructor(
     private val userNetworkMapper: UserNetworkMapper,
     private val userCacheMapper: UserCacheMapper
 ) {
+
+    companion object{
+        private const val TAG = "UserRepository"
+    }
     private val cacheThresholdInMillis = 5 * 60 * 1000L
 
     fun logout() = firebaseService.logout()
@@ -85,7 +90,7 @@ constructor(
     }
 
 
-    fun updateUserData(userData: HashMap<String, Any>): Flow<DataState<Boolean>> = channelFlow {
+    fun updateUserData(userData: HashMap<String, Any>): Flow<DataState<Boolean>> = callbackFlow {
         firebaseService.saveUserData(currentFirebaseUser!!.uid, userData)
             .addOnCompleteListener {
                 if (it.isSuccessful) {
@@ -95,7 +100,7 @@ constructor(
                 }
             }
         awaitClose {
-
+            Log.e(TAG, "updateUserData: await close", )
         }
     }.onStart {
         emit(DataState.loading())

@@ -1,4 +1,4 @@
-package com.example.instagram.ui.profile
+package com.example.instagram.ui.profile.view_posts
 
 import android.os.Build
 import android.os.Bundle
@@ -6,7 +6,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS
-import android.widget.ProgressBar
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.activityViewModels
 import com.example.instagram.R
@@ -23,7 +22,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 @ExperimentalCoroutinesApi
 @AndroidEntryPoint
-class PostBottomSheetFragment : BottomSheetDialogFragment() {
+class PostOptionsBottomSheet : BottomSheetDialogFragment() {
 
     companion object {
         private const val TAG = "PostBottomSheetFragment"

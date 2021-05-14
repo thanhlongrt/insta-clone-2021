@@ -15,17 +15,19 @@ data class PostCache(
     val avatarUrl: String = "",
     val userName: String = "",
     val photoUrl: String = "",
+    val videoUrl: String = "",
     val date: Long = 0,
     val caption: String = "",
     val likeCount: Long = 0,
     val commentCount: Long = 0,
     val path: String,
+    var isVideo: Boolean = false,
     var isLiked: Boolean = false,
     var isFeedPost: Boolean = false
 ) {
 }
 
-class PostCacheMapper @Inject constructor(): EntityMapper<PostCache, PostItem> {
+class PostCacheMapper @Inject constructor() : EntityMapper<PostCache, PostItem> {
     override fun fromEntity(entity: PostCache): PostItem {
         return PostItem(
             postId = entity.postId,
@@ -33,12 +35,14 @@ class PostCacheMapper @Inject constructor(): EntityMapper<PostCache, PostItem> {
             avatarUrl = entity.avatarUrl,
             userName = entity.userName,
             photoUrl = entity.photoUrl,
+            videoUrl = entity.videoUrl,
             date = entity.date,
             caption = entity.caption,
             likeCount = entity.likeCount,
             commentCount = entity.commentCount,
             likes = mutableListOf(),
             path = entity.path,
+            isVideo = entity.isVideo,
             isLiked = entity.isLiked
         )
     }
@@ -50,11 +54,13 @@ class PostCacheMapper @Inject constructor(): EntityMapper<PostCache, PostItem> {
             avatarUrl = model.avatarUrl,
             userName = model.userName,
             photoUrl = model.photoUrl,
+            videoUrl = model.videoUrl,
             date = model.date,
             caption = model.caption,
             likeCount = model.likeCount,
             commentCount = model.commentCount,
             path = model.path,
+            isVideo = model.isVideo,
             isLiked = model.isLiked
         )
     }

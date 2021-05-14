@@ -30,7 +30,7 @@ class ExploreFragment : Fragment() {
 
     private val exploreViewModel: ExploreViewModel by viewModels()
 
-    private lateinit var adapter: PostGridListAdapter
+    private lateinit var gridListAdapter: PostGridListAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,17 +63,22 @@ class ExploreFragment : Fragment() {
 
 //        val gridLayoutManager = GridLayoutManager(context, 3)
 //        adapter = PostGridListAdapter(mutableListOf())
-
+        gridListAdapter = PostGridListAdapter(mutableListOf())
+        binding?.recyclerView?.apply {
+            layoutManager = spannedGridLayoutManager
+            adapter = gridListAdapter
+        }
 
         exploreViewModel.feedPosts.observe(viewLifecycleOwner) {
             when (it.status) {
                 SUCCESS -> {
                     displayProgressBar(false)
-                    adapter = PostGridListAdapter(it.data!!)
-                    binding?.recyclerView?.apply {
-                        layoutManager = spannedGridLayoutManager
-                        adapter = this@ExploreFragment.adapter
-                    }
+//                    gridListAdapter = PostGridListAdapter(it.data!!)
+//                    binding?.recyclerView?.apply {
+//                        layoutManager = spannedGridLayoutManager
+//                        adapter = this@ExploreFragment.gridListAdapter
+//                    }
+                    gridListAdapter.addAll(it.data!!.reversed())
 
                 }
                 ERROR -> {

@@ -80,15 +80,6 @@ class ViewUserFragment : Fragment() {
                     header.bioTextView.text = user.bio
                     header.websiteTextView.text = user.website
                 }
-                ERROR -> {
-
-                }
-                LOADING -> {
-
-                }
-                IDLE -> {
-
-                }
             }
         })
     }

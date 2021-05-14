@@ -52,6 +52,8 @@ constructor(
         firebaseStorage.reference
             .child("Photos")
 
+    val storageReference = firebaseStorage.reference
+
     suspend fun uploadPhoto(context: Context, uri: Uri, path: String): String {
         val imageSize = ImageUtils.getImageSize(context, uri)
         val data = if (imageSize > 1 * 1024 * 1024) ImageUtils.compress(context, uri)

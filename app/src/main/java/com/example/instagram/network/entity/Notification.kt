@@ -6,7 +6,7 @@ import androidx.room.Entity
  * Created by Thanh Long Nguyen on 5/8/2021
  */
 
-@Entity(tableName = "notification", primaryKeys = ["notification_id"])
+@Entity(tableName = "notifications", primaryKeys = ["notification_id"])
 class Notification(
     val uid: String = "",
     val notification_id: String = "",

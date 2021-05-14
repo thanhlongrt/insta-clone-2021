@@ -48,7 +48,7 @@ constructor(
         viewModelScope.launch(Dispatchers.IO) {
             commentRepository.getCommentsFromFirebaseByPost(postId).collect {
                 _comments.postValue(it)
-                Log.e(TAG, "getCommentsByPost: ${it.status}")
+//                Log.e(TAG, "getCommentsByPost: ${it.status}")
             }
         }
     }

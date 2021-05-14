@@ -2,6 +2,7 @@ package com.example.instagram.repository
 
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import com.example.instagram.DataState
 import com.example.instagram.Status
 import com.example.instagram.model.StoryItem
@@ -33,6 +34,9 @@ constructor(
     private val storyDao: StoryDao,
     private val userStoryCacheMapper: UserStoryCacheMapper
 ) {
+    companion object{
+        private const val TAG = "StoryRepository"
+    }
 
     suspend fun getUserStories(): Flow<DataState<List<UserStoryItem>>> = flow {
         getStoriesFromFirebase().collect { storyResult ->

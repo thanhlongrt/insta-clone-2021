@@ -1,6 +1,7 @@
 package com.example.instagram
 
 import android.app.Activity
+import android.content.ContentResolver
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.ImageDecoder
@@ -10,8 +11,9 @@ import android.provider.MediaStore
 import android.provider.OpenableColumns
 import android.util.DisplayMetrics
 import android.view.WindowInsets
+import android.webkit.MimeTypeMap
 import java.io.ByteArrayOutputStream
-import java.io.IOException
+import java.util.*
 
 /**
  * Created by Thanh Long Nguyen on 4/15/2021
@@ -82,5 +84,18 @@ object ImageUtils {
         }
     }
 
+    fun Uri.mimeType(contentResolver: ContentResolver)
+            : String? {
+        if (scheme.equals(ContentResolver.SCHEME_CONTENT)) {
+            // get (image/jpeg, video/mp4) from ContentResolver if uri scheme is "content://"
+            return contentResolver.getType(this)
+        } else {
+            // get (.jpeg, .mp4) from uri "file://example/example.mp4"
+            val fileExtension = MimeTypeMap.getFileExtensionFromUrl(toString())
+            // turn ".mp4" into "video/mp4"
+            return MimeTypeMap.getSingleton()
+                .getMimeTypeFromExtension(fileExtension.toLowerCase(Locale.US))
+        }
+    }
 
 }

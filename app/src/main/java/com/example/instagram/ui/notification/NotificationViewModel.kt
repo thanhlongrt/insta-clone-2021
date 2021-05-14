@@ -1,6 +1,5 @@
 package com.example.instagram.ui.notification
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -29,14 +28,14 @@ class NotificationViewModel
         private const val TAG = "NotificationViewModel"
     }
 
-    private val _notification = MutableLiveData<DataState<List<Notification>>>()
-    val notification: LiveData<DataState<List<Notification>>>
-        get() = _notification
+    private val _notifications = MutableLiveData<DataState<List<Notification>>>()
+    val notifications: LiveData<DataState<List<Notification>>>
+        get() = _notifications
 
     fun getNotification() {
         viewModelScope.launch(Dispatchers.IO) {
             notificationRepository.getNotification().collect {
-                _notification.postValue(it)
+                _notifications.postValue(it)
             }
         }
     }
@@ -44,25 +43,6 @@ class NotificationViewModel
     fun uploadFcmToken() {
         viewModelScope.launch(Dispatchers.IO) {
             notificationRepository.uploadFcmToken()
-        }
-    }
-
-    fun sendPushNotification(
-        receiverUid: String,
-        notificationTitle: String,
-        notificationBody: String,
-        postId: String?,
-        avatar: String?
-    ) {
-        viewModelScope.launch(Dispatchers.IO) {
-            Log.e(TAG, "sendPushNotification: ")
-            notificationRepository.sendPushNotification(
-                receiverUid,
-                notificationTitle,
-                notificationBody,
-                postId,
-                avatar
-            )
         }
     }
 

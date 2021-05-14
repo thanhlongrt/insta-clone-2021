@@ -72,16 +72,14 @@ constructor(
 
     fun getPostByUser(uid: String) {
         viewModelScope.launch {
-            postRepository.getPostsByUser(uid)
-                .collect {
-                    _userPosts.value = it
-                    Log.e(TAG, "getPostById: ${it.status}")
-                }
+            postRepository.getPostsByUser(uid).collect {
+                _userPosts.value = it
+//                Log.e(TAG, "getPostById: ${it.status}")
+            }
         }
     }
 
     fun clickLike(postId: String) {
-        Log.e(TAG, "like: ")
         viewModelScope.launch(Dispatchers.IO) {
             postRepository.onLikeClick(postId)
         }

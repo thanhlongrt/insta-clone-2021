@@ -1,8 +1,14 @@
 package com.example.instagram.ui.profile
 
+import android.Manifest
+import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Log
 import android.view.*
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
@@ -33,10 +39,15 @@ class ProfileFragment : Fragment() {
 
     private val mainViewModel: MainViewModel by activityViewModels()
 
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        Log.e(TAG, "onAttach: ", )
+        profileViewModel.getPostByUser(profileViewModel.currentUserUid)
+    }
+    
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
-        profileViewModel.getPostByUser(profileViewModel.currentUserUid)
     }
 
     override fun onCreateView(
@@ -132,7 +143,6 @@ class ProfileFragment : Fragment() {
             }
 
             R.id.action_add -> {
-
                 findNavController().navigate(R.id.action_profileFragment_to_createBottomSheetFragment)
                 true
             }
@@ -142,6 +152,8 @@ class ProfileFragment : Fragment() {
             }
         }
     }
+
+
 
     private fun logout() {
         profileViewModel.logout()

@@ -26,6 +26,7 @@ class PreviewPhotoFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
+        uri = arguments?.getParcelable("uri")
     }
 
     override fun onCreateView(
@@ -39,8 +40,6 @@ class PreviewPhotoFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        uri = arguments?.getParcelable("uri")
-
 
         val imageSize = getImageSize(view.context, uri!!)
         Log.e(TAG, "onViewCreated: image size: ${imageSize / 1024}kB")
@@ -71,7 +70,6 @@ class PreviewPhotoFragment : Fragment() {
                 super.onOptionsItemSelected(item)
             }
         }
-
     }
 
 
