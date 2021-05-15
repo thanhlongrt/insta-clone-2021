@@ -14,7 +14,6 @@ import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.example.instagram.R
 import com.example.instagram.Status
-import com.example.instagram.afterTextChanged
 import com.example.instagram.databinding.FragmentLoginBinding
 import com.example.instagram.ui.MainActivity
 import com.google.android.material.snackbar.Snackbar
@@ -55,9 +54,7 @@ class LoginFragment : Fragment() {
 
         loginViewModel.loginFormState.observe(viewLifecycleOwner, Observer {
             val loginFormState = it ?: return@Observer
-
             binding?.login?.isEnabled = loginFormState.data!!
-
         })
 
         binding?.email?.apply {

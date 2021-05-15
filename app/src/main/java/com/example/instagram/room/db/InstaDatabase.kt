@@ -12,7 +12,7 @@ import com.example.instagram.room.entity.*
 @Database(
     entities = [StringKeyValuePair::class, UserCache::class,
         PostCache::class, StoryCache::class, UserStoryCache::class, Notification::class],
-    version = 4
+    version = 1
 )
 abstract class InstaDatabase : RoomDatabase() {
 

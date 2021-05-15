@@ -8,24 +8,27 @@
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarLayout"
+        style="@style/Theme.Instagram.AppBarOverlay"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:elevation="0dp"
+        android:backgroundTint="@color/white"
         app:layout_constraintTop_toTopOf="parent">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/tool_bar"
+            style="@style/Theme.Instagram.PopupOverlay"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="@color/white"
             app:title="Instagram"
+            android:backgroundTint="@color/white"
             app:titleTextColor="@color/purple_500">
 
             <androidx.constraintlayout.widget.ConstraintLayout
-                android:visibility="gone"
                 android:id="@+id/searchViewHolder"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                android:visibility="gone">
 
                 <View
                     android:layout_width="match_parent"
@@ -48,11 +51,11 @@
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
                     android:hint="Search"
                     android:textSize="16sp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/imageView2"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -60,16 +63,17 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <androidx.appcompat.widget.SearchView
-                android:background="@drawable/lighter_gray_rounded_corner"
-                app:queryBackground="@null"
-                app:searchIcon="@null"
                 android:id="@+id/searchView"
-                app:queryHint="Search"
-                app:iconifiedByDefault="false"
-                android:layout_marginEnd="16dp"
                 android:layout_width="match_parent"
+                android:layout_height="36dp"
+                android:layout_marginEnd="16dp"
+                android:background="@drawable/lighter_gray_rounded_corner"
                 android:focusable="true"
-                android:layout_height="36dp">
+                app:iconifiedByDefault="false"
+                app:queryBackground="@null"
+                app:queryHint="Search"
+                app:searchIcon="@null">
+
                 <requestFocus />
             </androidx.appcompat.widget.SearchView>
 

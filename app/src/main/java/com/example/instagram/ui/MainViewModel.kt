@@ -11,11 +11,9 @@ import com.example.instagram.model.UserItem
 import com.example.instagram.network.entity.Notification
 import com.example.instagram.repository.NotificationRepository
 import com.example.instagram.repository.UserRepository
-import com.example.instagram.ui.home.HomeViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -39,13 +37,9 @@ constructor(
     private val _userLivaData = MutableLiveData<DataState<UserItem>>()
     val currentUser: LiveData<DataState<UserItem>> = _userLivaData
 
-    fun getCurrentUser() {
-        viewModelScope.launch {
-            userRepository.getUser(userRepository.currentFirebaseUser!!.uid)
-                .collect {
-                    _userLivaData.value = it
-//                    Log.e(TAG, "getCurrentUser: ${it.status}", )
-                }
+    fun getCurrentUserData() {
+        viewModelScope.launch(Dispatchers.IO) {
+            userRepository.getCurrentUserFromFirebase()
         }
     }
 

@@ -12,7 +12,7 @@ import com.example.instagram.R
 import com.example.instagram.Status.*
 import com.example.instagram.databinding.FragmentViewUserPostGridListBinding
 import com.example.instagram.getFragmentNavController
-import com.example.instagram.ui.profile.PostGridListAdapter
+import com.example.instagram.ui.profile.view_post.PostGridListAdapter
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 

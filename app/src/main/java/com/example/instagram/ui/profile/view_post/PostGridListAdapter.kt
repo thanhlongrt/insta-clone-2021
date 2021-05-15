@@ -1,4 +1,4 @@
-package com.example.instagram.ui.profile
+package com.example.instagram.ui.profile.view_post
 
 import android.view.LayoutInflater
 import android.view.ViewGroup

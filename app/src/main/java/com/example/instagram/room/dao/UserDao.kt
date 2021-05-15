@@ -5,8 +5,8 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy.REPLACE
 import androidx.room.Query
 import androidx.room.Transaction
-import com.example.instagram.model.UserItem
 import com.example.instagram.room.entity.UserCache
+import kotlinx.coroutines.flow.Flow
 
 /**
  * Created by Thanh Long Nguyen on 5/1/2021
@@ -28,5 +28,9 @@ interface UserDao {
         deleteAll()
         insertUser(user)
     }
+
+    @Transaction
+    @Query("SELECT * FROM users LIMIT 1")
+    fun getUserFlow(): Flow<UserCache?>
 
 }

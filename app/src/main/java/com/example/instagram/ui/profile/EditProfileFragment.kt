@@ -4,12 +4,14 @@ import android.os.Bundle
 import android.util.Log
 import android.view.*
 import android.widget.ProgressBar
+import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.bumptech.glide.Glide
-import com.example.instagram.*
+import com.example.instagram.R
+import com.example.instagram.Status
 import com.example.instagram.databinding.FragmentEditProfileBinding
-import com.example.instagram.ui.MainViewModel
+import com.example.instagram.getFragmentNavController
 import com.example.instagram.ui.create.TakePhotoContract
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
@@ -31,8 +33,6 @@ class EditProfileFragment : Fragment() {
 
     private val profileViewModel: ProfileViewModel by activityViewModels()
 
-    private val mainViewModel: MainViewModel by activityViewModels()
-
     private var isSaved: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,31 +46,26 @@ class EditProfileFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding =
-            FragmentEditProfileBinding.inflate(inflater, container, false)
+            DataBindingUtil.inflate(inflater, R.layout.fragment_edit_profile, container, false)
+        binding?.viewModel = profileViewModel
+        binding?.lifecycleOwner = viewLifecycleOwner
         return binding!!.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        mainViewModel.currentUser.observe(requireActivity(), {
-            when (it.status) {
-                Status.SUCCESS -> {
-                    val user = it.data!!
-                    binding?.nameEditText?.setText(user.displayName)
-                    binding?.usernameEditText?.setText(user.username)
-                    binding?.websiteEditText?.setText(user.website)
-                    binding?.bioEditText?.setText(user.bio)
-                    if (!isSaved) {
-                        activity?.let { it1 ->
-                            Glide.with(it1)
-                                .load(user.avatarUrl)
-                                .into(binding?.circleImageView!!)
-                        }
-                    }
-                }
-            }
-        })
+//
+//        profileViewModel.currentUser.observe(requireActivity(), { user ->
+//            binding?.nameEditText?.setText(user.displayName)
+//            binding?.usernameEditText?.setText(user.username)
+//            binding?.websiteEditText?.setText(user.website)
+//            binding?.bioEditText?.setText(user.bio)
+//            if (!isSaved) {
+//                Glide.with(view.context)
+//                    .load(user.avatarUrl)
+//                    .into(binding?.circleImageView!!)
+//            }
+//        })
 
         binding?.circleImageView?.setOnClickListener {
             takePhoto.launch(Unit)
@@ -167,7 +162,7 @@ class EditProfileFragment : Fragment() {
                     .load(uri)
                     .into(binding?.circleImageView!!)
                 val path = "IMG_${System.currentTimeMillis()}.jpg"
-                profileViewModel.upload(uri, path)
+                profileViewModel.uploadProfilePicture(uri, path)
                 isSaved = true
             }
         }

@@ -3,7 +3,7 @@
     <string name="prompt_email">Email</string>
     <string name="prompt_password">Password</string>
     <string name="action_sign_in">Sign in or register</string>
-    <string name="action_sign_in_short">Sign in</string>
+    <string name="sign_in_button">Sign in</string>
     <string name="welcome">"Welcome !"</string>
     <string name="invalid_username">Not a valid username</string>
     <string name="invalid_password">Password must be >5 characters</string>
@@ -14,6 +14,10 @@
     <string name="post_notification_channel_id">fcm_default_channel</string>
     <string name="notification_title">Instagram</string>
     <string name="post_notification_channel_name">Post</string>
+    <string name="create_account_button">Create an account</string>
+    <string name="follow">Follow</string>
+    <string name="message">Message</string>
+    <string name="reply">Reply</string>
     <plurals name="likeCount">
         <item quantity="one">%d like</item>
         <item quantity="other">%d likes</item>

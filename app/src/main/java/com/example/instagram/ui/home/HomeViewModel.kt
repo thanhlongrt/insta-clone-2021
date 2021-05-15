@@ -8,8 +8,6 @@ import androidx.lifecycle.viewModelScope
 import com.example.instagram.DataState
 import com.example.instagram.model.PostItem
 import com.example.instagram.model.UserStoryItem
-import com.example.instagram.network.entity.Notification
-import com.example.instagram.repository.NotificationRepository
 import com.example.instagram.repository.PostRepository
 import com.example.instagram.repository.StoryRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -66,7 +64,7 @@ constructor(
     fun clickLike(postId: String) {
         Log.e(TAG, "like: ")
         viewModelScope.launch(Dispatchers.IO) {
-            postRepository.onLikeClick(postId)
+            postRepository.likeClick(postId)
         }
     }
 }

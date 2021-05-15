@@ -48,12 +48,12 @@
     </fragment>
     <fragment
         android:id="@+id/userPhotoFragment"
-        android:name="com.example.instagram.ui.profile.PostGridListFragment"
+        android:name="com.example.instagram.ui.profile.view_post.PostGridListFragment"
         android:label="UserPhotoFragment"
         tools:layout="@layout/fragment_post_grid_list" />
     <fragment
         android:id="@+id/userPostsFragment"
-        android:name="com.example.instagram.ui.profile.view_posts.PostListFragment"
+        android:name="com.example.instagram.ui.profile.view_post.PostListFragment"
         android:label="UserPostsFragment"
         tools:layout="@layout/fragment_post_list">
         <action
@@ -62,7 +62,7 @@
     </fragment>
     <dialog
         android:id="@+id/postBottomSheetFragment"
-        android:name="com.example.instagram.ui.profile.view_posts.PostOptionsBottomSheet"
+        android:name="com.example.instagram.ui.profile.view_post.PostOptionsBottomSheet"
         android:label="PostBottomSheetFragment"
         tools:layout="@layout/fragment_post_bottom_sheet" />
     <dialog

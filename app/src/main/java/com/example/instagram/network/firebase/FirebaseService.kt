@@ -3,19 +3,26 @@ package com.example.instagram.network.firebase
 import android.content.Context
 import android.net.Uri
 import com.example.instagram.ImageUtils
+import com.example.instagram.network.entity.Comment
 import com.example.instagram.network.entity.Notification
+import com.example.instagram.network.entity.Post
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.*
 import com.google.firebase.storage.FirebaseStorage
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.channels.sendBlocking
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 /**
  * Created by Thanh Long Nguyen on 4/12/2021
  */
+@ExperimentalCoroutinesApi
 class FirebaseService
 @Inject
 constructor(
@@ -23,6 +30,39 @@ constructor(
     private val firebaseDatabase: FirebaseDatabase,
     private val firebaseStorage: FirebaseStorage
 ) {
+
+    fun getPostById(postId: String) = callbackFlow<Post?> {
+        val postListener = object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val postItem = snapshot.getValue(Post::class.java)!!
+                sendBlocking(postItem)
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                sendBlocking(null)
+            }
+        }
+        val postRef = postDataReference.child(postId)
+        postRef.addListenerForSingleValueEvent(postListener)
+        awaitClose { postRef.removeEventListener(postListener) }
+    }.catch { emit(null) }
+
+    fun getCommentsByPost(postId: String) =
+        callbackFlow<List<Comment>?> {
+            val commentListener = object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val comments = snapshot.children.mapNotNull { it.getValue(Comment::class.java) }
+                    sendBlocking(comments)
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    sendBlocking(null)
+                }
+            }
+            val commentRef = commentDataReference.child(postId)
+            commentRef.addValueEventListener(commentListener)
+            awaitClose { commentRef.removeEventListener(commentListener) }
+        }.catch { emit(null) }
 
     fun createUser(email: String, password: String) =
         firebaseAuth.createUserWithEmailAndPassword(email, password)
@@ -91,9 +131,9 @@ constructor(
             .child(commentId)
             .updateChildren(commentData)
 
-//        postDataReference.child(commentData["post_id"].toString())
-//            .child("comment_count")
-//            .setValue(ServerValue.increment(1))
+        postDataReference.child(commentData["post_id"].toString())
+            .child("comment_count")
+            .setValue(ServerValue.increment(1))
     }
 
     fun uploadFcmToken(token: String): Task<Void>? {

@@ -1,5 +1,6 @@
-package com.example.instagram.ui.profile
+package com.example.instagram.ui.profile.view_post
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,7 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.instagram.R
-import com.example.instagram.Status.*
+import com.example.instagram.Status.SUCCESS
 import com.example.instagram.databinding.FragmentPostGridListBinding
 import com.example.instagram.getFragmentNavController
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -21,11 +22,18 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 class PostGridListFragment : Fragment() {
     private var binding: FragmentPostGridListBinding? = null
 
-    private val profileViewModel: ProfileViewModel by activityViewModels()
+
+    private val viewPostViewModel: ViewPostViewModel by activityViewModels()
 
     private lateinit var postGridListAdapter: PostGridListAdapter
 
     private var type: Int? = null
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        viewPostViewModel.getUploadedPosts()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -55,35 +63,27 @@ class PostGridListFragment : Fragment() {
             )
         }
         when (type) {
-            UPLOADED_PHOTOS_FRAGMENT -> {
+            UPLOADED_POSTS_FRAGMENT -> {
                 binding?.photoRecyclerView?.apply {
                     setHasFixedSize(true)
                     adapter = postGridListAdapter
                     val layoutManager = GridLayoutManager(view.context, 3)
                     this.layoutManager = layoutManager
-
                 }
+                viewPostViewModel.userPosts.observe(requireActivity(), {
+                    when (it.status) {
+                        SUCCESS -> {
+                            postGridListAdapter.addAll(it.data!!.reversed())
+                        }
+                    }
+                })
             }
-            TAGGED_PHOTOS_FRAGMENT -> {
+            TAGGED_POSTS_FRAGMENT -> {
 
             }
         }
 
-        profileViewModel.userPosts.observe(requireActivity(), {
-            when (it.status) {
-                LOADING -> {
-                }
 
-                ERROR -> {
-                }
-
-                SUCCESS -> {
-                    postGridListAdapter.addAll(it.data!!.reversed())
-                }
-                IDLE -> {
-                }
-            }
-        })
     }
 
     override fun onDestroyView() {
@@ -92,8 +92,8 @@ class PostGridListFragment : Fragment() {
     }
 
     companion object {
-        const val UPLOADED_PHOTOS_FRAGMENT = 1
-        const val TAGGED_PHOTOS_FRAGMENT = 2
+        const val UPLOADED_POSTS_FRAGMENT = 1
+        const val TAGGED_POSTS_FRAGMENT = 2
 
         fun newInstance(type: Int) =
             PostGridListFragment().apply {

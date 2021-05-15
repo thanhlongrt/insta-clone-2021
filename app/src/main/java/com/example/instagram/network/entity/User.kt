@@ -19,7 +19,20 @@ data class User(
     var following: Long = 0,
     var posts: Long = 0
 ) {
-
+    fun toMap(): HashMap<String, Any>{
+        val data = HashMap<String, Any>()
+        data["uid"] = uid
+        data["email"] = email
+        data["username"] = username
+        data["display_name"] = display_name
+        data["bio"] = bio
+        data["website"] = website
+        data["profile_photo"] = profile_photo
+        data["followers"] = followers
+        data["following"] = following
+        data["posts"] = posts
+        return data
+    }
     override fun toString(): String {
         return username
     }
@@ -35,6 +48,9 @@ class UserNetworkMapper @Inject constructor() : EntityMapper<User, UserItem> {
             bio = entity.bio,
             website = entity.website,
             avatarUrl = entity.profile_photo,
+            postCount = entity.posts,
+            followerCount = entity.followers,
+            followingCount = entity.following
         )
     }
 
@@ -47,6 +63,9 @@ class UserNetworkMapper @Inject constructor() : EntityMapper<User, UserItem> {
             bio = model.bio,
             website = model.website,
             profile_photo = model.avatarUrl,
+            posts = model.postCount,
+            followers = model.followerCount,
+            following = model.followingCount
         )
     }
 

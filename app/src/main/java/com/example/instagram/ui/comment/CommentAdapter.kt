@@ -2,8 +2,9 @@ package com.example.instagram.ui.comment
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
+import com.example.instagram.R
 import com.example.instagram.databinding.ItemCommentBinding
 import com.example.instagram.network.entity.Comment
 
@@ -17,8 +18,9 @@ class CommentAdapter(
     class CommentViewHolder(val binding: ItemCommentBinding) : RecyclerView.ViewHolder(binding.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CommentViewHolder {
-        val binding = ItemCommentBinding.inflate(
+        val binding = DataBindingUtil.inflate<ItemCommentBinding>(
             LayoutInflater.from(parent.context),
+            R.layout.item_comment,
             parent, false
         )
         return CommentViewHolder(binding)
@@ -27,21 +29,15 @@ class CommentAdapter(
     override fun onBindViewHolder(holder: CommentViewHolder, position: Int) {
         val comment = comments[position]
         val binding = holder.binding
-
-        Glide.with(holder.itemView.context)
-            .load(comment.avatar)
-            .into(binding.avatar)
-
-        binding.username.text = comment.username
-        binding.content.text = comment.content
-        binding.date.text = comment.date_created.toString()
+        binding.comment = comment
+        binding.executePendingBindings()
     }
 
     override fun getItemCount(): Int {
         return comments.size
     }
 
-    fun addAll(list: List<Comment>){
+    fun addAll(list: List<Comment>) {
         comments.clear()
         comments.addAll(list)
         notifyDataSetChanged()

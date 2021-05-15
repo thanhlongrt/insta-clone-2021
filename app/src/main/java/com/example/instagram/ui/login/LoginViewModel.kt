@@ -3,15 +3,21 @@ package com.example.instagram.ui.login
 import android.text.TextUtils
 import android.util.Log
 import android.util.Patterns
-import androidx.databinding.ObservableField
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.instagram.Constants
 import com.example.instagram.DataState
+import com.example.instagram.Status
+import com.example.instagram.model.UserItem
 import com.example.instagram.network.entity.User
 import com.example.instagram.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @ExperimentalCoroutinesApi
@@ -25,12 +31,12 @@ constructor(
         const val TAG = "LoginViewModel"
     }
 
-    var email = ObservableField("")
-    var password = ObservableField("")
-    var displayName = ObservableField("")
+    var email = MutableLiveData<String>("")
+    var password = MutableLiveData<String>("")
+    var displayName = MutableLiveData<String>("")
 
     val isLoggedIn: Boolean
-        get() = userRepository.currentFirebaseUser != null
+        get() = userRepository.currentUser != null
 
     private val _loginForm = MutableLiveData<DataState<Boolean>>()
     val loginFormState: LiveData<DataState<Boolean>> = _loginForm
@@ -50,23 +56,19 @@ constructor(
 
 
     fun login() {
-        Log.e(TAG, "login: Loading", )
-        _loginResult.postValue(DataState.loading())
-        userRepository.login(email.get()!!.trim(), password.get()!!.trim()).addOnCompleteListener {
-            if (it.isSuccessful) {
-                _loginResult.postValue(DataState.success(true))
-                Log.e(TAG, "login: Success")
-            } else {
-                _loginResult.postValue(DataState.error(false, it.exception?.message.toString()))
-                Log.e(TAG, "login: Failed: ${it.exception?.message.toString()}")
+        Log.e(TAG, "login: ...")
+        viewModelScope.launch(Dispatchers.IO) {
+            userRepository.login(email.value!!.trim(), password.value!!.trim()).collect {
+                _loginResult.postValue(it)
+                Log.e(TAG, "login: ${it.status}", )
             }
         }
     }
 
     fun loginDataChanged() {
-        if (!isEmailValid(email.get()!!)) {
+        if (!isEmailValid(email.value!!)) {
             _loginForm.value = DataState.error(false, "Invalid email")
-        } else if (!isPasswordValid(password.get()!!)) {
+        } else if (!isPasswordValid(password.value!!)) {
             _loginForm.value = DataState.error(false, "Password cannot be empty")
         } else {
             _loginForm.value = DataState.success(true)
@@ -75,64 +77,37 @@ constructor(
 
     fun signUp() {
         _signUpResult.postValue(DataState.loading())
-        Log.e(TAG, "signUp: Loading", )
-        userRepository.createUser(email.get()!!.trim(), password.get()!!.trim()).addOnCompleteListener {
-            if (it.isSuccessful) {
-                val user = User(
-                    uid = userRepository.currentFirebaseUser!!.uid,
-                    email = email.get()!!,
-                    username = email.get()!!.split("@")[0],
-                    display_name = displayName.get()!!,
-                    bio = "",
-                    website = "",
-                    profile_photo = "",
-                    followers = 0,
-                    following = 0,
-                    posts = 0
-                )
-
-                saveUserData(user)
-                _signUpResult.postValue(DataState.success(true))
-                Log.e(TAG, "signUp: Success", )
-            } else {
-                _signUpResult.postValue(DataState.error(false, it.exception?.message.toString()))
-                Log.e(TAG, "signUp: Failed: ${it.exception?.message.toString()}", )
+        viewModelScope.launch(Dispatchers.IO) {
+            userRepository.createUser(email.value!!.trim(), password.value!!.trim()).collect {
+                Log.e(TAG, "signUp: ${it.status}", )
+                _signUpResult.postValue(it)
+                if (it.status == Status.SUCCESS) {
+                    val user = UserItem(
+                        uid = userRepository.currentUser!!.uid,
+                        email = email.value!!,
+                        username = email.value!!.split("@")[0],
+                        displayName = displayName.value!!,
+                        avatarUrl = Constants.DEFAULT_PROFILE_IMAGE_URL,
+                    )
+                    saveUserData(user)
+                }
             }
         }
     }
 
-    private fun saveUserData(user: User) {
-        val userData = HashMap<String, Any>()
-        userData["uid"] = user.uid
-        userData["email"] = user.email
-        userData["username"] = user.username
-        userData["display_name"] = user.display_name
-        userData["bio"] = user.bio
-        userData["website"] = user.website
-        userData["profile_photo"] = user.profile_photo
-        userData["followers"] = user.followers
-        userData["following"] = user.following
-        userData["posts"] = user.posts
-        Log.e(TAG, "saveUserData: Loading", )
-        userRepository.saveUserData(user.uid, userData).addOnCompleteListener {
-            if (it.isSuccessful) {
-                Log.e(TAG, "saveUserData: Saved")
-            } else {
-                Log.e(TAG, "saveUserData: Failed: ${it.exception?.message.toString()}")
-            }
-        }
-
+    private suspend fun saveUserData(user: UserItem) {
+        userRepository.saveUserData(user.uid, user)
     }
 
     fun signUpDataChanged() {
         when {
-            !isEmailValid(email.get()!!) -> {
+            !isEmailValid(email.value!!) -> {
                 _signUpForm.value = DataState.error(false, "Invalid email")
             }
-            !isPasswordValid(password.get()!!) -> {
+            !isPasswordValid(password.value!!) -> {
                 _signUpForm.value = DataState.error(false, "Password cannot be empty")
             }
-            !isDisplayNameValid(displayName.get()!!) -> {
+            !isDisplayNameValid(displayName.value!!) -> {
                 _signUpForm.value = DataState.error(false, "Invalid display name")
             }
             else -> {
@@ -151,15 +126,5 @@ constructor(
 
     private fun isDisplayNameValid(name: String): Boolean {
         return !TextUtils.isEmpty(name)
-    }
-
-    class LoginFormState(
-        var isDataValid: Boolean = false,
-        var emailError: String? = null,
-        var passwordError: String? = null,
-    ) {
-        override fun toString(): String {
-            return "($isDataValid, $emailError, $passwordError)"
-        }
     }
 }

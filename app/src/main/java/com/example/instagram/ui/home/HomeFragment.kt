@@ -19,8 +19,8 @@ import com.example.instagram.getFragmentNavController
 import com.example.instagram.model.PostItem
 import com.example.instagram.network.entity.Notification
 import com.example.instagram.ui.MainViewModel
-import com.example.instagram.ui.profile.view_posts.CacheDataSourceFactory
-import com.example.instagram.ui.profile.view_posts.PostListAdapter
+import com.example.instagram.ui.profile.view_post.CacheDataSourceFactory
+import com.example.instagram.ui.profile.view_post.PostListAdapter
 import com.google.android.exoplayer2.DefaultLoadControl
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player

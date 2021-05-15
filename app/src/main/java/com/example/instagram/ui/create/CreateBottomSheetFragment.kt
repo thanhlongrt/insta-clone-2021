@@ -12,12 +12,9 @@ import android.view.WindowInsetsController
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
-import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import com.example.instagram.R
 import com.example.instagram.databinding.FragmentCreateNewBottomSheetBinding
 import com.example.instagram.getFragmentNavController
-import com.example.instagram.ui.MainViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -34,12 +31,6 @@ class CreateBottomSheetFragment : BottomSheetDialogFragment() {
     }
 
     private var binding: FragmentCreateNewBottomSheetBinding? = null
-
-    private val mainViewModel: MainViewModel by activityViewModels()
-
-    private val createViewModel: CreateViewModel by viewModels()
-
-    private lateinit var storagePath: String
 
     private val newPost =
         registerForActivityResult(TakePhotoContract()) { uri ->
@@ -104,11 +95,11 @@ class CreateBottomSheetFragment : BottomSheetDialogFragment() {
             }
         }
 
-        if (notGrantedPermissions.isNotEmpty()){
+        if (notGrantedPermissions.isNotEmpty()) {
             val requestPermissionLauncher =
                 registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { result ->
-                    for (entry in result){
-                        if (!entry.value){
+                    for (entry in result) {
+                        if (!entry.value) {
                             getFragmentNavController(R.id.nav_host_fragment)?.navigateUp()
                         }
                     }

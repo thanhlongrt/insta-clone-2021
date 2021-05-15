@@ -1,4 +1,4 @@
-package com.example.instagram.ui.profile.view_posts
+package com.example.instagram.ui.profile.view_post
 
 import android.os.Bundle
 import android.util.Log
@@ -16,8 +16,6 @@ import com.example.instagram.R
 import com.example.instagram.Status.SUCCESS
 import com.example.instagram.databinding.FragmentPostListBinding
 import com.example.instagram.getFragmentNavController
-import com.example.instagram.ui.MainViewModel
-import com.example.instagram.ui.profile.ProfileViewModel
 import com.google.android.exoplayer2.DefaultLoadControl
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
@@ -47,8 +45,7 @@ class PostListFragment : Fragment() {
 
     private var binding: FragmentPostListBinding? = null
 
-    private val profileViewModel: ProfileViewModel by activityViewModels()
-    private val mainViewModel: MainViewModel by activityViewModels()
+    private val viewPostViewModel: ViewPostViewModel by activityViewModels()
     private lateinit var postListAdapter: PostListAdapter
     private lateinit var linearLayoutManager: LinearLayoutManager
 
@@ -89,7 +86,7 @@ class PostListFragment : Fragment() {
             }
 
             onLikeClick = { position, post ->
-                profileViewModel.clickLike(post.postId)
+                viewPostViewModel.like(post.postId)
                 onLikeClick(position)
             }
             onCommentClick = { postId ->
@@ -125,7 +122,7 @@ class PostListFragment : Fragment() {
             setHasFixedSize(true)
         }
 
-        profileViewModel.userPosts.observe(requireActivity(), {
+        viewPostViewModel.userPosts.observe(requireActivity(), {
             when (it.status) {
                 SUCCESS -> {
                     postListAdapter.addAll(it.data!!.reversed())

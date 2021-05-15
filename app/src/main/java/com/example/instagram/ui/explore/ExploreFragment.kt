@@ -10,7 +10,7 @@ import androidx.fragment.app.viewModels
 import com.example.instagram.R
 import com.example.instagram.Status.*
 import com.example.instagram.databinding.FragmentExploreBinding
-import com.example.instagram.ui.profile.PostGridListAdapter
+import com.example.instagram.ui.profile.view_post.PostGridListAdapter
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 

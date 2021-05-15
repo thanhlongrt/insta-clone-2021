@@ -1,4 +1,4 @@
-package com.example.instagram.ui.profile.view_posts
+package com.example.instagram.ui.profile.view_post
 
 import android.os.Build
 import android.os.Bundle

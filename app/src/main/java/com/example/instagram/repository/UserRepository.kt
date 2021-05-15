@@ -2,6 +2,7 @@ package com.example.instagram.repository
 
 import android.util.Log
 import com.example.instagram.DataState
+import com.example.instagram.Status
 import com.example.instagram.model.UserItem
 import com.example.instagram.network.entity.User
 import com.example.instagram.network.entity.UserNetworkMapper
@@ -12,10 +13,12 @@ import com.example.instagram.room.entity.UserCacheMapper
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.channels.sendBlocking
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 
@@ -30,87 +33,135 @@ constructor(
     private val userCacheMapper: UserCacheMapper
 ) {
 
-    companion object{
+    companion object {
         private const val TAG = "UserRepository"
     }
-    private val cacheThresholdInMillis = 5 * 60 * 1000L
 
     fun logout() = firebaseService.logout()
 
-    val currentFirebaseUser
+    val currentUser
         get() = firebaseService.currentFirebaseUser
 
 
-    fun createUser(email: String, password: String) =
-        firebaseService.createUser(email, password)
+    suspend fun createUser(email: String, password: String) = callbackFlow<DataState<Boolean>> {
+        firebaseService.createUser(email, password).addOnCompleteListener {
+            if (it.isSuccessful) {
+                sendBlocking(DataState.success(true))
+            } else {
+                sendBlocking(DataState.error(false, it.exception?.message))
+            }
+        }
+        awaitClose { }
+    }.onStart {
+        emit(DataState.loading())
+    }.catch {
+        emit(DataState.error(false, it.message))
+    }
 
-    fun login(email: String, password: String) =
-        firebaseService.login(email, password)
 
-    fun saveUserData(uid: String, userData: HashMap<String, Any>) =
-        firebaseService.saveUserData(uid, userData)
+    suspend fun login(email: String, password: String) = callbackFlow<DataState<Boolean>> {
+        firebaseService.login(email, password).addOnCompleteListener {
+            if (it.isSuccessful) {
+                sendBlocking(DataState.success(true))
+            } else {
+                sendBlocking(DataState.error(false, it.exception?.message))
+            }
+        }
+        awaitClose { }
+    }.onStart {
+        emit(DataState.loading())
+    }.catch {
+        emit(DataState.error(false, it.message))
+    }
+
+
+    suspend fun saveUserData(uid: String, userItem: UserItem) {
+        val user = userNetworkMapper.fromModel(userItem)
+        firebaseService.saveUserData(uid, user.toMap())
+        val userCache = userCacheMapper.fromModel(userItem)
+        userDao.insertUser(userCache)
+    }
 
     fun allUserDataReference() =
         firebaseService.allUsersDataReference()
 
-    fun getUser(uid: String): Flow<DataState<UserItem>> = flow {
-        emit(getUserFromCache())
+    fun getUserDataById(uid: String): Flow<DataState<UserItem>> = flow {
         getUserFromFirebase(uid)
             .collect {
-                emit(DataState.success(it))
-                if (it.uid == currentFirebaseUser!!.uid) {
-                    userDao.deleteAllAndInsert(userCacheMapper.fromModel(it))
-                }
+                emit(it)
             }
     }
 
-    private suspend fun getUserFromCache() =
-        userDao.getUser()?.let { user ->
-            DataState.success(userCacheMapper.fromEntity(user))
-        } ?: DataState.error(null, "getUserCache: Error")
-
-    private fun getUserFromFirebase(uid: String) = callbackFlow<UserItem> {
+    private fun getUserFromFirebase(uid: String) = callbackFlow<DataState<UserItem>> {
+        Log.e(TAG, "getUserFromFirebase: ")
         val userListener = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val user = snapshot.getValue(User::class.java)!!
                 val userItem = userNetworkMapper.fromEntity(user)
-                this@callbackFlow.sendBlocking(userItem)
+                sendBlocking(DataState.success(userItem))
             }
 
             override fun onCancelled(error: DatabaseError) {
+                sendBlocking(DataState.error(null, error.message))
             }
-
         }
-
-        firebaseService.userDataReference(uid).addValueEventListener(userListener)
-
+        firebaseService.userDataReference(uid).addListenerForSingleValueEvent(userListener)
         awaitClose {
             firebaseService.userDataReference(uid).removeEventListener(userListener)
         }
+    }.catch { e ->
+        emit(DataState.error(null, e.message))
     }
 
-
     fun updateUserData(userData: HashMap<String, Any>): Flow<DataState<Boolean>> = callbackFlow {
-        firebaseService.saveUserData(currentFirebaseUser!!.uid, userData)
+        firebaseService.saveUserData(currentUser!!.uid, userData)
             .addOnCompleteListener {
                 if (it.isSuccessful) {
                     this.sendBlocking(DataState.success(true))
                 } else {
-                    this.sendBlocking(DataState.error(null, it.exception?.message!!))
+                    this.sendBlocking(DataState.error(null, it.exception?.message))
                 }
             }
         awaitClose {
-            Log.e(TAG, "updateUserData: await close", )
         }
     }.onStart {
         emit(DataState.loading())
     }
 
-    fun shouldFetchFirebaseData(
-        lastFetchTimeMillis: String,
-        cacheThresholdInMillis: Long = 300000L // default value is 5 minutes
-    ): Boolean {
-        return (System.currentTimeMillis() - lastFetchTimeMillis.toLong()) >= cacheThresholdInMillis
-    }
+    suspend fun getUser() =
+        withContext(Dispatchers.IO) {
+            userDao.getUser()?.let { userCacheMapper.fromEntity(it) }
+        }
 
+    fun getUserFlow() =
+        userDao.getUserFlow().map { userCache ->
+            val userItem = userCache?.let { it -> userCacheMapper.fromEntity(it) }
+            userItem
+        }
+
+    suspend fun getCurrentUserFromFirebase() = callbackFlow<DataState<UserItem>> {
+        Log.e(TAG, "getCurrentUserFromFirebase: ")
+        val userListener = object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val user = snapshot.getValue(User::class.java)!!
+                val userItem = userNetworkMapper.fromEntity(user)
+                sendBlocking(DataState.success(userItem))
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                sendBlocking(DataState.error(null, error.message))
+            }
+        }
+        firebaseService.userDataReference(currentUser!!.uid).addValueEventListener(userListener)
+        awaitClose {
+            firebaseService.userDataReference(currentUser!!.uid).removeEventListener(userListener)
+        }
+    }.catch { e ->
+        emit(DataState.error(null, e.message))
+    }.collect {
+        if (it.status == Status.SUCCESS) {
+            val userCache = userCacheMapper.fromModel(it.data!!)
+            userDao.deleteAllAndInsert(userCache)
+        }
+    }
 }

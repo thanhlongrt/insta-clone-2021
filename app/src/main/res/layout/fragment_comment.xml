@@ -1,50 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/commentRecyclerView"
+    <data>
+
+        <variable
+            name="viewModel"
+            type="com.example.instagram.ui.comment.CommentViewModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent">
 
-    <LinearLayout
-        android:background="@drawable/background_gray_top_border"
-        android:layout_width="match_parent"
-        android:layout_height="44dp"
-        android:orientation="horizontal"
-        app:layout_constraintBottom_toBottomOf="@+id/commentRecyclerView">
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/commentRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
 
-        <de.hdodenhof.circleimageview.CircleImageView
-            android:id="@+id/avatar"
-            android:layout_width="34dp"
-            android:layout_height="34dp"
-            android:layout_gravity="center"
-            android:layout_marginStart="12dp"
-            android:layout_marginEnd="12dp"
-            android:src="@mipmap/ic_launcher" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:background="@drawable/background_gray_top_border"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="@+id/commentRecyclerView">
 
-        <EditText
-            android:textSize="14sp"
-            android:background="@null"
-            android:hint="Add a comment"
-            android:id="@+id/commentEditText"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            app:layout_constraintBottom_toBottomOf="parent" />
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/avatar"
+                android:layout_width="34dp"
+                android:layout_height="34dp"
+                android:layout_gravity="center"
+                android:layout_marginStart="12dp"
+                android:layout_marginEnd="12dp"
+                android:src="@mipmap/ic_launcher"
+                app:image_url="@{viewModel.currentUser.avatarUrl}" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/commentButton"
-            style="@style/Widget.MaterialComponents.Button.TextButton"
-            android:layout_width="56dp"
-            android:textSize="14sp"
-            android:layout_height="match_parent"
-            android:text="Post"
-            android:textAllCaps="false" />
+            <EditText
+                android:id="@+id/commentEditText"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@null"
+                android:hint="Add a comment"
+                android:text="@={viewModel.commentEditText}"
+                android:textSize="14sp"
+                app:layout_constraintBottom_toBottomOf="parent" />
 
-    </LinearLayout>
+            <com.google.android.material.button.MaterialButton
+                android:onClick="@{()->viewModel.addComment()}"
+                android:id="@+id/commentButton"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="56dp"
+                android:layout_height="match_parent"
+                android:text="Post"
+                android:textAllCaps="false"
+                android:textSize="14sp" />
+
+        </LinearLayout>
 
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

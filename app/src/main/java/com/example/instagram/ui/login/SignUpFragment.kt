@@ -13,7 +13,6 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import com.example.instagram.R
 import com.example.instagram.Status
-import com.example.instagram.afterTextChanged
 import com.example.instagram.databinding.FragmentSignUpBinding
 import com.example.instagram.ui.MainActivity
 import com.google.android.material.snackbar.Snackbar

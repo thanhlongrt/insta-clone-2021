@@ -6,11 +6,12 @@
     <data>
 
         <variable
-            name="comment"
-            type="com.example.instagram.network.entity.Comment" />
+            name="post"
+            type="com.example.instagram.model.PostItem" />
     </data>
 
     <LinearLayout
+        android:background="@drawable/background_gray_bottom_border"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -21,7 +22,7 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:src="@mipmap/ic_launcher"
-            app:image_url="@{comment.avatar}" />
+            app:image_url="@{post.avatarUrl}" />
 
         <LinearLayout
             android:layout_width="0dp"
@@ -39,19 +40,19 @@
                     android:id="@+id/username"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@{comment.username}"
+                    android:text="@{post.userName}"
                     android:textColor="@color/black"
                     android:textSize="14sp"
                     android:textStyle="bold"
                     tools:text="username" />
 
                 <TextView
-                    android:id="@+id/content"
+                    android:id="@+id/caption"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="4dp"
                     android:maxLines="1"
-                    android:text="@{comment.content}"
+                    android:text="@{post.caption}"
                     android:textColor="@color/black"
                     android:textSize="14sp"
                     tools:text="content" />
@@ -69,42 +70,10 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
                     android:textSize="13sp"
-                    app:date_from_millis="@{comment.date_created}"
+                    app:date_from_millis="@{post.date}"
                     tools:text="date" />
 
-                <TextView
-                    android:id="@+id/likeCount"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="12dp"
-                    android:layout_marginTop="4dp"
-                    android:textSize="13sp"
-                    app:set_like_count="@{comment.like_count}"
-                    tools:text="Like count" />
-
-                <TextView
-                    android:id="@+id/reply"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="12dp"
-                    android:layout_marginTop="4dp"
-                    android:text="@string/reply"
-                    android:textSize="13sp" />
-
             </LinearLayout>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_marginEnd="8dp"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:gravity="center_vertical">
-
-            <ImageView
-                android:layout_width="13dp"
-                android:layout_height="13dp"
-                android:src="@drawable/ic_04_heart_gray" />
 
         </LinearLayout>
 

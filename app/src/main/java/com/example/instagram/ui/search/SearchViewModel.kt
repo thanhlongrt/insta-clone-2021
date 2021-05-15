@@ -6,11 +6,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.instagram.DataState
+import com.example.instagram.Status
 import com.example.instagram.model.PostItem
 import com.example.instagram.model.UserItem
-import com.example.instagram.network.entity.Notification
 import com.example.instagram.network.entity.User
-import com.example.instagram.repository.NotificationRepository
 import com.example.instagram.repository.PostRepository
 import com.example.instagram.repository.UserRepository
 import com.google.firebase.database.DataSnapshot
@@ -41,15 +40,15 @@ constructor(
     private val _searchUserResult = MutableLiveData<DataState<List<User>>>()
     val searchUserResult: LiveData<DataState<List<User>>> = _searchUserResult
 
-    private val _otherUserLiveData = MutableLiveData<DataState<UserItem>>()
-    val otherUserLiveData: LiveData<DataState<UserItem>> = _otherUserLiveData
+    private val _otherUserLiveData = MutableLiveData<UserItem>()
+    val otherUserLiveData: LiveData<UserItem>
+        get() = _otherUserLiveData
 
     private val _otherUserPosts = MutableLiveData<DataState<List<PostItem>>>()
     val otherUserPosts: LiveData<DataState<List<PostItem>>> = _otherUserPosts
 
     val currentUserUid = postRepository.currentUser!!.uid
 
-    @ExperimentalCoroutinesApi
     fun getPostById(uid: String) {
         viewModelScope.launch {
             postRepository.getPostsByUser(uid).collect {
@@ -59,15 +58,16 @@ constructor(
         }
     }
 
-    fun getUserData(uid: String) {
-        _otherUserLiveData.postValue(DataState.loading())
-        viewModelScope.launch {
-            userRepository.getUser(uid).collect {
-                _otherUserLiveData.value = it
-//                Log.e(TAG, "getUserData: ${it.status}")
+    fun getUserDataById(uid: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            userRepository.getUserDataById(uid).collect {
+                when(it.status){
+                    Status.SUCCESS -> {
+                        _otherUserLiveData.postValue(it.data!!)
+                    }
+                }
             }
         }
-
     }
 
     fun searchUser(query: String): LiveData<DataState<List<User>>> {
@@ -82,7 +82,7 @@ constructor(
                     val results = mutableListOf<User>()
                     for (item in snapshot.children) {
                         val user = item.getValue(User::class.java)!!
-                        if (user.uid != userRepository.currentFirebaseUser!!.uid) {
+                        if (user.uid != userRepository.currentUser!!.uid) {
                             results.add(user)
                         }
 
@@ -101,7 +101,7 @@ constructor(
     fun clickLike(postId: String) {
         Log.e(TAG, "like: ")
         viewModelScope.launch(Dispatchers.IO) {
-            postRepository.onLikeClick(postId)
+            postRepository.likeClick(postId)
         }
     }
 }

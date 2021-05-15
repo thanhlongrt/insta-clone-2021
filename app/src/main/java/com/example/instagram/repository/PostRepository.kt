@@ -2,9 +2,7 @@ package com.example.instagram.repository
 
 import android.content.Context
 import android.net.Uri
-import android.util.Log
 import com.example.instagram.DataState
-import com.example.instagram.Status
 import com.example.instagram.model.PostItem
 import com.example.instagram.network.entity.Post
 import com.example.instagram.network.entity.PostNetworkMapper
@@ -38,13 +36,21 @@ constructor(
         private const val TAG = "PostRepository"
     }
 
+    fun getPostById(postId: String) =
+        firebaseService.getPostById(postId)
+            .map { post ->
+                val postItem = postNetworkMapper.fromEntity(post!!)
+                DataState.success(postItem)
+            }.catch { emit(DataState.error(null, it.message)) }
+            .onStart { emit(DataState.loading()) }
+
     fun deletePost(id: String, photoPath: String): Task<Void> {
         val deletePostDataTask = firebaseService.postDataReference.child(id).removeValue()
         val deletePhotoTask = firebaseService.photoStorage.child(photoPath).delete()
         return Tasks.whenAll(deletePostDataTask, deletePhotoTask)
     }
 
-    suspend fun uploadPhoto(context: Context, uri: Uri, path: String): Flow<DataState<String>> =
+    suspend fun uploadImage(context: Context, uri: Uri, path: String): Flow<DataState<String>> =
         flow {
             val photoUrl = firebaseService.uploadPhoto(context, uri, path)
             emit(DataState.success(photoUrl))
@@ -53,24 +59,6 @@ constructor(
         }.onStart {
             emit(DataState.loading())
         }
-
-    suspend fun savePostData(
-        context: Context,
-        uri: Uri,
-        post: Post
-    ) {
-        if (post.is_video) {
-
-        } else {
-            uploadPhoto(context, uri, post.path).collect { photoUrlResult ->
-                if (photoUrlResult.status == Status.SUCCESS) {
-                    val postData = post.toMap()
-                    postData["photo_url"] = photoUrlResult.data!!
-                    firebaseService.savePostData(postData)
-                }
-            }
-        }
-    }
 
     fun getFeedPosts(): Flow<DataState<List<PostItem>>> = flow {
         getFeedPostsFromFirebase().collect { feedPost ->
@@ -163,7 +151,7 @@ constructor(
         }
     }
 
-    fun onLikeClick(postId: String) {
+    fun likeClick(postId: String) {
         postDataReference.child(postId).runTransaction(object : Transaction.Handler {
             override fun doTransaction(currentData: MutableData): Transaction.Result {
                 val post = currentData.getValue(Post::class.java)

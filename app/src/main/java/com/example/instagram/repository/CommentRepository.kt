@@ -1,17 +1,12 @@
 package com.example.instagram.repository
 
-import android.util.Log
 import com.example.instagram.DataState
 import com.example.instagram.network.entity.Comment
 import com.example.instagram.network.firebase.FirebaseService
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.ValueEventListener
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.channels.sendBlocking
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
 import javax.inject.Inject
 
 /**
@@ -23,30 +18,18 @@ class CommentRepository
 constructor(
     private val firebaseService: FirebaseService
 ) {
-    companion object{
+    companion object {
         private const val TAG = "CommentRepository"
     }
 
-    fun addComment(commentData: HashMap<String, Any>) {
-        firebaseService.saveCommentData(commentData)
+    fun saveCommentData(comment: Comment) {
+        firebaseService.saveCommentData(comment.toMap())
     }
 
-    fun getCommentsFromFirebaseByPost(postId: String): Flow<DataState<List<Comment>>> =
-        callbackFlow {
-            val commentListener = object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    val comments = snapshot.children.mapNotNull { it.getValue(Comment::class.java) }
-
-                    this@callbackFlow.sendBlocking(DataState.success(comments))
-                }
-
-                override fun onCancelled(error: DatabaseError) {
-                    this@callbackFlow.sendBlocking(DataState.error(null, error.message))
-                }
-            }
-            val commentRef = firebaseService.commentDataReference.child(postId)
-            commentRef.addListenerForSingleValueEvent(commentListener)
-            awaitClose { commentRef.removeEventListener(commentListener) }
-        }
+    fun getCommentsByPost(postId: String) =
+        firebaseService.getCommentsByPost(postId).map {
+            DataState.success(it!!)
+        }.catch { emit(DataState.error(null, it.message)) }
+            .onStart { emit(DataState.loading()) }
 
 }

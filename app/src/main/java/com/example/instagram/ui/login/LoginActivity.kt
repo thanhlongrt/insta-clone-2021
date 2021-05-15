@@ -20,22 +20,20 @@ class LoginActivity : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
         val isLoggedIn = loginViewModel.isLoggedIn
-        if (isLoggedIn){
+        if (isLoggedIn) {
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
             finish()
         }
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
-
         val hostFragment: NavHostFragment =
             supportFragmentManager.findFragmentById(R.id.login_nav_host_fragment) as NavHostFragment?
                 ?: return
-
-        val navController = hostFragment.navController
 
     }
 }

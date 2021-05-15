@@ -1,4 +1,4 @@
-package com.example.instagram.ui.profile
+package com.example.instagram.ui.profile.view_post
 
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter

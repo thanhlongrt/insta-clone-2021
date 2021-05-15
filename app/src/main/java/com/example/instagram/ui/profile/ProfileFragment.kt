@@ -1,23 +1,19 @@
 package com.example.instagram.ui.profile
 
-import android.Manifest
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
 import android.view.*
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.content.ContextCompat
+import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
-import com.bumptech.glide.Glide
 import com.example.instagram.R
-import com.example.instagram.Status
 import com.example.instagram.databinding.FragmentProfileBinding
-import com.example.instagram.ui.MainViewModel
 import com.example.instagram.ui.login.LoginActivity
+import com.example.instagram.ui.profile.view_post.PostGridListFragment
+import com.example.instagram.ui.profile.view_post.ViewPagerAdapter
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -37,14 +33,10 @@ class ProfileFragment : Fragment() {
 
     private val profileViewModel: ProfileViewModel by activityViewModels()
 
-    private val mainViewModel: MainViewModel by activityViewModels()
-
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        Log.e(TAG, "onAttach: ", )
-        profileViewModel.getPostByUser(profileViewModel.currentUserUid)
     }
-    
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
@@ -55,31 +47,30 @@ class ProfileFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding =
-            FragmentProfileBinding.inflate(inflater, container, false)
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_profile, container, false)
+        binding?.viewmodel = profileViewModel
+        binding?.lifecycleOwner = viewLifecycleOwner
         return binding?.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-
         configObservers(view)
 
         setupControllers()
 
-
     }
 
     private fun setupControllers() {
+
         binding?.editProfileButton?.setOnClickListener {
             findNavController().navigate(R.id.action_profileFragment_to_editProfileFragment)
         }
 
-
         val fragments = listOf(
-            PostGridListFragment.newInstance(PostGridListFragment.UPLOADED_PHOTOS_FRAGMENT),
-            PostGridListFragment.newInstance(PostGridListFragment.TAGGED_PHOTOS_FRAGMENT),
+            PostGridListFragment.newInstance(PostGridListFragment.UPLOADED_POSTS_FRAGMENT),
+            PostGridListFragment.newInstance(PostGridListFragment.TAGGED_POSTS_FRAGMENT),
         )
         binding?.viewPager2?.adapter = ViewPagerAdapter(this, fragments)
         TabLayoutMediator(binding?.tabLayout!!, binding?.viewPager2!!) { tab, position ->
@@ -103,31 +94,26 @@ class ProfileFragment : Fragment() {
 //            }
 //        })
 
-        mainViewModel.currentUser.observe(requireActivity(), {
-            when (it.status) {
-                Status.SUCCESS -> {
-                    val user = it.data!!
-                    if (user.avatarUrl != "") {
-                        binding?.circleImageView?.let { it1 ->
-                            Glide.with(view.context)
-                                .load(user.avatarUrl)
-                                .into(it1)
-                        }
-                    }
-                    binding?.displayNameTextView?.text = user.displayName
-                    binding?.bioTextView?.text = user.bio
-                    binding?.websiteTextView?.text = user.website
-                }
-            }
+        profileViewModel.currentUser.observe(requireActivity(), {
+            Log.e(TAG, "configObservers: ${it?.username ?: null}", )
+//            when (it.status) {
+//                Status.SUCCESS -> {
+//                    val user = it.data!!
+//                    binding?.circleImageView?.let { imageView ->
+//                        Glide.with(view.context)
+//                            .load(user.avatarUrl)
+//                            .into(imageView)
+//                    }
+//                    binding?.displayNameTextView?.text = user.displayName
+//                    binding?.bioTextView?.text = user.bio
+//                    binding?.websiteTextView?.text = user.website
+//                    binding?.postCount?.text = user.postCount.toString()
+//                    binding?.followerCount?.text = user.followerCount.toString()
+//                    binding?.followingCount?.text = user.followingCount.toString()
+//                }
+//            }
         })
 
-        profileViewModel.userPosts.observe(requireActivity()) {
-            when(it.status){
-                Status.SUCCESS -> {
-                    binding?.postCount?.text = it.data!!.size.toString()
-                }
-            }
-        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -152,7 +138,6 @@ class ProfileFragment : Fragment() {
             }
         }
     }
-
 
 
     private fun logout() {
