@@ -15,6 +15,7 @@ import com.google.firebase.storage.ktx.storageMetadata
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -23,6 +24,7 @@ import javax.inject.Inject
  * Created by Thanh Long Nguyen on 5/11/2021
  */
 
+@ExperimentalCoroutinesApi
 @HiltWorker
 class PostUploadWorker
 @AssistedInject
@@ -62,7 +64,7 @@ constructor(
                             .storage.downloadUrl.await().toString()
                 }
                 firebaseService.savePostData(post.toMap())
-                firebaseService.userDataReference(post.uid).child("post").setValue(ServerValue.increment(1))
+                firebaseService.userDataReference(post.uid).child("post_count").setValue(ServerValue.increment(1))
             }
             Log.e(TAG, "doWork: Success")
             return Result.success()

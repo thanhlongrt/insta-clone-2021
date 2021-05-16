@@ -47,10 +47,6 @@ constructor(
     val currentUser: LiveData<UserItem?> =
         userRepository.getUserFlow().asLiveData()
 
-    init {
-
-    }
-
     fun uploadProfilePicture(photoUri: Uri, path: String) {
         viewModelScope.launch(Dispatchers.IO) {
             postRepository.uploadImage(getApplication(), photoUri, path).collect {

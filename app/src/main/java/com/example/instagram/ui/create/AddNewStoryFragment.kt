@@ -2,6 +2,7 @@ package com.example.instagram.ui.create
 
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -9,7 +10,6 @@ import com.bumptech.glide.Glide
 import com.example.instagram.R
 import com.example.instagram.databinding.FragmentAddNewStoryBinding
 import com.example.instagram.getFragmentNavController
-import com.example.instagram.ui.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
@@ -21,11 +21,13 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 @AndroidEntryPoint
 class AddNewStoryFragment : Fragment() {
 
+    companion object {
+        private const val TAG = "AddNewStoryFragment"
+    }
+
     private var binding: FragmentAddNewStoryBinding? = null
 
     private val createViewModel: CreateViewModel by activityViewModels()
-
-    private val mainViewModel: MainViewModel by activityViewModels()
 
     private var storyUri: Uri? = null
 
@@ -61,8 +63,9 @@ class AddNewStoryFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_done -> {
-                val user = mainViewModel.currentUser.value
+                val user = createViewModel.currentUser.value
                 if (storyUri != null && user != null) {
+                    Log.e(TAG, "onOptionsItemSelected: createStory: ...")
                     val storagePath = "IMG_${System.currentTimeMillis()}.jpg"
                     val storyData = HashMap<String, Any>()
                     storyData["uid"] = user.uid

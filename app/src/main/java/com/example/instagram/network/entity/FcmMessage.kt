@@ -9,7 +9,9 @@ class FcmMessage(
     @SerializedName("to")
     val token: String = "",
     val collapseKey: String = "",
+    @SerializedName("notification")
     val notificationPayload: NotificationPayload,
+    @SerializedName("data")
     val dataPayload: DataPayload
 ) {
 }

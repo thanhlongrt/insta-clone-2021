@@ -1,6 +1,7 @@
 package com.example.instagram.ui.home
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,7 +19,6 @@ import com.example.instagram.databinding.FragmentHomeBinding
 import com.example.instagram.getFragmentNavController
 import com.example.instagram.model.PostItem
 import com.example.instagram.network.entity.Notification
-import com.example.instagram.ui.MainViewModel
 import com.example.instagram.ui.profile.view_post.CacheDataSourceFactory
 import com.example.instagram.ui.profile.view_post.PostListAdapter
 import com.google.android.exoplayer2.DefaultLoadControl
@@ -49,8 +49,6 @@ class HomeFragment : Fragment() {
     private var binding: FragmentHomeBinding? = null
 
     private val homeViewModel: HomeViewModel by activityViewModels()
-
-    private val mainViewModel: MainViewModel by activityViewModels()
 
     private lateinit var postListAdapter: PostListAdapter
 
@@ -94,7 +92,7 @@ class HomeFragment : Fragment() {
         postListAdapter = PostListAdapter(mutableListOf())
         postListAdapter.apply {
             onLikeClick = { position, post ->
-                if (!post.isLiked && post.uid != mainViewModel.currentUser.value?.uid ?: false) {
+                if (!post.isLiked && post.uid != homeViewModel.currentUser.value?.uid ?: false) {
                     sendLikePushNotification(post)
                 }
                 homeViewModel.clickLike(post.postId)
@@ -152,7 +150,8 @@ class HomeFragment : Fragment() {
         lifecycleScope.launch {
             delay(3000)
             if (post.isLiked) {
-                mainViewModel.currentUser.value?.let {
+                homeViewModel.currentUser.value?.let {
+                    Log.e(TAG, "sendLikePushNotification: ...")
                     val notification = Notification(
                         uid = post.uid,
                         post_id = post.postId,
@@ -162,7 +161,7 @@ class HomeFragment : Fragment() {
                         sender_avatar = it.avatarUrl,
                         seen = false
                     )
-                    mainViewModel.sendPushNotification(notification)
+                    homeViewModel.sendPushNotification(notification)
                 }
             }
         }

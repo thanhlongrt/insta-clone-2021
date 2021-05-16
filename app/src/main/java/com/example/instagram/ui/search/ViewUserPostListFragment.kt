@@ -18,7 +18,6 @@ import com.example.instagram.databinding.FragmentViewUserPostListBinding
 import com.example.instagram.getFragmentNavController
 import com.example.instagram.model.PostItem
 import com.example.instagram.network.entity.Notification
-import com.example.instagram.ui.MainViewModel
 import com.example.instagram.ui.profile.view_post.CacheDataSourceFactory
 import com.example.instagram.ui.profile.view_post.PostListAdapter
 import com.google.android.exoplayer2.DefaultLoadControl
@@ -52,8 +51,6 @@ class ViewUserPostListFragment : Fragment() {
 
     private val searchViewModel: SearchViewModel by activityViewModels()
 
-    private val mainViewModel: MainViewModel by activityViewModels()
-
     private var position: Int? = null
 
     private var uid: String? = null
@@ -83,7 +80,6 @@ class ViewUserPostListFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         postListAdapter = PostListAdapter(mutableListOf())
         postListAdapter.apply {
             onLikeClick = { position, post ->
@@ -148,7 +144,8 @@ class ViewUserPostListFragment : Fragment() {
         lifecycleScope.launch {
             delay(3000)
             if (post.isLiked) {
-                mainViewModel.currentUser.value?.let {
+                searchViewModel.currentUser.value?.let {
+                    Log.e(TAG, "sendLikePushNotification: ...")
                     val notification = Notification(
                         uid = post.uid,
                         post_id = post.postId,
@@ -158,7 +155,7 @@ class ViewUserPostListFragment : Fragment() {
                         sender_avatar = it.avatarUrl,
                         seen = false
                     )
-                    mainViewModel.sendPushNotification(notification)
+                    searchViewModel.sendPushNotification(notification)
                 }
             }
         }

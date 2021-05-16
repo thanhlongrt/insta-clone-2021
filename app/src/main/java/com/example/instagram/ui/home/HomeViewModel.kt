@@ -7,9 +7,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.instagram.DataState
 import com.example.instagram.model.PostItem
+import com.example.instagram.model.UserItem
 import com.example.instagram.model.UserStoryItem
+import com.example.instagram.network.entity.Notification
+import com.example.instagram.repository.NotificationRepository
 import com.example.instagram.repository.PostRepository
 import com.example.instagram.repository.StoryRepository
+import com.example.instagram.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -28,6 +32,8 @@ class HomeViewModel
 constructor(
     private val postRepository: PostRepository,
     private val storyRepository: StoryRepository,
+    private val userRepository: UserRepository,
+    private val notificationRepository: NotificationRepository
 ) : ViewModel() {
     companion object {
         private const val TAG = "HomeViewModel"
@@ -41,13 +47,23 @@ constructor(
     val feedPosts: LiveData<DataState<List<PostItem>>>
         get() = _feedPosts
 
+    private val _currentUser = MutableLiveData<UserItem?>()
+    val currentUser: LiveData<UserItem?> = _currentUser
+
     val currentUserUid = postRepository.currentUser!!.uid
+
+    init {
+        viewModelScope.launch(Dispatchers.IO) {
+            userRepository.getUserFlow().collect {
+                _currentUser.postValue(it)
+            }
+        }
+    }
 
     fun getStoryData() {
         viewModelScope.launch(Dispatchers.IO) {
             storyRepository.getUserStories().collect {
                 _stories.postValue(it)
-//                Log.e(TAG, "getStoryData: ${it.status}: ${it.message}")
             }
         }
     }
@@ -56,7 +72,6 @@ constructor(
         viewModelScope.launch(Dispatchers.IO) {
             postRepository.getFeedPosts().collect {
                 _feedPosts.postValue(it)
-//                Log.e(TAG, "getAllPosts: ${it.status}")
             }
         }
     }
@@ -65,6 +80,12 @@ constructor(
         Log.e(TAG, "like: ")
         viewModelScope.launch(Dispatchers.IO) {
             postRepository.likeClick(postId)
+        }
+    }
+
+    fun sendPushNotification(notification: Notification) {
+        viewModelScope.launch(Dispatchers.IO) {
+            notificationRepository.sendPushNotification(notification)
         }
     }
 }

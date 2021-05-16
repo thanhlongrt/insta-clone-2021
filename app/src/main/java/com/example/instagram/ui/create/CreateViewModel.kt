@@ -13,15 +13,18 @@ import com.example.instagram.Constants.KEY_URI
 import com.example.instagram.Constants.SAVE_POST_WORK_NAME
 import com.example.instagram.DataState
 import com.example.instagram.TypeConverters
+import com.example.instagram.model.UserItem
 import com.example.instagram.network.entity.Post
 import com.example.instagram.repository.PostRepository
 import com.example.instagram.repository.StoryRepository
+import com.example.instagram.repository.UserRepository
 import com.example.instagram.worker.CompressWorker
 import com.example.instagram.worker.MyWorker
 import com.example.instagram.worker.PostUploadWorker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -35,10 +38,11 @@ class CreateViewModel
 constructor(
     private val postRepository: PostRepository,
     private val storyRepository: StoryRepository,
+    private val userRepository: UserRepository,
     application: Application
 ) : AndroidViewModel(application) {
     companion object {
-        const val TAG = "PostViewModel"
+        const val TAG = "CreateViewModel"
     }
 
     private val workManager = WorkManager.getInstance(application)
@@ -48,6 +52,17 @@ constructor(
 
     private val _saveStoryDataResult = MutableLiveData<DataState<Boolean>>()
     val saveStoryDataResult: LiveData<DataState<Boolean>> = _saveStoryDataResult
+
+    private val _currentUser = MutableLiveData<UserItem?>()
+    val currentUser: LiveData<UserItem?> = _currentUser
+
+    init {
+        viewModelScope.launch(Dispatchers.IO) {
+            userRepository.getUserFlow().collect {
+                _currentUser.postValue(it)
+            }
+        }
+    }
 
     fun saveStoryData(uri: Uri, storagePath: String, storyData: HashMap<String, Any>) {
         Log.e(TAG, "saveStoryData: Loading...")

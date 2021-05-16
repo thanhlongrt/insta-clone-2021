@@ -31,7 +31,6 @@ fun NotificationManager.sendNotification(
         val futureTarget = Glide.with(applicationContext)
             .asBitmap()
             .load(it).submit()
-        Log.e("AAAAAAAAAAAAAAa", "sendNotification: $it")
         val bitmap = futureTarget.get()
         val largeIcon = bitmap.getCircularBitmap()
         builder.setLargeIcon(largeIcon)

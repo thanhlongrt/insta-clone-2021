@@ -9,7 +9,9 @@ import com.example.instagram.DataState
 import com.example.instagram.Status
 import com.example.instagram.model.PostItem
 import com.example.instagram.model.UserItem
+import com.example.instagram.network.entity.Notification
 import com.example.instagram.network.entity.User
+import com.example.instagram.repository.NotificationRepository
 import com.example.instagram.repository.PostRepository
 import com.example.instagram.repository.UserRepository
 import com.google.firebase.database.DataSnapshot
@@ -32,6 +34,7 @@ class SearchViewModel
 constructor(
     private val userRepository: UserRepository,
     private val postRepository: PostRepository,
+    private val notificationRepository: NotificationRepository
 ) : ViewModel() {
     companion object {
         private const val TAG = "SearchViewModel"
@@ -48,6 +51,17 @@ constructor(
     val otherUserPosts: LiveData<DataState<List<PostItem>>> = _otherUserPosts
 
     val currentUserUid = postRepository.currentUser!!.uid
+
+    private val _currentUser = MutableLiveData<UserItem?>()
+    val currentUser: LiveData<UserItem?> = _currentUser
+
+    init {
+        viewModelScope.launch(Dispatchers.IO) {
+            userRepository.getUserFlow().collect {
+                _currentUser.postValue(it)
+            }
+        }
+    }
 
     fun getPostById(uid: String) {
         viewModelScope.launch {
@@ -102,6 +116,12 @@ constructor(
         Log.e(TAG, "like: ")
         viewModelScope.launch(Dispatchers.IO) {
             postRepository.likeClick(postId)
+        }
+    }
+
+    fun sendPushNotification(notification: Notification) {
+        viewModelScope.launch(Dispatchers.IO) {
+            notificationRepository.sendPushNotification(notification)
         }
     }
 }

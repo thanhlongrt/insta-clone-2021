@@ -56,8 +56,6 @@ class ProfileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        configObservers(view)
-
         setupControllers()
 
     }
@@ -83,37 +81,6 @@ class ProfileFragment : Fragment() {
                 }
             }
         }.attach()
-    }
-
-    private fun configObservers(view: View) {
-//        profileViewModel.saveUserDataResult.observe(requireActivity(), {
-//            when (it.status) {
-//                Status.SUCCESS -> {
-//                    mainViewModel.getCurrentUser()
-//                }
-//            }
-//        })
-
-        profileViewModel.currentUser.observe(requireActivity(), {
-            Log.e(TAG, "configObservers: ${it?.username ?: null}", )
-//            when (it.status) {
-//                Status.SUCCESS -> {
-//                    val user = it.data!!
-//                    binding?.circleImageView?.let { imageView ->
-//                        Glide.with(view.context)
-//                            .load(user.avatarUrl)
-//                            .into(imageView)
-//                    }
-//                    binding?.displayNameTextView?.text = user.displayName
-//                    binding?.bioTextView?.text = user.bio
-//                    binding?.websiteTextView?.text = user.website
-//                    binding?.postCount?.text = user.postCount.toString()
-//                    binding?.followerCount?.text = user.followerCount.toString()
-//                    binding?.followingCount?.text = user.followingCount.toString()
-//                }
-//            }
-        })
-
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

@@ -17,7 +17,6 @@ import com.example.instagram.R
 import com.example.instagram.databinding.FragmentCreateNewPostBinding
 import com.example.instagram.getFragmentNavController
 import com.example.instagram.network.entity.Post
-import com.example.instagram.ui.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import java.io.IOException
@@ -37,8 +36,6 @@ class CreateNewPostFragment : Fragment() {
     private var binding: FragmentCreateNewPostBinding? = null
 
     private val createViewModel: CreateViewModel by activityViewModels()
-
-    private val mainViewModel: MainViewModel by activityViewModels()
 
     private var uri: Uri? = null
     private var isVideo: Boolean = false
@@ -64,15 +61,15 @@ class CreateNewPostFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        mainViewModel.currentUser.observe(requireActivity(), { user ->
-            binding?.avatar?.let { imageView ->
+        Log.e(TAG, "onViewCreated: ${createViewModel.currentUser.value?.username}")
+        createViewModel.currentUser.observe(viewLifecycleOwner, { user ->
+            if (user != null) {
                 Glide.with(view.context)
                     .load(user.avatarUrl)
-                    .into(imageView)
+                    .into(binding?.avatar!!)
             }
         })
-
+        Log.e(TAG, "onViewCreated: ${createViewModel.currentUser.value?.username}")
         Glide.with(view.context)
             .load(uri)
             .into(binding?.imageView!!)
@@ -91,7 +88,7 @@ class CreateNewPostFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_done -> {
-                val user = mainViewModel.currentUser.value
+                val user = createViewModel.currentUser.value
                 if (user != null && uri != null) {
                     val storagePath: String = if (isVideo) {
                         "${user.uid}/VIDEO_${System.currentTimeMillis()}.mp4"
