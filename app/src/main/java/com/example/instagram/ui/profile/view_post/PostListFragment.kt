@@ -92,7 +92,7 @@ class PostListFragment : Fragment() {
             onCommentClick = { postId ->
                 val bundle = bundleOf("postId" to postId)
                 getFragmentNavController(R.id.nav_host_fragment)?.navigate(
-                    R.id.action_homeFragment_to_commentFragment,
+                    R.id.action_userPostsFragment_to_commentFragment2,
                     bundle
                 )
             }

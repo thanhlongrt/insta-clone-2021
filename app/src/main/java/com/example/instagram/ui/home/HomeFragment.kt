@@ -94,7 +94,7 @@ class HomeFragment : Fragment() {
         postListAdapter = PostListAdapter(mutableListOf())
         postListAdapter.apply {
             onLikeClick = { position, post ->
-                if (!post.isLiked && post.uid != mainViewModel.currentUser.value?.data?.uid ?: false) {
+                if (!post.isLiked && post.uid != mainViewModel.currentUser.value?.uid ?: false) {
                     sendLikePushNotification(post)
                 }
                 homeViewModel.clickLike(post.postId)
@@ -152,7 +152,7 @@ class HomeFragment : Fragment() {
         lifecycleScope.launch {
             delay(3000)
             if (post.isLiked) {
-                mainViewModel.currentUser.value?.data?.let {
+                mainViewModel.currentUser.value?.let {
                     val notification = Notification(
                         uid = post.uid,
                         post_id = post.postId,

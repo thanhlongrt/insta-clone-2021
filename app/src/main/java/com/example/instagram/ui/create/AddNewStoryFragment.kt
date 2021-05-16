@@ -61,17 +61,17 @@ class AddNewStoryFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_done -> {
-                storyUri?.let {
+                val user = mainViewModel.currentUser.value
+                if (storyUri != null && user != null) {
                     val storagePath = "IMG_${System.currentTimeMillis()}.jpg"
                     val storyData = HashMap<String, Any>()
-                    storyData["uid"] = mainViewModel.currentUser.value!!.data!!.uid
-                    storyData["username"] = mainViewModel.currentUser.value!!.data!!.username
-                    storyData["avatar_url"] = mainViewModel.currentUser.value!!.data!!.avatarUrl
+                    storyData["uid"] = user.uid
+                    storyData["username"] = user.username
+                    storyData["avatar_url"] = user.avatarUrl
                     storyData["video_url"] = ""
                     storyData["path"] = storagePath
 
-                    createViewModel.saveStoryData(it, storagePath, storyData)
-
+                    createViewModel.saveStoryData(storyUri!!, storagePath, storyData)
                     getFragmentNavController(R.id.nav_host_fragment)?.navigate(R.id.action_addNewStoryFragment_to_profileFragment)
                 }
                 true

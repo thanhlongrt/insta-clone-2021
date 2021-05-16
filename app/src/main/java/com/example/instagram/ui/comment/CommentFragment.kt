@@ -79,35 +79,6 @@ class CommentFragment : Fragment() {
             commentHeaderAdapter.setPost(it)
         }
 
-//        binding?.commentButton?.setOnClickListener {
-//            val content = binding?.commentEditText?.text.toString()
-//            if (!TextUtils.isEmpty(content) && postId != null && userData != null) {
-//                val comment = Comment()
-//                val commentData = HashMap<String, Any>()
-//                commentData["uid"] = userData!!.uid
-//                commentData["avatar"] = userData!!.avatarUrl
-//                commentData["username"] = userData!!.username
-//                commentData["content"] = content
-//                commentData["post_id"] = postId!!
-//                commentData["date_created"] = System.currentTimeMillis()
-//
-//                commentViewModel.addComment(commentData)
-
-//                val notification = Notification(
-//                    uid = post.uid,
-//                    post_id = post.postId,
-//                    title = "Instagram",
-//                    body = "${post.userName}: ${it.username} liked your post",
-//                    date = System.currentTimeMillis(),
-//                    sender_avatar = it.avatarUrl,
-//                    seen = false
-//                )
-//                commentViewModel.sendPushNotification()
-
-//                binding?.commentEditText?.setText("")
-//            }
-//        }
-
     }
 
     override fun onDestroyView() {

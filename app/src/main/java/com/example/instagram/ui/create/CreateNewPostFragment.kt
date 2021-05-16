@@ -14,7 +14,6 @@ import androidx.fragment.app.activityViewModels
 import com.bumptech.glide.Glide
 import com.example.instagram.ImageUtils.mimeType
 import com.example.instagram.R
-import com.example.instagram.Status
 import com.example.instagram.databinding.FragmentCreateNewPostBinding
 import com.example.instagram.getFragmentNavController
 import com.example.instagram.network.entity.Post
@@ -66,25 +65,11 @@ class CreateNewPostFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        mainViewModel.currentUser.observe(requireActivity(), {
-            when (it.status) {
-                Status.SUCCESS -> {
-                    val user = it.data!!
-                    binding?.avatar?.let { imageView ->
-                        Glide.with(view.context)
-                            .load(user.avatarUrl)
-                            .into(imageView)
-                    }
-                }
-                Status.ERROR -> {
-
-                }
-                Status.LOADING -> {
-
-                }
-                Status.IDLE -> {
-
-                }
+        mainViewModel.currentUser.observe(requireActivity(), { user ->
+            binding?.avatar?.let { imageView ->
+                Glide.with(view.context)
+                    .load(user.avatarUrl)
+                    .into(imageView)
             }
         })
 
@@ -106,20 +91,17 @@ class CreateNewPostFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_done -> {
-                uri?.let { uri ->
-                    val currentUserData = mainViewModel.currentUser.value!!.data!!
-                    val storagePath: String
-                    if (isVideo) {
-                        storagePath =
-                            "${currentUserData.uid}/VIDEO_${System.currentTimeMillis()}.mp4"
+                val user = mainViewModel.currentUser.value
+                if (user != null && uri != null) {
+                    val storagePath: String = if (isVideo) {
+                        "${user.uid}/VIDEO_${System.currentTimeMillis()}.mp4"
                     } else {
-                        storagePath = "${currentUserData.uid}/IMG_${System.currentTimeMillis()}.jpg"
+                        "${user.uid}/IMG_${System.currentTimeMillis()}.jpg"
                     }
-
                     val post = Post(
-                        uid = mainViewModel.currentUser.value!!.data!!.uid,
-                        avatar_url = currentUserData.avatarUrl,
-                        user_name = currentUserData.username,
+                        uid = user.uid,
+                        avatar_url = user.avatarUrl,
+                        user_name = user.username,
                         date_created = System.currentTimeMillis(),
                         caption = binding?.captionEditText?.text.toString(),
                         path = storagePath,
@@ -127,8 +109,7 @@ class CreateNewPostFragment : Fragment() {
                         comment_count = 0,
                         is_video = isVideo
                     )
-                    createViewModel.savePostData(uri, post)
-
+                    createViewModel.savePostData(uri!!, post)
                     getFragmentNavController(R.id.nav_host_fragment)?.navigate(R.id.action_createNewPostFragment_to_profileFragment)
                 }
                 true

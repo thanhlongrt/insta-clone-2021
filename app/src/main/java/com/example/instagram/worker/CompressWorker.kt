@@ -58,7 +58,7 @@ constructor(
 //                val uri = compressVideo(resourceUri)
                 outputDataBuilder.putString(KEY_COMPRESSED_FILE_URI, resourceUri)
             } else {
-                val uri = compressImage(resourceUri)
+                val uri = withContext(Dispatchers.Default) { compressImage(resourceUri) }
                 outputDataBuilder.putString(KEY_COMPRESSED_FILE_URI, uri.toString())
             }
 

@@ -59,6 +59,9 @@
         <action
             android:id="@+id/action_userPostsFragment_to_postBottomSheetFragment"
             app:destination="@id/postBottomSheetFragment" />
+        <action
+            android:id="@+id/action_userPostsFragment_to_commentFragment2"
+            app:destination="@id/commentFragment2" />
     </fragment>
     <dialog
         android:id="@+id/postBottomSheetFragment"
@@ -100,4 +103,9 @@
             android:id="@+id/action_previewVideoFragment_to_createNewPostFragment"
             app:destination="@id/createNewPostFragment" />
     </fragment>
+    <fragment
+        tools:layout="@layout/fragment_comment"
+        android:id="@+id/commentFragment2"
+        android:name="com.example.instagram.ui.comment.CommentFragment"
+        android:label="CommentFragment" />
 </navigation>

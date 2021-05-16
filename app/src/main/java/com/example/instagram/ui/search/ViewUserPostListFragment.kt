@@ -148,7 +148,7 @@ class ViewUserPostListFragment : Fragment() {
         lifecycleScope.launch {
             delay(3000)
             if (post.isLiked) {
-                mainViewModel.currentUser.value?.data?.let {
+                mainViewModel.currentUser.value?.let {
                     val notification = Notification(
                         uid = post.uid,
                         post_id = post.postId,
