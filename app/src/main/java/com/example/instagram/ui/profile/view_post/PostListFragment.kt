@@ -128,7 +128,7 @@ class PostListFragment : Fragment() {
                     postListAdapter.addAll(it.data!!.reversed())
 
                     lifecycleScope.launch {
-                        delay(100)
+                        delay(50)
                         Log.e(TAG, "onViewCreated: Scroll with offset to $position")
                         linearLayoutManager.scrollToPositionWithOffset(position!!, 0)
                     }

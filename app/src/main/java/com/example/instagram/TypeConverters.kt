@@ -1,5 +1,6 @@
 package com.example.instagram
 
+import com.example.instagram.model.PostItem
 import com.example.instagram.network.entity.Post
 import com.google.gson.Gson
 
@@ -14,6 +15,14 @@ object TypeConverters {
 
     fun jsonToPost(json: String): Post {
         return Gson().fromJson(json, Post::class.java)
+    }
+
+    fun postItemToJson(post: PostItem): String {
+        return Gson().toJson(post)
+    }
+
+    fun jsonToPostItem(json: String): PostItem {
+        return Gson().fromJson(json, PostItem::class.java)
     }
 
 }

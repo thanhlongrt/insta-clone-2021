@@ -75,7 +75,7 @@ constructor(
     fun getUserDataById(uid: String) {
         viewModelScope.launch(Dispatchers.IO) {
             userRepository.getUserDataById(uid).collect {
-                when(it.status){
+                when (it.status) {
                     Status.SUCCESS -> {
                         _otherUserLiveData.postValue(it.data!!)
                     }
@@ -99,7 +99,6 @@ constructor(
                         if (user.uid != userRepository.currentUser!!.uid) {
                             results.add(user)
                         }
-
                     }
                     Log.e(TAG, "onDataChange: searchUser: Success")
                     _searchUserResult.postValue(DataState.success(results))

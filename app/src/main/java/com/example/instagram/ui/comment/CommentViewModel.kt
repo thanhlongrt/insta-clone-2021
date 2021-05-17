@@ -43,11 +43,13 @@ constructor(
     val comments: LiveData<List<Comment>>
         get() = _comments
 
-    private val _currentPost = MutableLiveData<PostItem>()
+    val _currentPost = MutableLiveData<PostItem>()
     val currentPost: LiveData<PostItem>
         get() = _currentPost
 
     val commentEditText = MutableLiveData<String>()
+    val progressBar = MutableLiveData<Boolean>()
+    val commentRecyclerView = MutableLiveData<Boolean>()
 
     fun addComment() {
         val post = _currentPost.value
@@ -86,24 +88,21 @@ constructor(
         notificationRepository.sendPushNotification(notification)
     }
 
-    fun getPostById(postId: String) {
-        viewModelScope.launch(Dispatchers.IO) {
-            postRepository.getPostById(postId).collect { postResult ->
-                when (postResult.status) {
-                    Status.SUCCESS -> {
-                        _currentPost.postValue(postResult.data!!)
-                    }
-                }
-            }
-        }
-    }
-
     fun getCommentsByPost(postId: String) {
         viewModelScope.launch(Dispatchers.IO) {
             commentRepository.getCommentsByPost(postId).collect { commentsResult ->
                 when (commentsResult.status) {
+                    Status.LOADING -> {
+                        progressBar.postValue(true)
+                        commentRecyclerView.postValue(false)
+                    }
+                    Status.ERROR -> {
+                        progressBar.postValue(true)
+                    }
                     Status.SUCCESS -> {
                         _comments.postValue(commentsResult.data!!)
+                        progressBar.postValue(false)
+                        commentRecyclerView.postValue(true)
                     }
                 }
             }

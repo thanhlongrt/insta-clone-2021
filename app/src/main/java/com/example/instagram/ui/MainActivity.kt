@@ -1,19 +1,19 @@
 package com.example.instagram.ui
 
-import android.content.Context
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.util.TypedValue
 import android.view.View
 import android.view.WindowInsets
+import android.view.WindowInsetsController
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.Observer
 import androidx.navigation.NavController
+import androidx.navigation.NavDestination
 import androidx.navigation.ui.setupActionBarWithNavController
 import com.example.instagram.R
 import com.example.instagram.databinding.ActivityMainBinding
@@ -35,6 +35,11 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
 
     private val mainViewModel: MainViewModel by viewModels()
+
+    override fun onStart() {
+        super.onStart()
+        useLightStatusBar()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,6 +67,7 @@ class MainActivity : AppCompatActivity() {
         val navGraphIds = listOf(
             R.navigation.nav_home,
             R.navigation.nav_explore,
+            R.navigation.nav_reel,
             R.navigation.nav_notification,
             R.navigation.nav_profile,
         )
@@ -82,67 +88,100 @@ class MainActivity : AppCompatActivity() {
                     TAG,
                     "setupBottomNavigationBar: ${resources.getResourceName(destination.id)}",
                 )
-                binding.toolBar.title = if (destination.id == R.id.homeFragment) {
-                    "Instagram"
-                } else {
-                    ""
-                }
+                configUi(destination, navController)
 
-                if (destination.id == R.id.storyFragment) {
-                    hideUIs()
-                } else {
-                    showUIs()
-                }
-
-                if (destination.id == R.id.exploreFragment) {
-                    binding.searchViewHolder.visibility = View.VISIBLE
-                    binding.searchViewHolder.setOnClickListener {
-                        navController.navigate(R.id.action_exploreFragment_to_searchFragment)
-                    }
-
-                } else {
-                    binding.searchViewHolder.visibility = View.GONE
-
-                }
-
-                if (destination.id == R.id.searchFragment) {
-                    binding.searchView.visibility = View.VISIBLE
-                    val searchEditText =
-                        binding.searchView.findViewById(androidx.appcompat.R.id.search_src_text) as EditText
-                    searchEditText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
-                    searchEditText.requestFocus()
-                    val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                    imm.showSoftInput(searchEditText, InputMethodManager.SHOW_IMPLICIT)
-                } else {
-                    binding.searchView.visibility = View.GONE
-                }
-
-                binding.bottomNavView.visibility =
-                    if (destination.id == R.id.commentFragment) View.GONE else View.VISIBLE
-                
             }
         })
         currentNavigationController = controller
 
     }
 
+    private fun configUi(
+        destination: NavDestination,
+        navController: NavController
+    ) {
+        binding.toolBar.title = when (destination.id) {
+            R.id.homeFragment -> "Instagram"
+            R.id.notificationFragment -> "Notifications"
+            R.id.userPostsFragment -> "Posts"
+            R.id.editProfileFragment -> "Edit Profile"
+            R.id.createNewPostFragment -> "New post"
+            else -> ""
+        }
+
+        if (destination.id == R.id.storyFragment) {
+            hideUIs()
+        } else {
+            showUIs()
+        }
+
+        binding.searchViewHolder.setOnClickListener {
+            navController.navigate(R.id.action_exploreFragment_to_searchFragment)
+        }
+        if (destination.id == R.id.exploreFragment) {
+            binding.searchViewHolder.visibility = View.VISIBLE
+
+        } else {
+            binding.searchViewHolder.visibility = View.GONE
+
+        }
+
+        val searchEditText =
+            binding.searchView.findViewById(androidx.appcompat.R.id.search_src_text) as EditText
+        searchEditText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
+        if (destination.id == R.id.searchFragment) {
+            binding.searchView.visibility = View.VISIBLE
+            searchEditText.requestFocus()
+            showKeyboard(searchEditText)
+        } else {
+            binding.searchView.visibility = View.GONE
+        }
+
+        binding.bottomNavView.visibility =
+            if (destination.id == R.id.commentFragment) View.GONE else View.VISIBLE
+    }
+
+    private fun showKeyboard(searchEditText: EditText) {
+        val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.showSoftInput(searchEditText, InputMethodManager.SHOW_IMPLICIT)
+    }
+
     private fun showUIs() {
         binding.toolBar.visibility = View.VISIBLE
-        binding.bottomNavView.visibility = View.VISIBLE
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             binding.root.windowInsetsController?.show(WindowInsets.Type.statusBars())
         } else {
             window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_VISIBLE
         }
+        useLightStatusBar()
+
+        binding.bottomNavView.visibility = View.VISIBLE
     }
 
     private fun hideUIs() {
         binding.toolBar.visibility = View.GONE
-        binding.bottomNavView.visibility = View.GONE
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             binding.root.windowInsetsController?.hide(WindowInsets.Type.statusBars())
         } else {
             window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN
+        }
+
+        binding.bottomNavView.visibility = View.GONE
+    }
+
+    private fun useLightStatusBar() {
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.Q) {
+            window.insetsController?.setSystemBarsAppearance(
+                WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS,
+                WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
+            )
+        } else {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+//                window.statusBarColor = Color.WHITE
+            }
         }
     }
 

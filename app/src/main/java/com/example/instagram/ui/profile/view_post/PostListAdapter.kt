@@ -24,7 +24,7 @@ class PostListAdapter(
     var onAvatarClick: ((PostItem) -> Unit)? = null
     var onOptionClick: ((PostItem) -> Unit)? = null
     var onLikeClick: ((Int, PostItem) -> Unit)? = null
-    var onCommentClick: ((String) -> Unit)? = null
+    var onCommentClick: ((PostItem) -> Unit)? = null
     var onSendClick: ((PostItem) -> Unit)? = null
 
     var onViewAttachToWindow: ((PlayerView, String) -> Unit)? = null
@@ -71,7 +71,7 @@ class PostListAdapter(
 
         }
         binding.comment.setOnClickListener {
-            onCommentClick?.invoke(postItem.postId)
+            onCommentClick?.invoke(postItem)
         }
     }
 

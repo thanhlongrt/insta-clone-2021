@@ -11,6 +11,8 @@
         android:label="ProfileFragment"
         tools:layout="@layout/fragment_profile">
         <action
+            app:enterAnim="@anim/slide_in_bottom"
+            app:popExitAnim="@anim/slide_out_bottom"
             android:id="@+id/action_profileFragment_to_editProfileFragment"
             app:destination="@id/editProfileFragment" />
         <action

@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+
         <variable
             name="loginViewModel"
             type="com.example.instagram.ui.login.LoginViewModel" />
@@ -21,40 +22,42 @@
         tools:context=".ui.login.LoginActivity">
 
         <EditText
-            android:text="@={loginViewModel.email}"
             android:id="@+id/email"
+            style="@style/Theme.Instagram.LoginEditText"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="44dp"
             android:layout_marginStart="24dp"
             android:layout_marginTop="96dp"
             android:layout_marginEnd="24dp"
             android:hint="@string/prompt_email"
             android:inputType="textEmailAddress"
             android:selectAllOnFocus="true"
+            android:text="@={loginViewModel.email}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
 
         <EditText
-            android:text="@={loginViewModel.displayName}"
             android:id="@+id/display_name"
+            style="@style/Theme.Instagram.LoginEditText"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="44dp"
             android:layout_marginStart="24dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="24dp"
             android:hint="@string/promt_display_name"
             android:selectAllOnFocus="true"
+            android:text="@={loginViewModel.displayName}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/email" />
 
         <EditText
-            android:text="@={loginViewModel.password}"
             android:id="@+id/password"
+            style="@style/Theme.Instagram.LoginEditText"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="44dp"
             android:layout_marginStart="24dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="24dp"
@@ -63,27 +66,38 @@
             android:imeOptions="actionDone"
             android:inputType="textPassword"
             android:selectAllOnFocus="true"
+            android:text="@={loginViewModel.password}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/display_name" />
 
         <com.google.android.material.button.MaterialButton
-            android:onClick="@{() -> loginViewModel.signUp()}"
             android:id="@+id/signUp"
-            style="@style/Widget.MaterialComponents.Button"
+            style="@style/Theme.Instagram.MaterialButton"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="56dp"
             android:layout_gravity="start"
             android:layout_marginTop="16dp"
             android:layout_marginBottom="64dp"
             android:enabled="true"
-            android:text="Create account"
-            android:textAllCaps="false"
+            android:onClick="@{() -> loginViewModel.signUp()}"
+            android:text="@string/create_account"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="@+id/password"
             app:layout_constraintStart_toStartOf="@+id/password"
             app:layout_constraintTop_toBottomOf="@+id/password"
             app:layout_constraintVertical_bias="0.2" />
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:indeterminateDrawable="@drawable/progress_drawable"
+            android:visibility="gone"
+            app:layout_constraintBottom_toTopOf="@+id/signUp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/password" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

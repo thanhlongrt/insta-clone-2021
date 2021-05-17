@@ -3,8 +3,8 @@ package com.example.instagram.ui.profile
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.*
+import androidx.appcompat.widget.Toolbar
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -55,6 +55,12 @@ class ProfileFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        profileViewModel.currentUser.observe(requireActivity()) { user ->
+            user?.let {
+                requireActivity().findViewById<Toolbar>(R.id.tool_bar).title = it.username
+            }
+        }
 
         setupControllers()
 

@@ -20,6 +20,7 @@
         android:name="com.example.instagram.ui.search.SearchFragment"
         android:label="SearchFragment" >
         <action
+            app:enterAnim="@anim/slide_in_right"
             android:id="@+id/action_searchFragment_to_otherUserFragment"
             app:destination="@id/otherUserFragment" />
     </fragment>
@@ -29,6 +30,7 @@
         android:name="com.example.instagram.ui.search.ViewUserFragment"
         android:label="OtherUserFragment" >
         <action
+            app:enterAnim="@anim/slide_in_right"
             android:id="@+id/action_otherUserFragment_to_otherUserPostsFragment"
             app:destination="@id/otherUserPostsFragment" />
     </fragment>

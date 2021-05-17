@@ -31,21 +31,8 @@ class NotificationAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val notification = notifications[position]
         val binding = holder.binding
-        Glide.with(holder.itemView.context)
-            .load(notification.sender_avatar)
-            .into(binding.avatar)
-        binding.body.text = notification.body
-        binding.date.text = notification.date.toString()
-        binding.layout.background =
-            if (notification.seen) ContextCompat.getDrawable(
-                holder.itemView.context,
-                R.drawable.background_seen_notification
-            )
-            else ContextCompat.getDrawable(
-                holder.itemView.context,
-                R.drawable.background_unseen_notification
-            )
-
+        binding.notification = notification
+        binding.executePendingBindings()
         binding.layout.setOnClickListener {
             onClick?.invoke(position, notification)
         }

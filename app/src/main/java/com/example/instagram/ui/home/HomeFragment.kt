@@ -2,9 +2,7 @@ package com.example.instagram.ui.home
 
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -13,8 +11,10 @@ import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.instagram.Constants.KEY_POST_JSON
 import com.example.instagram.R
 import com.example.instagram.Status.SUCCESS
+import com.example.instagram.TypeConverters
 import com.example.instagram.databinding.FragmentHomeBinding
 import com.example.instagram.getFragmentNavController
 import com.example.instagram.model.PostItem
@@ -63,6 +63,9 @@ class HomeFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        setHasOptionsMenu(true)
+
         homeViewModel.getStoryData()
         homeViewModel.getAllPosts()
     }
@@ -99,8 +102,8 @@ class HomeFragment : Fragment() {
                 onLikeClick(position)
             }
 
-            onCommentClick = { postId ->
-                val bundle = bundleOf("postId" to postId)
+            onCommentClick = { postItem ->
+                val bundle = bundleOf(KEY_POST_JSON to TypeConverters.postItemToJson(postItem))
                 getFragmentNavController(R.id.nav_host_fragment)?.navigate(
                     R.id.action_homeFragment_to_commentFragment,
                     bundle
@@ -113,7 +116,7 @@ class HomeFragment : Fragment() {
                 }
             }
 
-            onViewDetachedFromWindow = { playerView, url ->
+            onViewDetachedFromWindow = { _, _ ->
                 this@HomeFragment.releasePlayer()
             }
         }
@@ -211,6 +214,26 @@ class HomeFragment : Fragment() {
         player?.let { player ->
             player.release()
             this.player = null
+        }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.menu_home, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_add -> {
+                getFragmentNavController(R.id.nav_host_fragment)?.navigate(R.id.action_homeFragment_to_createBottomSheetFragment2)
+                true
+            }
+
+            R.id.action_direct -> {
+                getFragmentNavController(R.id.nav_host_fragment)?.navigate(R.id.action_homeFragment_to_directFragment)
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
         }
     }
 }

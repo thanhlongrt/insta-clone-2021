@@ -1,7 +1,6 @@
 package com.example.instagram.ui
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.instagram.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -19,8 +18,7 @@ class MainViewModel
 @Inject
 constructor(
     private val userRepository: UserRepository,
-    application: Application
-) : AndroidViewModel(application) {
+) : ViewModel() {
 
     companion object {
         private const val TAG = "MainViewModel"

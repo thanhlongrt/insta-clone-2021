@@ -13,19 +13,36 @@
         <action
             android:id="@+id/action_homeFragment_to_storyFragment"
             app:destination="@id/storyFragment"
-            app:enterAnim="@anim/slide_in_right"/>
+            app:enterAnim="@anim/slide_in_bottom"
+            app:popExitAnim="@anim/slide_out_bottom"/>
         <action
             android:id="@+id/action_homeFragment_to_commentFragment"
             app:destination="@id/commentFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_createBottomSheetFragment2"
+            app:destination="@id/createBottomSheetFragment2" />
+        <action
+            android:id="@+id/action_homeFragment_to_directFragment"
+            app:destination="@id/directFragment" />
     </fragment>
     <fragment
-        tools:layout="@layout/fragment_story"
         android:id="@+id/storyFragment"
         android:name="com.example.instagram.ui.home.StoryFragment"
-        android:label="StoryFragment" />
+        android:label="StoryFragment"
+        tools:layout="@layout/fragment_story" />
     <fragment
-        tools:layout="@layout/fragment_comment"
         android:id="@+id/commentFragment"
         android:name="com.example.instagram.ui.comment.CommentFragment"
-        android:label="CommentFragment" />
+        android:label="CommentFragment"
+        tools:layout="@layout/fragment_comment" />
+    <dialog
+        android:id="@+id/createBottomSheetFragment2"
+        android:name="com.example.instagram.ui.create.CreateBottomSheetFragment"
+        android:label="CreateBottomSheetFragment"
+        tools:layout="@layout/fragment_create_new_bottom_sheet" />
+    <fragment
+        android:id="@+id/directFragment"
+        android:name="com.example.instagram.ui.direct.DirectFragment"
+        android:label="DirectFragment"
+        tools:layout="@layout/fragment_direct" />
 </navigation>

@@ -2,10 +2,16 @@ package com.example.instagram.ui.profile
 
 import android.annotation.SuppressLint
 import android.net.Uri
+import android.os.Build
+import android.text.Html
+import android.text.method.LinkMovementMethod
+import android.text.util.Linkify
 import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.text.HtmlCompat
+import androidx.core.text.util.LinkifyCompat
 import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
 import com.example.instagram.R
@@ -83,6 +89,21 @@ fun TextView.setDate(millis: Long) {
             val dateStr = simpleDateFormat.format(date)
             this.text = dateStr
         }
+    }
+}
+
+@BindingAdapter("link")
+fun TextView.setWebLink(link: String?) {
+    link?.let {
+        val html = "<a href=\'$link\'>$link</a>"
+//        val html = resources.getString(R.string.user_website, link)
+        movementMethod  = LinkMovementMethod.getInstance()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N){
+            text = HtmlCompat.fromHtml(html, HtmlCompat.FROM_HTML_MODE_LEGACY)
+        } else{
+            text = Html.fromHtml(html)
+        }
+        Log.e("BindingAdapters", "setWebLink: $text", )
     }
 }
 

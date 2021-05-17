@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.widget.Toolbar
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -68,14 +69,9 @@ class ViewUserFragment : Fragment() {
             }
         }.attach()
 
-//        searchViewModel.otherUserLiveData.observe(requireActivity(), { user ->
-//            Glide.with(view.context)
-//                .load(user.avatarUrl)
-//                .into(header.circleImageView)
-//            header.displayNameTextView.text = user.displayName
-//            header.bioTextView.text = user.bio
-//            header.websiteTextView.text = user.website
-//        })
+        searchViewModel.otherUserLiveData.observe(requireActivity(), { user ->
+            activity?.findViewById<Toolbar>(R.id.tool_bar)?.title = user.username
+        })
     }
 
     override fun onDestroyView() {

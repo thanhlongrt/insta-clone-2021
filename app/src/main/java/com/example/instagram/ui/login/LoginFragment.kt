@@ -6,7 +6,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
-import android.widget.ProgressBar
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -98,10 +97,7 @@ class LoginFragment : Fragment() {
     }
 
     private fun displayProgressBar(isDisplayed: Boolean) {
-        activity?.let {
-            it.findViewById<ProgressBar>(R.id.progressBar).visibility =
-                if (isDisplayed) View.VISIBLE else View.GONE
-        }
+        binding?.progressBar?.visibility = if (isDisplayed) View.VISIBLE else View.GONE
     }
 
     private fun navigateToMainActivity() {

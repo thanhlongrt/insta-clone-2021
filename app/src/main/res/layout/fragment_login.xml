@@ -22,8 +22,9 @@
 
         <EditText
             android:id="@+id/email"
+            style="@style/Theme.Instagram.LoginEditText"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="44dp"
             android:layout_marginStart="24dp"
             android:layout_marginTop="96dp"
             android:layout_marginEnd="24dp"
@@ -37,8 +38,9 @@
 
         <EditText
             android:id="@+id/password"
+            style="@style/Theme.Instagram.LoginEditText"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="44dp"
             android:layout_marginStart="24dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="24dp"
@@ -54,16 +56,15 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/login"
-            style="@style/Widget.MaterialComponents.Button"
+            style="@style/Theme.Instagram.MaterialButton"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="56dp"
             android:layout_gravity="start"
             android:layout_marginTop="16dp"
             android:layout_marginBottom="64dp"
             android:enabled="false"
             android:onClick="@{() -> loginViewModel.login()}"
             android:text="@string/sign_in_button"
-            android:textAllCaps="false"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="@+id/password"
             app:layout_constraintStart_toStartOf="@+id/password"
@@ -72,13 +73,35 @@
 
 
         <TextView
+            android:id="@+id/or"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="-or-"
+            android:padding="8dp"
+            android:text="OR"
+            android:textColor="@color/dark_dark_grey"
+            android:textSize="14sp"
             app:layout_constraintBottom_toTopOf="@+id/nav_to_signup"
             app:layout_constraintEnd_toEndOf="@+id/login"
             app:layout_constraintStart_toStartOf="@+id/login"
             app:layout_constraintTop_toBottomOf="@+id/login" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:background="@drawable/darker_gray_rounded_corner"
+            app:layout_constraintBottom_toBottomOf="@id/or"
+            app:layout_constraintEnd_toStartOf="@id/or"
+            app:layout_constraintStart_toStartOf="@+id/login"
+            app:layout_constraintTop_toTopOf="@id/or" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:background="@drawable/darker_gray_rounded_corner"
+            app:layout_constraintBottom_toBottomOf="@id/or"
+            app:layout_constraintEnd_toEndOf="@id/login"
+            app:layout_constraintStart_toEndOf="@+id/or"
+            app:layout_constraintTop_toTopOf="@id/or" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/nav_to_signup"
@@ -86,16 +109,28 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="start"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="36dp"
             android:layout_marginBottom="64dp"
             android:enabled="true"
             android:text="@string/create_account_button"
             android:textAllCaps="false"
+            android:textColor="@color/blue"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="@+id/password"
             app:layout_constraintStart_toStartOf="@+id/password"
             app:layout_constraintTop_toBottomOf="@+id/login"
             app:layout_constraintVertical_bias="0" />
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:indeterminateDrawable="@drawable/progress_drawable"
+            android:visibility="gone"
+            app:layout_constraintBottom_toTopOf="@+id/login"
+            app:layout_constraintEnd_toEndOf="@+id/login"
+            app:layout_constraintStart_toStartOf="@+id/login"
+            app:layout_constraintTop_toBottomOf="@+id/password" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

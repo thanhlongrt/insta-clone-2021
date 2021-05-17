@@ -152,9 +152,10 @@ constructor(
                 sendBlocking(DataState.error(null, error.message))
             }
         }
-        firebaseService.userDataReference(currentUser!!.uid).addValueEventListener(userListener)
+        val userRef = firebaseService.userDataReference(currentUser!!.uid)
+        userRef.addValueEventListener(userListener)
         awaitClose {
-            firebaseService.userDataReference(currentUser!!.uid).removeEventListener(userListener)
+            userRef.removeEventListener(userListener)
         }
     }.catch { e ->
         emit(DataState.error(null, e.message))

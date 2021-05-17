@@ -150,13 +150,14 @@
                         tools:text="Bio" />
 
                     <TextView
+                        android:text="@{viewmodel.currentUser.website}"
                         android:id="@+id/websiteTextView"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="0dp"
-                        android:text="@{viewmodel.currentUser.website}"
                         android:textColor="@color/black"
                         android:textSize="14sp"
+                        android:linksClickable="true"
                         android:visibility="@{viewmodel.currentUser.website.length() > 0 ? View.VISIBLE : View.GONE}"
                         app:layout_constraintStart_toStartOf="@+id/circleImageView"
                         app:layout_constraintTop_toBottomOf="@+id/bioTextView"
@@ -205,6 +206,7 @@
             </com.google.android.material.appbar.CollapsingToolbarLayout>
 
             <com.google.android.material.tabs.TabLayout
+                style="@style/Theme.Instagram.TabLayout"
                 android:id="@+id/tabLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />

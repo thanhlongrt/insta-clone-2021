@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
     tools:context=".ui.MainActivity">
 
     <com.google.android.material.appbar.AppBarLayout
@@ -22,7 +23,8 @@
             android:layout_height="?attr/actionBarSize"
             app:title="Instagram"
             android:backgroundTint="@color/white"
-            app:titleTextColor="@color/purple_500">
+            app:titleTextAppearance="@style/TextAppearance.MaterialComponents.Headline6"
+            app:titleTextColor="@color/black">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/searchViewHolder"
@@ -77,7 +79,6 @@
                 <requestFocus />
             </androidx.appcompat.widget.SearchView>
 
-
         </androidx.appcompat.widget.Toolbar>
 
     </com.google.android.material.appbar.AppBarLayout>
@@ -109,6 +110,7 @@
         android:layout_width="match_parent"
         android:layout_height="42dp"
         app:itemIconSize="24dp"
+        app:itemIconTint="@drawable/bottom_nav_icon_color"
         app:labelVisibilityMode="unlabeled"
         app:layout_constraintBottom_toBottomOf="parent"
         app:menu="@menu/menu_bottom_nav" />
