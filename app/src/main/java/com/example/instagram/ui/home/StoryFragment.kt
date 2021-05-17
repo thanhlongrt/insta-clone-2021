@@ -1,25 +1,22 @@
 package com.example.instagram.ui.home
 
-import android.content.res.ColorStateList
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
-import android.widget.ProgressBar
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
-import com.example.instagram.ImageUtils
 import com.example.instagram.R
-import com.example.instagram.Status.*
 import com.example.instagram.databinding.FragmentStoryBinding
 import com.example.instagram.getFragmentNavController
+import com.example.instagram.model.UserStoryItem
+import com.example.instagram.ui.profile.setDate
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 /**
  * Created by Thanh Long Nguyen on 4/27/2021
@@ -27,7 +24,7 @@ import kotlinx.coroutines.*
 
 @ExperimentalCoroutinesApi
 @AndroidEntryPoint
-class StoryFragment : Fragment() {
+class StoryFragment : Fragment(), StoryProgressView.StoriesListener {
     companion object {
         private const val TAG = "StoryFragment"
         private const val STORY_DURATION = 10 * 1000 // millisecond
@@ -38,6 +35,10 @@ class StoryFragment : Fragment() {
     private val homeViewModel: HomeViewModel by activityViewModels()
 
     private var position: Int? = null
+
+    private val userStoryItem: UserStoryItem by lazy { homeViewModel.stories.value!!.data!![position!!] }
+
+    private var storyIndex: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,105 +58,61 @@ class StoryFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-
-        val screenWidth = ImageUtils.getScreenWidth(requireActivity())
-
-        homeViewModel.stories.observe(requireActivity()) {
-            when (it.status) {
-                SUCCESS -> {
-                    val userStory = it.data!![position!!]
-
-                    for (story in userStory.stories) {
-                        Glide.with(view.context)
-                            .load(story.photoUrl)
-                            .preload()
-                    }
-
-                    val progressBarList = ArrayList<ProgressBar>()
-
-                    val numberOfStories = userStory.stories.size
-                    addProgressBars(screenWidth, numberOfStories, progressBarList)
-
-                    lifecycleScope.launch {
-                        withContext(Dispatchers.Main) {
-                            for (i in 0 until numberOfStories) {
-                                Glide.with(view.context)
-                                    .load(userStory.stories[i].photoUrl)
-                                    .into(binding?.imageView!!)
-                                while (progressBarList[i].progress < STORY_DURATION) {
-                                    delay(1)
-                                    progressBarList[i].incrementProgressBy(1)
-                                }
-
-                                if (i == numberOfStories - 1 && progressBarList[i].progress == STORY_DURATION) {
-                                    getFragmentNavController(R.id.nav_host_fragment)?.navigateUp()
-                                }
-
-//                                this@withContext.launch {
-//                                    val animator = ObjectAnimator.ofInt(
-//                                        progressBarList[i],
-//                                        "progress",
-//                                        0,
-//                                        STORY_DURATION*1000
-//                                    )
-//                                    animator.duration = (STORY_DURATION*1000).toLong()
-//                                    animator.interpolator = LinearInterpolator()
-//                                    animator.start()
-//                                }
-                            }
-                        }
-
-                    }
-
-
-                }
-                ERROR -> {
-
-                }
-                LOADING -> {
-
-                }
-                IDLE -> {
-
-                }
-            }
+        binding?.progressBarContainer?.apply {
+            setStoriesCount(userStoryItem.stories.size)
+            setStoryDuration(10000L)
+            setStoriesListener(this@StoryFragment)
         }
-    }
 
-    @RequiresApi(Build.VERSION_CODES.M)
-    private fun addProgressBars(
-        screenWidth: Int,
-        numberOfStories: Int,
-        progressBarList: ArrayList<ProgressBar>
-    ) {
-        val progressBarWidth =
-            (screenWidth - (4 * (numberOfStories + 1))) / numberOfStories
 
-        for (i in 0 until numberOfStories) {
-            val progressBar = ProgressBar(
-                context,
-                null,
-                android.R.attr.progressBarStyleHorizontal
-            )
-            progressBar.max = STORY_DURATION
-            progressBar.isIndeterminate = false
-            progressBar.progressTintList = ColorStateList.valueOf(
-                resources.getColor(R.color.white, null)
-            )
-            progressBar.progressBackgroundTintList = ColorStateList.valueOf(
-                resources.getColor(R.color.light_grey, null)
-            )
+        Glide.with(view.context)
+            .load(userStoryItem.stories[storyIndex].photoUrl)
+            .into(binding?.imageView!!)
+        Glide.with(view.context)
+            .load(userStoryItem.avatarUrl)
+            .into(binding?.avatar!!)
+        binding?.username?.text = userStoryItem.username
+        binding?.date?.setDate(userStoryItem.stories[storyIndex].date)
+        binding?.progressBarContainer?.startStories(storyIndex)
 
-            val params = LinearLayout.LayoutParams(progressBarWidth, 3)
-            params.setMargins(4, 0, 0, 0)
-            progressBar.layoutParams = params
-            progressBarList.add(progressBar)
-            binding?.progressBarHolder?.addView(progressBar)
+        binding?.reverse?.setOnClickListener {
+            binding?.progressBarContainer?.reverse()
         }
+
+        binding?.skip?.setOnClickListener {
+            binding?.progressBarContainer?.skip()
+        }
+
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         binding = null
+    }
+
+    override fun onNext() {
+        context?.let {
+            Glide.with(it)
+                .load(userStoryItem.stories[++storyIndex].photoUrl)
+                .into(binding?.imageView!!)
+        }
+    }
+
+    override fun onPrev() {
+        if (storyIndex - 1 < 0) return
+        context?.let {
+            Glide.with(it)
+                .load(userStoryItem.stories[--storyIndex].photoUrl)
+                .into(binding?.imageView!!)
+        }
+    }
+
+    override fun onComplete() {
+        getFragmentNavController(R.id.nav_host_fragment)?.navigateUp()
+    }
+
+    override fun onDestroy() {
+        binding?.progressBarContainer?.destroy()
+        super.onDestroy()
     }
 }

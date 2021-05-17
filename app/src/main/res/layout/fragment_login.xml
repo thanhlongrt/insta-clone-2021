@@ -78,7 +78,7 @@
             android:layout_height="wrap_content"
             android:padding="8dp"
             android:text="OR"
-            android:textColor="@color/dark_dark_grey"
+            android:textColor="@color/dark_gray"
             android:textSize="14sp"
             app:layout_constraintBottom_toTopOf="@+id/nav_to_signup"
             app:layout_constraintEnd_toEndOf="@+id/login"

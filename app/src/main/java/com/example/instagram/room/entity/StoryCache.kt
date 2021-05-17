@@ -17,7 +17,8 @@ data class StoryCache(
     val userAvatar: String = "",
     val photoUrl: String = "",
     val videoUrl: String = "",
-    val path: String = ""
+    val path: String = "",
+    val date: Long = 0L
 )
 
 class StoryCacheMapper @Inject constructor() : EntityMapper<StoryCache, StoryItem> {
@@ -30,6 +31,7 @@ class StoryCacheMapper @Inject constructor() : EntityMapper<StoryCache, StoryIte
             photoUrl = entity.photoUrl,
             videoUrl = entity.videoUrl,
             path = entity.path,
+            date = entity.date
         )
     }
 
@@ -42,6 +44,7 @@ class StoryCacheMapper @Inject constructor() : EntityMapper<StoryCache, StoryIte
             photoUrl = model.photoUrl,
             videoUrl = model.videoUrl,
             path = model.path,
+            date = model.date
         )
     }
 

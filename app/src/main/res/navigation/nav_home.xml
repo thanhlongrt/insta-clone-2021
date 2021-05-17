@@ -39,10 +39,18 @@
         android:id="@+id/createBottomSheetFragment2"
         android:name="com.example.instagram.ui.create.CreateBottomSheetFragment"
         android:label="CreateBottomSheetFragment"
-        tools:layout="@layout/fragment_create_new_bottom_sheet" />
+        tools:layout="@layout/fragment_create_new_bottom_sheet" >
+        <action
+            android:id="@+id/action_createBottomSheetFragment2_to_addNewStoryFragment2"
+            app:destination="@id/addNewStoryFragment2" />
+    </dialog>
     <fragment
         android:id="@+id/directFragment"
         android:name="com.example.instagram.ui.direct.DirectFragment"
         android:label="DirectFragment"
         tools:layout="@layout/fragment_direct" />
+    <fragment
+        android:id="@+id/addNewStoryFragment2"
+        android:name="com.example.instagram.ui.create.AddNewStoryFragment"
+        android:label="AddNewStoryFragment" />
 </navigation>

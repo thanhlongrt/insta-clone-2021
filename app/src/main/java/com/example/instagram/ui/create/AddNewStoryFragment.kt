@@ -73,6 +73,7 @@ class AddNewStoryFragment : Fragment() {
                     storyData["avatar_url"] = user.avatarUrl
                     storyData["video_url"] = ""
                     storyData["path"] = storagePath
+                    storyData["date"] = System.currentTimeMillis()
 
                     createViewModel.saveStoryData(storyUri!!, storagePath, storyData)
                     getFragmentNavController(R.id.nav_host_fragment)?.navigate(R.id.action_addNewStoryFragment_to_profileFragment)

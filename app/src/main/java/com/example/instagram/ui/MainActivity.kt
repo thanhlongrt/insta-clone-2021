@@ -138,7 +138,9 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.bottomNavView.visibility =
-            if (destination.id == R.id.commentFragment) View.GONE else View.VISIBLE
+            if (destination.id == R.id.commentFragment ||
+                destination.id == R.id.storyFragment
+            ) View.GONE else View.VISIBLE
     }
 
     private fun showKeyboard(searchEditText: EditText) {
@@ -156,7 +158,6 @@ class MainActivity : AppCompatActivity() {
         }
         useLightStatusBar()
 
-        binding.bottomNavView.visibility = View.VISIBLE
     }
 
     private fun hideUIs() {
@@ -168,7 +169,6 @@ class MainActivity : AppCompatActivity() {
             window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN
         }
 
-        binding.bottomNavView.visibility = View.GONE
     }
 
     private fun useLightStatusBar() {

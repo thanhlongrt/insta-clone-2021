@@ -16,7 +16,7 @@
 
         <item name="bottomSheetDialogTheme">@style/Theme.Instagram.BottomSheetDialog</item>
 
-        <item name="android:textColorHint">@color/dark_grey</item>
+        <item name="android:textColorHint">@color/gray</item>
 
         <item name="android:windowLightStatusBar" tools:targetApi="m">true</item>
 

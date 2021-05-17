@@ -8,10 +8,10 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
-    <color name="dark_dark_grey">#808080</color>
-    <color name="dark_grey">#aaaaaa</color>
-    <color name="grey">#e6e6e6</color>
-    <color name="light_grey">#f2f2f2</color>
+    <color name="dark_gray">#808080</color>
+    <color name="gray">#aaaaaa</color>
+    <color name="light_gray">#e6e6e6</color>
+    <color name="light_light_gray">#f2f2f2</color>
 
 
     <color name="blue">#0195f7</color>

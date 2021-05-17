@@ -10,6 +10,7 @@ class StoryItem(
     val userAvatar: String = "",
     val photoUrl: String = "",
     val videoUrl: String = "",
-    val path: String = ""
+    val path: String = "",
+    val date: Long = 0L
 ) {
 }
