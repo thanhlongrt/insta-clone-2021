@@ -39,6 +39,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Instagram"
         tools:replace="android:allowBackup">
+        <activity android:name=".ui.create.AddNewPostActivity"></activity>
         <activity android:name=".ui.login.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -48,9 +49,7 @@
         </activity>
         <activity
             android:name=".ui.MainActivity"
-            android:theme="@style/Theme.Instagram.NoActionBar">
-
-        </activity>
+            android:theme="@style/Theme.Instagram.NoActionBar"></activity>
 
         <provider
             android:name="androidx.core.content.FileProvider"
@@ -73,11 +72,9 @@
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
             android:resource="@mipmap/ic_launcher" />
-
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_color"
             android:resource="@color/teal_200" />
-
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"
             android:value="@string/post_notification_channel_id" />

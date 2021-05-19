@@ -17,11 +17,6 @@ data class DataState<out T>(
         fun <T> loading(): DataState<T> {
             return DataState(Status.LOADING, null, null)
         }
-
-        fun <T> idle(data: T?): DataState<T>{
-            return DataState(Status.IDLE, null, null)
-        }
-
     }
 }
 
@@ -29,5 +24,4 @@ enum class Status {
     SUCCESS,
     ERROR,
     LOADING,
-    IDLE
 }

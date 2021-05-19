@@ -63,7 +63,7 @@ class PostListFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = FragmentPostListBinding.inflate(inflater, container, false)
         return binding!!.root
     }
@@ -72,12 +72,16 @@ class PostListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        binding?.backButton?.setOnClickListener {
+            getFragmentNavController(R.id.nav_host_fragment)?.navigateUp()
+        }
+
         postListAdapter = PostListAdapter(mutableListOf())
         postListAdapter.apply {
             onOptionClick = {
                 val bundle = bundleOf(
-                    "photo_path" to it.path,
-                    "photo_id" to it.postId
+                    "path" to it.path,
+                    "post_id" to it.postId
                 )
                 getFragmentNavController(R.id.nav_host_fragment)?.navigate(
                     R.id.action_userPostsFragment_to_postBottomSheetFragment,

@@ -3,7 +3,7 @@ package com.example.instagram.model
 /**
  * Created by Thanh Long Nguyen on 4/29/2021
  */
-class PostItem(
+data class PostItem(
     val postId: String = "",
     val uid: String = "",
     val avatarUrl: String = "",

@@ -44,10 +44,14 @@ constructor(
             }.catch { emit(DataState.error(null, it.message)) }
             .onStart { emit(DataState.loading()) }
 
-    fun deletePost(id: String, photoPath: String): Task<Void> {
-        val deletePostDataTask = firebaseService.postDataReference.child(id).removeValue()
-        val deletePhotoTask = firebaseService.photoStorage.child(photoPath).delete()
-        return Tasks.whenAll(deletePostDataTask, deletePhotoTask)
+    fun deletePost(postId: String, mediaPath: String): Task<Void> {
+        val deletePostDataTask = firebaseService.postDataReference.child(postId).removeValue()
+        val decreasePostCountTask =
+            firebaseService.userDataReference(currentUser!!.uid).child("post_count")
+                .setValue(ServerValue.increment(-1))
+        val deletePhotoTask =
+            firebaseService.photoStorage.child(currentUser!!.uid).child(mediaPath).delete()
+        return Tasks.whenAll(deletePostDataTask, decreasePostCountTask, deletePhotoTask)
     }
 
     suspend fun uploadImage(context: Context, uri: Uri, path: String): Flow<DataState<String>> =
@@ -132,7 +136,7 @@ constructor(
                     .filter { it.uid == uid }
                 val postItems = networkPosts.map { postNetworkMapper.fromEntity(it) }
                 postItems.forEach {
-                    it.isLiked = it.likes.contains(currentUser!!.uid)
+                    it.isLiked = it.likes.contains(currentUser?.uid)
                 }
                 this@callbackFlow.sendBlocking(postItems)
             }
@@ -151,7 +155,7 @@ constructor(
         }
     }
 
-    fun likeClick(postId: String) {
+    fun likePost(postId: String) {
         postDataReference.child(postId).runTransaction(object : Transaction.Handler {
             override fun doTransaction(currentData: MutableData): Transaction.Result {
                 val post = currentData.getValue(Post::class.java)

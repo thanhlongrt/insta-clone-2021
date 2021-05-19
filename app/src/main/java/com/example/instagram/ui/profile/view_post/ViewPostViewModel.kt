@@ -47,9 +47,15 @@ constructor(
         }
     }
 
+    fun deletePost(id: String, photoPath: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            postRepository.deletePost(id, photoPath)
+        }
+    }
+
     fun like(postId: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            postRepository.likeClick(postId)
+            postRepository.likePost(postId)
         }
     }
 }

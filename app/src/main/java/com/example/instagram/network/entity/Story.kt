@@ -14,7 +14,8 @@ data class Story(
     val avatar_url: String = "",
     val photo_url: String = "",
     val video_url: String = "",
-    val path: String = ""
+    val path: String = "",
+    val date: Long = 0
 ) {
 }
 
@@ -28,6 +29,7 @@ class StoryNetworkMapper @Inject constructor() : EntityMapper<Story, StoryItem> 
             photoUrl = entity.photo_url,
             videoUrl = entity.video_url,
             path = entity.path,
+            date = entity.date
         )
     }
 
@@ -40,6 +42,7 @@ class StoryNetworkMapper @Inject constructor() : EntityMapper<Story, StoryItem> 
             photo_url = model.photoUrl,
             video_url = model.videoUrl,
             path = model.path,
+            date = model.date
         )
     }
 

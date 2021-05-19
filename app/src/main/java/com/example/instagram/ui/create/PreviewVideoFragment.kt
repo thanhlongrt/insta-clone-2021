@@ -10,10 +10,12 @@ import android.widget.CheckBox
 import androidx.core.content.FileProvider
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import com.example.instagram.Constants.KEY_IS_VIDEO
+import com.example.instagram.Constants.KEY_URI
 import com.example.instagram.R
 import com.example.instagram.databinding.FragmentPreviewVideoBinding
+import com.example.instagram.getFragmentNavController
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
@@ -21,8 +23,6 @@ import com.otaliastudios.transcoder.Transcoder
 import com.otaliastudios.transcoder.TranscoderListener
 import com.otaliastudios.transcoder.source.UriDataSource
 import com.otaliastudios.transcoder.validator.WriteVideoValidator
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import java.io.File
 import java.io.IOException
 import java.util.*
@@ -51,7 +51,7 @@ class PreviewVideoFragment : Fragment() {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
         arguments?.let {
-            videoUri = it.getParcelable("uri")
+            videoUri = it.getParcelable(KEY_URI)
         }
     }
 
@@ -59,7 +59,7 @@ class PreviewVideoFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = FragmentPreviewVideoBinding.inflate(inflater, container, false)
         return binding!!.root
     }
@@ -67,6 +67,32 @@ class PreviewVideoFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val checkBox = binding?.playerView?.findViewById<CheckBox>(R.id.exo_toggle_sound)!!
+
+        binding?.toolBar?.inflateMenu(R.menu.menu_next)
+        binding?.toolBar?.setOnMenuItemClickListener { item ->
+            when (item.itemId) {
+                R.id.action_next -> {
+                    val bundle = bundleOf(
+                        KEY_URI to videoUri,
+                        KEY_IS_VIDEO to true
+                    )
+                    findNavController().navigate(
+                        R.id.action_previewVideoFragment_to_createNewPostFragment,
+                        bundle
+                    )
+                    true
+                }
+
+                else -> {
+                    super.onOptionsItemSelected(item)
+                }
+            }
+        }
+
+        binding?.backButton?.setOnClickListener {
+            getFragmentNavController(R.id.nav_host_fragment)?.navigateUp()
+        }
+
         binding?.playerView?.setOnClickListener {
             checkBox.isChecked = !checkBox.isChecked
             toggleSound()
@@ -147,28 +173,6 @@ class PreviewVideoFragment : Fragment() {
         super.onStop()
         if (Build.VERSION.SDK_INT >= 24 && videoUri != null) {
             releasePlayer()
-        }
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        super.onCreateOptionsMenu(menu, inflater)
-        inflater.inflate(R.menu.menu_next, menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.action_next -> {
-                val bundle = bundleOf("uri" to videoUri, "is_video" to true)
-                findNavController().navigate(
-                    R.id.action_previewVideoFragment_to_createNewPostFragment,
-                    bundle
-                )
-                true
-            }
-
-            else -> {
-                super.onOptionsItemSelected(item)
-            }
         }
     }
 

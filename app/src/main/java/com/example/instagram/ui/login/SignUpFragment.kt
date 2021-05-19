@@ -34,7 +34,7 @@ class SignUpFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding =
             DataBindingUtil.inflate(layoutInflater, R.layout.fragment_sign_up, container, false)
         binding?.loginViewModel = loginViewModel
@@ -44,13 +44,12 @@ class SignUpFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        setupControllers()
 
-        loginViewModel.signUpFormState.observe(viewLifecycleOwner, Observer {
-            val formState = it ?: return@Observer
+        configObservers(view)
+    }
 
-            binding?.signUp?.isEnabled = formState.data!!
-        })
-
+    private fun setupControllers() {
         binding?.email?.apply {
             afterTextChanged {
                 loginViewModel.signUpDataChanged()
@@ -75,6 +74,14 @@ class SignUpFragment : Fragment() {
                 false
             }
         }
+    }
+
+    private fun configObservers(view: View) {
+        loginViewModel.signUpFormState.observe(viewLifecycleOwner, Observer {
+            val formState = it ?: return@Observer
+
+            binding?.signUp?.isEnabled = formState.data!!
+        })
 
         loginViewModel.signUpResult.observe(viewLifecycleOwner, Observer {
             when (it.status) {

@@ -19,6 +19,18 @@
     <string name="reply">Reply</string>
     <string name="create_account">Create account</string>
     <string name="user_website">&lt;b href=%1$s>%1$s&lt;/b></string>
+    <string name="edit_profile">Edit Profile</string>
+    <string name="comments">Comments</string>
+    <string name="new_post">New post</string>
+    <string name="write_a_caption">Write a caption...</string>
+    <string name="tag_people">Tag people</string>
+    <string name="add_location">Add location</string>
+    <string name="also_post_to">Also post to</string>
+    <string name="facebook">Facebook</string>
+    <string name="twitter">Twitter</string>
+    <string name="tumblr">Tumblr</string>
+    <string name="advanced_settings">Advanced settings</string>
+    <string name="posts">Posts</string>
     <plurals name="likeCount">
         <item quantity="one">%d like</item>
         <item quantity="other">%d likes</item>

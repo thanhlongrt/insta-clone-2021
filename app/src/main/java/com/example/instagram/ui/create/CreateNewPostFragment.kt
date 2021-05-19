@@ -8,10 +8,14 @@ import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.bumptech.glide.Glide
+import com.example.instagram.Constants.KEY_IS_VIDEO
+import com.example.instagram.Constants.KEY_URI
 import com.example.instagram.ImageUtils.mimeType
 import com.example.instagram.R
 import com.example.instagram.databinding.FragmentCreateNewPostBinding
@@ -45,8 +49,8 @@ class CreateNewPostFragment : Fragment() {
         setHasOptionsMenu(true)
 
         arguments?.let {
-            uri = it.getParcelable("uri")
-            isVideo = it.getBoolean("is_video")
+            uri = it.getParcelable(KEY_URI)
+            isVideo = it.getBoolean(KEY_IS_VIDEO)
         }
     }
 
@@ -61,18 +65,10 @@ class CreateNewPostFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        Log.e(TAG, "onViewCreated: ${createViewModel.currentUser.value?.username}")
-        createViewModel.currentUser.observe(viewLifecycleOwner, { user ->
-            if (user != null) {
-                Glide.with(view.context)
-                    .load(user.avatarUrl)
-                    .into(binding?.avatar!!)
-            }
-        })
-        Log.e(TAG, "onViewCreated: ${createViewModel.currentUser.value?.username}")
-        Glide.with(view.context)
-            .load(uri)
-            .into(binding?.imageView!!)
+
+        configObservers(view)
+
+        setupControllers(view)
 
 //        lifecycleScope.launch(Dispatchers.IO) {
 //            addPhotoToGallery(uri!!)
@@ -80,42 +76,62 @@ class CreateNewPostFragment : Fragment() {
 
     }
 
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        super.onCreateOptionsMenu(menu, inflater)
-        inflater.inflate(R.menu.menu_done, menu)
+    private fun configObservers(view: View) {
+        createViewModel.currentUser.observe(viewLifecycleOwner, { user ->
+            if (user != null) {
+                Glide.with(view.context)
+                    .load(user.avatarUrl)
+                    .into(binding?.avatar!!)
+            }
+        })
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.action_done -> {
-                val user = createViewModel.currentUser.value
-                if (user != null && uri != null) {
-                    val storagePath: String = if (isVideo) {
-                        "${user.uid}/VIDEO_${System.currentTimeMillis()}.mp4"
-                    } else {
-                        "${user.uid}/IMG_${System.currentTimeMillis()}.jpg"
+    private fun setupControllers(view: View) {
+        binding?.toolBar?.inflateMenu(R.menu.menu_done)
+        binding?.toolBar?.setOnMenuItemClickListener { item ->
+            when (item.itemId) {
+                R.id.action_done -> {
+                    val user = createViewModel.currentUser.value
+                    if (user != null && uri != null) {
+                        val storagePath: String = if (isVideo) {
+                            "${user.uid}/VIDEO_${System.currentTimeMillis()}.mp4"
+                        } else {
+                            "${user.uid}/IMG_${System.currentTimeMillis()}.jpg"
+                        }
+                        val post = Post(
+                            uid = user.uid,
+                            avatar_url = user.avatarUrl,
+                            user_name = user.username,
+                            date_created = System.currentTimeMillis(),
+                            caption = binding?.captionEditText?.text.toString(),
+                            path = storagePath,
+                            like_count = 0,
+                            comment_count = 0,
+                            is_video = isVideo
+                        )
+                        createViewModel.savePostData(uri!!, post)
+
+                        getFragmentNavController(R.id.nav_host_fragment)?.navigate(
+                            R.id.action_createNewPostFragment_to_createBottomSheetFragment,
+                        )
                     }
-                    val post = Post(
-                        uid = user.uid,
-                        avatar_url = user.avatarUrl,
-                        user_name = user.username,
-                        date_created = System.currentTimeMillis(),
-                        caption = binding?.captionEditText?.text.toString(),
-                        path = storagePath,
-                        like_count = 0,
-                        comment_count = 0,
-                        is_video = isVideo
-                    )
-                    createViewModel.savePostData(uri!!, post)
-                    getFragmentNavController(R.id.nav_host_fragment)?.navigate(R.id.action_createNewPostFragment_to_profileFragment)
+                    true
                 }
-                true
-            }
-            else -> {
-                super.onOptionsItemSelected(item)
+                else -> {
+                    super.onOptionsItemSelected(item)
+                }
             }
         }
+
+        binding?.backButton?.setOnClickListener {
+            getFragmentNavController(R.id.nav_host_fragment)?.navigateUp()
+        }
+
+        Glide.with(view.context)
+            .load(uri)
+            .into(binding?.imageView!!)
     }
+
 
     private fun addPhotoToGallery(inputUri: Uri) {
         val contentResolver = context?.contentResolver!!

@@ -33,22 +33,13 @@ class ProfileFragment : Fragment() {
 
     private val profileViewModel: ProfileViewModel by activityViewModels()
 
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setHasOptionsMenu(true)
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_profile, container, false)
-        binding?.viewmodel = profileViewModel
+        binding?.viewModel = profileViewModel
         binding?.lifecycleOwner = viewLifecycleOwner
         return binding?.root
     }
@@ -56,17 +47,36 @@ class ProfileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        profileViewModel.currentUser.observe(requireActivity()) { user ->
-            user?.let {
-                requireActivity().findViewById<Toolbar>(R.id.tool_bar).title = it.username
-            }
-        }
+//        profileViewModel.currentUser.observe(requireActivity()) { user ->
+//            user?.let {
+//                requireActivity().findViewById<Toolbar>(R.id.tool_bar).title = it.username
+//            }
+//        }
 
         setupControllers()
 
     }
 
     private fun setupControllers() {
+
+        binding?.toolBar?.inflateMenu(R.menu.menu_profile)
+        binding?.toolBar?.setOnMenuItemClickListener { menuItem ->
+            when(menuItem.itemId){
+                R.id.action_logout -> {
+                    logout()
+                    true
+                }
+
+                R.id.action_add -> {
+                    findNavController().navigate(R.id.action_profileFragment_to_nav_create)
+                    true
+                }
+
+                else -> {
+                    super.onOptionsItemSelected(menuItem)
+                }
+            }
+        }
 
         binding?.editProfileButton?.setOnClickListener {
             findNavController().navigate(R.id.action_profileFragment_to_editProfileFragment)
@@ -89,11 +99,6 @@ class ProfileFragment : Fragment() {
         }.attach()
     }
 
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        super.onCreateOptionsMenu(menu, inflater)
-        inflater.inflate(R.menu.menu_profile, menu)
-    }
-
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_logout -> {
@@ -102,7 +107,7 @@ class ProfileFragment : Fragment() {
             }
 
             R.id.action_add -> {
-                findNavController().navigate(R.id.action_profileFragment_to_createBottomSheetFragment)
+                findNavController().navigate(R.id.action_profileFragment_to_nav_create)
                 true
             }
 

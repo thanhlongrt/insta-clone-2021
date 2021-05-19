@@ -4,6 +4,7 @@ import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.RequiresApi
@@ -14,7 +15,7 @@ import com.example.instagram.R
 import com.example.instagram.databinding.FragmentStoryBinding
 import com.example.instagram.getFragmentNavController
 import com.example.instagram.model.UserStoryItem
-import com.example.instagram.ui.profile.setDate
+import com.example.instagram.setDate
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
@@ -40,6 +41,29 @@ class StoryFragment : Fragment(), StoryProgressView.StoriesListener {
 
     private var storyIndex: Int = 0
 
+    private var pressTime = 0L
+
+    private var limit = 500L
+
+    private val onTouchListener = object : View.OnTouchListener {
+        override fun onTouch(v: View?, event: MotionEvent?): Boolean {
+            when (event?.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    Log.e(TAG, "onTouch: Action Down", )
+                    pressTime = System.currentTimeMillis()
+                    binding?.progressBarContainer?.pause()
+                    return false
+                }
+                MotionEvent.ACTION_UP -> {
+                    Log.e(TAG, "onTouch: Action Up", )
+                    binding?.progressBarContainer?.resume()
+                    return limit < System.currentTimeMillis() - pressTime
+                }
+            }
+            return false
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         position = arguments?.getInt("position", 0)
@@ -49,7 +73,7 @@ class StoryFragment : Fragment(), StoryProgressView.StoriesListener {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = FragmentStoryBinding.inflate(inflater, container, false)
         return binding!!.root
     }
@@ -58,31 +82,38 @@ class StoryFragment : Fragment(), StoryProgressView.StoriesListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding?.progressBarContainer?.apply {
-            setStoriesCount(userStoryItem.stories.size)
-            setStoryDuration(10000L)
-            setStoriesListener(this@StoryFragment)
+        setupControllers(view)
+
+    }
+
+    private fun setupControllers(view: View) {
+        binding?.apply {
+            progressBarContainer.apply {
+                setStoriesCount(userStoryItem.stories.size)
+                setStoryDuration(10000L)
+                setStoriesListener(this@StoryFragment)
+            }
+            Glide.with(view.context)
+                .load(userStoryItem.stories[storyIndex].photoUrl)
+                .into(imageView)
+            Glide.with(view.context)
+                .load(userStoryItem.avatarUrl)
+                .into(avatar)
+            username.text = userStoryItem.username
+            date.setDate(userStoryItem.stories[storyIndex].date)
+            progressBarContainer.startStories(storyIndex)
+
+            reverse.setOnClickListener {
+                progressBarContainer.reverse()
+            }
+
+            skip.setOnClickListener {
+                progressBarContainer.skip()
+            }
+
+            reverse.setOnTouchListener(onTouchListener)
+            skip.setOnTouchListener(onTouchListener)
         }
-
-
-        Glide.with(view.context)
-            .load(userStoryItem.stories[storyIndex].photoUrl)
-            .into(binding?.imageView!!)
-        Glide.with(view.context)
-            .load(userStoryItem.avatarUrl)
-            .into(binding?.avatar!!)
-        binding?.username?.text = userStoryItem.username
-        binding?.date?.setDate(userStoryItem.stories[storyIndex].date)
-        binding?.progressBarContainer?.startStories(storyIndex)
-
-        binding?.reverse?.setOnClickListener {
-            binding?.progressBarContainer?.reverse()
-        }
-
-        binding?.skip?.setOnClickListener {
-            binding?.progressBarContainer?.skip()
-        }
-
     }
 
     override fun onDestroyView() {
@@ -92,18 +123,26 @@ class StoryFragment : Fragment(), StoryProgressView.StoriesListener {
 
     override fun onNext() {
         context?.let {
-            Glide.with(it)
-                .load(userStoryItem.stories[++storyIndex].photoUrl)
-                .into(binding?.imageView!!)
+            ++storyIndex
+            binding?.apply {
+                date.setDate(userStoryItem.stories[storyIndex].date)
+                Glide.with(it)
+                    .load(userStoryItem.stories[storyIndex].photoUrl)
+                    .into(imageView)
+            }
         }
     }
 
     override fun onPrev() {
         if (storyIndex - 1 < 0) return
         context?.let {
-            Glide.with(it)
-                .load(userStoryItem.stories[--storyIndex].photoUrl)
-                .into(binding?.imageView!!)
+            --storyIndex
+            binding?.apply {
+                date.setDate(userStoryItem.stories[storyIndex].date)
+                Glide.with(it)
+                    .load(userStoryItem.stories[storyIndex].photoUrl)
+                    .into(imageView)
+            }
         }
     }
 

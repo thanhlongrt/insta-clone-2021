@@ -2,11 +2,13 @@ package com.example.instagram.ui.create
 
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.bumptech.glide.Glide
+import com.example.instagram.Constants.KEY_URI
 import com.example.instagram.R
 import com.example.instagram.databinding.FragmentAddNewStoryBinding
 import com.example.instagram.getFragmentNavController
@@ -33,55 +35,56 @@ class AddNewStoryFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        storyUri = arguments?.getParcelable("story_uri")
-        setHasOptionsMenu(true)
+        storyUri = arguments?.getParcelable(KEY_URI)
     }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = FragmentAddNewStoryBinding.inflate(inflater, container, false)
         return binding!!.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        setupControllers(view)
+    }
+
+    private fun setupControllers(view: View) {
         storyUri?.let {
             Glide.with(view.context)
                 .load(it)
                 .into(binding?.imageView!!)
         }
-    }
 
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        super.onCreateOptionsMenu(menu, inflater)
-        inflater.inflate(R.menu.menu_done, menu)
-    }
+        binding?.toolBar?.inflateMenu(R.menu.menu_done)
+        binding?.toolBar?.setOnMenuItemClickListener { item ->
+            when (item.itemId) {
+                R.id.action_done -> {
+                    val user = createViewModel.currentUser.value
+                    if (storyUri != null && user != null) {
+                        val storagePath = "IMG_${System.currentTimeMillis()}.jpg"
+                        val storyData = HashMap<String, Any>()
+                        storyData["uid"] = user.uid
+                        storyData["username"] = user.username
+                        storyData["avatar_url"] = user.avatarUrl
+                        storyData["video_url"] = ""
+                        storyData["path"] = storagePath
+                        storyData["date"] = System.currentTimeMillis()
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.action_done -> {
-                val user = createViewModel.currentUser.value
-                if (storyUri != null && user != null) {
-                    Log.e(TAG, "onOptionsItemSelected: createStory: ...")
-                    val storagePath = "IMG_${System.currentTimeMillis()}.jpg"
-                    val storyData = HashMap<String, Any>()
-                    storyData["uid"] = user.uid
-                    storyData["username"] = user.username
-                    storyData["avatar_url"] = user.avatarUrl
-                    storyData["video_url"] = ""
-                    storyData["path"] = storagePath
-                    storyData["date"] = System.currentTimeMillis()
-
-                    createViewModel.saveStoryData(storyUri!!, storagePath, storyData)
-                    getFragmentNavController(R.id.nav_host_fragment)?.navigate(R.id.action_addNewStoryFragment_to_profileFragment)
+                        createViewModel.saveStoryData(storyUri!!, storagePath, storyData)
+                        getFragmentNavController(R.id.nav_host_fragment)?.navigate(
+                            R.id.action_addNewStoryFragment_to_createBottomSheetFragment,
+                        )
+                    }
+                    true
                 }
-                true
-            }
-            else -> {
-                super.onOptionsItemSelected(item)
+                else -> {
+                    super.onOptionsItemSelected(item)
+                }
             }
         }
     }

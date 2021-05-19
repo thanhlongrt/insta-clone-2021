@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.example.instagram.R
 import com.example.instagram.databinding.FragmentViewUserBinding
+import com.example.instagram.getFragmentNavController
 import com.example.instagram.ui.profile.view_post.PostGridListFragment
 import com.example.instagram.ui.profile.view_post.ViewPagerAdapter
 import com.google.android.material.tabs.TabLayoutMediator
@@ -43,7 +44,7 @@ class ViewUserFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_view_user, container, false)
         binding?.viewmodel = searchViewModel
         binding?.lifecycleOwner = viewLifecycleOwner
@@ -52,6 +53,15 @@ class ViewUserFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        setupControllers()
+
+    }
+
+    private fun setupControllers() {
+        binding?.backButton?.setOnClickListener {
+            getFragmentNavController(R.id.nav_host_fragment)?.navigateUp()
+        }
 
         val fragments = listOf(
             ViewUserPostGridListFragment.newInstance(uid!!),
@@ -68,10 +78,6 @@ class ViewUserFragment : Fragment() {
                 }
             }
         }.attach()
-
-        searchViewModel.otherUserLiveData.observe(requireActivity(), { user ->
-            activity?.findViewById<Toolbar>(R.id.tool_bar)?.title = user.username
-        })
     }
 
     override fun onDestroyView() {

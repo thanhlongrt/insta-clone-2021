@@ -63,9 +63,6 @@ class HomeFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        setHasOptionsMenu(true)
-
         homeViewModel.getStoryData()
         homeViewModel.getAllPosts()
     }
@@ -74,14 +71,40 @@ class HomeFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding =
             FragmentHomeBinding.inflate(inflater, container, false)
-        return binding?.root
+        return binding!!.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        setupControllers(view)
+
+        configObservers()
+
+    }
+
+    private fun setupControllers(view: View) {
+
+        binding?.toolBar?.inflateMenu(R.menu.menu_home)
+        binding?.toolBar?.setOnMenuItemClickListener { item ->
+            when (item.itemId) {
+                R.id.action_add -> {
+                    getFragmentNavController(R.id.nav_host_fragment)
+                        ?.navigate(R.id.action_homeFragment_to_nav_create)
+                    true
+                }
+
+                R.id.action_direct -> {
+                    getFragmentNavController(R.id.nav_host_fragment)
+                        ?.navigate(R.id.action_homeFragment_to_directFragment)
+                    true
+                }
+                else -> super.onOptionsItemSelected(item)
+            }
+        }
 
         storyListAdapter = StoryListAdapter(mutableListOf())
         storyListAdapter.onItemClick = { position ->
@@ -98,7 +121,7 @@ class HomeFragment : Fragment() {
                 if (!post.isLiked && post.uid != homeViewModel.currentUser.value?.uid ?: false) {
                     sendLikePushNotification(post)
                 }
-                homeViewModel.clickLike(post.postId)
+                homeViewModel.likePost(post.postId)
                 onLikeClick(position)
             }
 
@@ -134,7 +157,9 @@ class HomeFragment : Fragment() {
                 }
             }
         }
+    }
 
+    private fun configObservers() {
         homeViewModel.stories.observe(requireActivity()) {
             if (it.status == SUCCESS) {
                 storyListAdapter.addAll(it.data!!)
@@ -146,7 +171,6 @@ class HomeFragment : Fragment() {
                 postListAdapter.addAll(it.data!!.reversed())
             }
         })
-
     }
 
     private fun sendLikePushNotification(post: PostItem) {
@@ -178,24 +202,22 @@ class HomeFragment : Fragment() {
     private var player: SimpleExoPlayer? = null
     private fun initPlayer(playerView: PlayerView, videoUrl: String) {
         val context = playerView.context
-        player = SimpleExoPlayer.Builder(
-            context,
-        )
+        player = SimpleExoPlayer.Builder(context)
             .setLoadControl(DefaultLoadControl())
             .setTrackSelector(DefaultTrackSelector(context))
             .build()
 
-
-        playerView.setKeepContentOnPlayerReset(true)
-        playerView.useController = true
-        playerView.player = this.player
-        playerView.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_ZOOM
+        playerView.apply {
+            setKeepContentOnPlayerReset(true)
+            useController = true
+            player = this.player
+            resizeMode = AspectRatioFrameLayout.RESIZE_MODE_ZOOM
+        }
         val mediaItem =
             MediaItem.Builder()
                 .setUri(videoUrl)
                 .setMimeType(MimeTypes.VIDEO_MP4)
                 .build()
-
 
         val mediaSource = ProgressiveMediaSource.Factory(
             cacheDataSourceFactory
@@ -214,26 +236,6 @@ class HomeFragment : Fragment() {
         player?.let { player ->
             player.release()
             this.player = null
-        }
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        super.onCreateOptionsMenu(menu, inflater)
-        inflater.inflate(R.menu.menu_home, menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.action_add -> {
-                getFragmentNavController(R.id.nav_host_fragment)?.navigate(R.id.action_homeFragment_to_createBottomSheetFragment2)
-                true
-            }
-
-            R.id.action_direct -> {
-                getFragmentNavController(R.id.nav_host_fragment)?.navigate(R.id.action_homeFragment_to_directFragment)
-                true
-            }
-            else -> super.onOptionsItemSelected(item)
         }
     }
 }

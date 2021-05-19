@@ -10,6 +10,7 @@ import androidx.fragment.app.viewModels
 import com.example.instagram.R
 import com.example.instagram.Status.*
 import com.example.instagram.databinding.FragmentExploreBinding
+import com.example.instagram.getFragmentNavController
 import com.example.instagram.ui.profile.view_post.PostGridListAdapter
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -22,7 +23,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 @AndroidEntryPoint
 class ExploreFragment : Fragment() {
 
-    companion object{
+    companion object {
         private const val TAG = "ExploreFragment"
     }
 
@@ -41,14 +42,24 @@ class ExploreFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding =
             FragmentExploreBinding.inflate(inflater, container, false)
-        return binding?.root
+        return binding!!.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        setupControllers()
+
+        configObservers()
+    }
+
+    private fun setupControllers() {
+        binding?.searchViewHolder?.setOnClickListener {
+            getFragmentNavController(R.id.nav_host_fragment)?.navigate(R.id.action_exploreFragment_to_searchFragment)
+        }
 
         val spannedGridLayoutManager = SpannedGridLayoutManager(
             object : SpannedGridLayoutManager.GridSpanLookup {
@@ -61,34 +72,25 @@ class ExploreFragment : Fragment() {
             }, 3, 1f
         )
 
-//        val gridLayoutManager = GridLayoutManager(context, 3)
-//        adapter = PostGridListAdapter(mutableListOf())
         gridListAdapter = PostGridListAdapter(mutableListOf())
         binding?.recyclerView?.apply {
             layoutManager = spannedGridLayoutManager
             adapter = gridListAdapter
         }
+    }
 
+    private fun configObservers() {
         exploreViewModel.feedPosts.observe(viewLifecycleOwner) {
             when (it.status) {
                 SUCCESS -> {
                     displayProgressBar(false)
-//                    gridListAdapter = PostGridListAdapter(it.data!!)
-//                    binding?.recyclerView?.apply {
-//                        layoutManager = spannedGridLayoutManager
-//                        adapter = this@ExploreFragment.gridListAdapter
-//                    }
                     gridListAdapter.addAll(it.data!!.reversed())
-
                 }
                 ERROR -> {
                     displayProgressBar(false)
                 }
                 LOADING -> {
                     displayProgressBar(true)
-                }
-                IDLE -> {
-
                 }
             }
         }

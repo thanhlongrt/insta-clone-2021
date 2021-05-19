@@ -53,7 +53,6 @@ class NotificationFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-
         createChannel(
             getString(R.string.post_notification_channel_id),
             getString(R.string.post_notification_channel_name)

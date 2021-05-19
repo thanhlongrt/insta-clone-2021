@@ -19,11 +19,11 @@
             android:id="@+id/action_homeFragment_to_commentFragment"
             app:destination="@id/commentFragment" />
         <action
-            android:id="@+id/action_homeFragment_to_createBottomSheetFragment2"
-            app:destination="@id/createBottomSheetFragment2" />
-        <action
             android:id="@+id/action_homeFragment_to_directFragment"
             app:destination="@id/directFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_nav_create"
+            app:destination="@id/nav_create" />
     </fragment>
     <fragment
         android:id="@+id/storyFragment"
@@ -35,22 +35,11 @@
         android:name="com.example.instagram.ui.comment.CommentFragment"
         android:label="CommentFragment"
         tools:layout="@layout/fragment_comment" />
-    <dialog
-        android:id="@+id/createBottomSheetFragment2"
-        android:name="com.example.instagram.ui.create.CreateBottomSheetFragment"
-        android:label="CreateBottomSheetFragment"
-        tools:layout="@layout/fragment_create_new_bottom_sheet" >
-        <action
-            android:id="@+id/action_createBottomSheetFragment2_to_addNewStoryFragment2"
-            app:destination="@id/addNewStoryFragment2" />
-    </dialog>
     <fragment
         android:id="@+id/directFragment"
         android:name="com.example.instagram.ui.direct.DirectFragment"
         android:label="DirectFragment"
         tools:layout="@layout/fragment_direct" />
-    <fragment
-        android:id="@+id/addNewStoryFragment2"
-        android:name="com.example.instagram.ui.create.AddNewStoryFragment"
-        android:label="AddNewStoryFragment" />
+
+    <include app:graph="@navigation/nav_create"/>
 </navigation>

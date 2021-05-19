@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_create"
+    app:startDestination="@id/createBottomSheetFragment">
+    <dialog
+        android:id="@+id/createBottomSheetFragment"
+        android:name="com.example.instagram.ui.create.CreateBottomSheetFragment"
+        android:label="CreateBottomSheetFragment"
+        tools:layout="@layout/fragment_create_new_bottom_sheet">
+        <action
+            android:id="@+id/action_createBottomSheetFragment_to_previewImageFragment"
+            app:destination="@id/previewImageFragment" />
+        <action
+            android:id="@+id/action_createBottomSheetFragment_to_addNewStoryFragment"
+            app:destination="@id/addNewStoryFragment" />
+        <action
+            android:id="@+id/action_createBottomSheetFragment_to_previewVideoFragment"
+            app:destination="@id/previewVideoFragment" />
+        <action
+            android:id="@+id/action_createBottomSheetFragment_to_chooseMediaFragment"
+            app:destination="@id/chooseMediaFragment" />
+    </dialog>
+    <fragment
+        android:id="@+id/previewImageFragment"
+        android:name="com.example.instagram.ui.create.PreviewPhotoFragment"
+        android:label="PreviewImageFragment"
+        tools:layout="@layout/fragment_preview_photo">
+        <action
+            android:id="@+id/action_previewImageFragment_to_createNewPostFragment"
+            app:destination="@id/createNewPostFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/createNewPostFragment"
+        android:name="com.example.instagram.ui.create.CreateNewPostFragment"
+        android:label="NewPostFragment"
+        tools:layout="@layout/fragment_create_new_post">
+        <action
+            android:id="@+id/action_createNewPostFragment_to_createBottomSheetFragment"
+            app:popUpTo="@id/nav_create"
+            app:popUpToInclusive="true" />
+    </fragment>
+    <fragment
+        android:id="@+id/previewVideoFragment"
+        android:name="com.example.instagram.ui.create.PreviewVideoFragment"
+        android:label="PreviewVideoFragment"
+        tools:layout="@layout/fragment_preview_video">
+        <action
+            android:id="@+id/action_previewVideoFragment_to_createNewPostFragment"
+            app:destination="@id/createNewPostFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/addNewStoryFragment"
+        android:name="com.example.instagram.ui.create.AddNewStoryFragment"
+        android:label="AddNewStoryFragment"
+        tools:layout="@layout/fragment_add_new_story">
+        <action
+            android:id="@+id/action_addNewStoryFragment_to_createBottomSheetFragment"
+            app:popUpTo="@id/nav_create"
+            app:popUpToInclusive="true" />
+    </fragment>
+    <fragment
+        android:id="@+id/chooseMediaFragment"
+        android:name="com.example.instagram.ui.create.choose_media.ChoosePhotoFragment"
+        android:label="ChooseMediaFragment"
+        tools:layout="@layout/fragment_choose_photo">
+        <action
+            android:id="@+id/action_chooseMediaFragment_to_albumBottomSheetFragment"
+            app:destination="@id/albumBottomSheetFragment" />
+    </fragment>
+    <dialog
+        android:id="@+id/albumBottomSheetFragment"
+        android:name="com.example.instagram.ui.create.choose_media.AlbumBottomSheetFragment"
+        android:label="AlbumBottomSheetFragment"
+        tools:layout="@layout/fragment_album_bottom_sheet" />
+</navigation>

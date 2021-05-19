@@ -71,12 +71,6 @@ constructor(
         }
     }
 
-    fun deletePost(id: String, photoPath: String) {
-        viewModelScope.launch(Dispatchers.IO) {
-            postRepository.deletePost(id, photoPath)
-        }
-    }
-
     fun savePostData(uri: Uri, post: Post) {
         Log.e(TAG, "savePostData: Loading...")
 //        viewModelScope.launch(Dispatchers.IO) {
@@ -103,5 +97,6 @@ constructor(
             .enqueue()
 //        workManager.enqueue(compressWorkRequest)
     }
+
 
 }

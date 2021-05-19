@@ -1,20 +1,18 @@
 package com.example.instagram.ui.comment
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.instagram.Constants
 import com.example.instagram.Constants.KEY_POST_JSON
 import com.example.instagram.R
 import com.example.instagram.TypeConverters
 import com.example.instagram.databinding.FragmentCommentBinding
+import com.example.instagram.getFragmentNavController
 import com.example.instagram.model.PostItem
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -37,11 +35,7 @@ class CommentFragment : Fragment() {
 
     private var postItem: PostItem? = null
 
-    private var postId: String? = null
-
     private lateinit var commentAdapter: CommentAdapter
-
-    private lateinit var commentHeaderAdapter: CommentHeaderAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,7 +51,7 @@ class CommentFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_comment, container, false)
         binding?.viewModel = commentViewModel
         binding?.lifecycleOwner = viewLifecycleOwner
@@ -67,6 +61,23 @@ class CommentFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        setupControllers(view)
+
+        configObservers()
+
+    }
+
+    private fun configObservers() {
+        commentViewModel.comments.observe(viewLifecycleOwner) {
+            commentAdapter.addAll(it.reversed())
+        }
+    }
+
+    private fun setupControllers(view: View) {
+        binding?.backButton?.setOnClickListener {
+            getFragmentNavController(R.id.nav_host_fragment)?.navigateUp()
+        }
+
         commentAdapter = CommentAdapter(mutableListOf())
 
 
@@ -74,11 +85,6 @@ class CommentFragment : Fragment() {
             layoutManager = LinearLayoutManager(view.context)
             adapter = commentAdapter
         }
-
-        commentViewModel.comments.observe(viewLifecycleOwner) {
-            commentAdapter.addAll(it.reversed())
-        }
-
     }
 
     override fun onDestroyView() {

@@ -78,7 +78,6 @@ class ViewUserPostGridListFragment : Fragment() {
                 }
                 ERROR -> {}
                 LOADING -> {}
-                IDLE -> {}
             }
         })
 

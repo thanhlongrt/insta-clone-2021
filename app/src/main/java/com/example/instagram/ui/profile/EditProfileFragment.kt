@@ -2,7 +2,9 @@ package com.example.instagram.ui.profile
 
 import android.os.Bundle
 import android.util.Log
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.ProgressBar
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -35,11 +37,6 @@ class EditProfileFragment : Fragment() {
 
     private var isSaved: Boolean = false
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setHasOptionsMenu(true)
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -54,27 +51,14 @@ class EditProfileFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-//
-//        profileViewModel.currentUser.observe(requireActivity(), { user ->
-//            binding?.nameEditText?.setText(user.displayName)
-//            binding?.usernameEditText?.setText(user.username)
-//            binding?.websiteEditText?.setText(user.website)
-//            binding?.bioEditText?.setText(user.bio)
-//            if (!isSaved) {
-//                Glide.with(view.context)
-//                    .load(user.avatarUrl)
-//                    .into(binding?.circleImageView!!)
-//            }
-//        })
 
-        binding?.circleImageView?.setOnClickListener {
-            takePhoto.launch(Unit)
-        }
+        setupControllers()
 
-        binding?.textViewChangePhoto?.setOnClickListener {
-            takePhoto.launch(Unit)
-        }
+        configObservers(view)
 
+    }
+
+    private fun configObservers(view: View) {
         profileViewModel.uploadResult.observe(requireActivity(), {
             when (it.status) {
                 Status.LOADING -> {
@@ -88,9 +72,6 @@ class EditProfileFragment : Fragment() {
                     val userData = HashMap<String, Any>()
                     userData["profile_photo"] = it.data!!
                     profileViewModel.updateUserData(userData)
-                    it.status = Status.IDLE
-                }
-                Status.IDLE -> {
                 }
             }
         })
@@ -110,13 +91,42 @@ class EditProfileFragment : Fragment() {
                     if (isSaved) {
                         getFragmentNavController(R.id.nav_host_fragment)?.navigateUp()
                     }
-
-                }
-                Status.IDLE -> {
                 }
             }
         })
+    }
 
+    private fun setupControllers() {
+        binding?.toolBar?.inflateMenu(R.menu.menu_done)
+        binding?.toolBar?.setOnMenuItemClickListener { item ->
+            when (item.itemId) {
+                R.id.action_done -> {
+                    val userData = HashMap<String, Any>()
+                    userData["display_name"] = binding?.nameEditText?.text.toString()
+                    userData["username"] = binding?.usernameEditText?.text.toString()
+                    userData["website"] = binding?.websiteEditText?.text.toString()
+                    userData["bio"] = binding?.bioEditText?.text.toString()
+                    profileViewModel.updateUserData(userData)
+                    isSaved = true
+                    true
+                }
+                else -> {
+                    super.onOptionsItemSelected(item)
+                }
+            }
+        }
+
+        binding?.cancelButton?.setOnClickListener {
+            getFragmentNavController(R.id.nav_host_fragment)?.navigateUp()
+        }
+
+        binding?.circleImageView?.setOnClickListener {
+            takePhoto.launch(Unit)
+        }
+
+        binding?.textViewChangePhoto?.setOnClickListener {
+            takePhoto.launch(Unit)
+        }
     }
 
     private fun displayProgressBar(isDisplayed: Boolean) {
@@ -129,29 +139,6 @@ class EditProfileFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         binding = null
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        super.onCreateOptionsMenu(menu, inflater)
-        inflater.inflate(R.menu.menu_done, menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.action_done -> {
-                val userData = HashMap<String, Any>()
-                userData["display_name"] = binding?.nameEditText?.text.toString()
-                userData["username"] = binding?.usernameEditText?.text.toString()
-                userData["website"] = binding?.websiteEditText?.text.toString()
-                userData["bio"] = binding?.bioEditText?.text.toString()
-                profileViewModel.updateUserData(userData)
-                isSaved = true
-                true
-            }
-            else -> {
-                super.onOptionsItemSelected(item)
-            }
-        }
     }
 
     private val takePhoto =

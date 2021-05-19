@@ -12,6 +12,8 @@ import android.view.WindowInsetsController
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
+import androidx.fragment.app.activityViewModels
+import com.example.instagram.Constants.KEY_URI
 import com.example.instagram.R
 import com.example.instagram.databinding.FragmentCreateNewBottomSheetBinding
 import com.example.instagram.getFragmentNavController
@@ -32,11 +34,13 @@ class CreateBottomSheetFragment : BottomSheetDialogFragment() {
 
     private var binding: FragmentCreateNewBottomSheetBinding? = null
 
-    private val newPost =
+    private val createViewModel: CreateViewModel by activityViewModels()
+
+    private val newPhoto =
         registerForActivityResult(TakePhotoContract()) { uri ->
-            Log.e(TAG, "getMedia: uri: $uri")
+            Log.e(TAG, "newPhoto: uri: $uri")
             uri?.let {
-                val bundle = bundleOf("uri" to it)
+                val bundle = bundleOf(KEY_URI to it)
                 getFragmentNavController(
                     R.id.nav_host_fragment
                 )?.navigate(
@@ -51,7 +55,7 @@ class CreateBottomSheetFragment : BottomSheetDialogFragment() {
             Log.e(TAG, "newStory: uri: $uri")
             uri?.let {
 
-                val bundle = bundleOf("story_uri" to it)
+                val bundle = bundleOf(KEY_URI to it)
                 getFragmentNavController(
                     R.id.nav_host_fragment
                 )?.navigate(
@@ -63,9 +67,9 @@ class CreateBottomSheetFragment : BottomSheetDialogFragment() {
 
     private val newVideo =
         registerForActivityResult(TakeVideoContract()) { uri ->
-            Log.e(TAG, "New Video: uri: $uri")
+            Log.e(TAG, "newVideo: uri: $uri")
             uri?.let {
-                val bundle = bundleOf("uri" to uri)
+                val bundle = bundleOf(KEY_URI to uri)
                 getFragmentNavController(R.id.nav_host_fragment)?.navigate(
                     R.id.action_createBottomSheetFragment_to_previewVideoFragment,
                     bundle
@@ -112,7 +116,7 @@ class CreateBottomSheetFragment : BottomSheetDialogFragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = FragmentCreateNewBottomSheetBinding.inflate(inflater, container, false)
         return binding!!.root
     }
@@ -122,7 +126,8 @@ class CreateBottomSheetFragment : BottomSheetDialogFragment() {
         adjustNavigationBarIconsColor(view)
 
         binding?.feedPost?.setOnClickListener {
-            newPost.launch(Unit)
+//            newPhoto.launch(Unit)
+            getFragmentNavController(R.id.nav_host_fragment)?.navigate(R.id.action_createBottomSheetFragment_to_chooseMediaFragment)
         }
 
         binding?.story?.setOnClickListener {

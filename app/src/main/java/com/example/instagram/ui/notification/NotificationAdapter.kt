@@ -2,9 +2,8 @@ package com.example.instagram.ui.notification
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.example.instagram.R
 import com.example.instagram.databinding.ItemNotificationBinding
 import com.example.instagram.network.entity.Notification
@@ -31,8 +30,14 @@ class NotificationAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val notification = notifications[position]
         val binding = holder.binding
+        val context = holder.itemView.context
         binding.notification = notification
         binding.executePendingBindings()
+        binding.layout.background = if (!notification.seen) ResourcesCompat.getDrawable(
+            context.resources,
+            R.drawable.background_unseen_notification,
+            null
+        ) else null
         binding.layout.setOnClickListener {
             onClick?.invoke(position, notification)
         }

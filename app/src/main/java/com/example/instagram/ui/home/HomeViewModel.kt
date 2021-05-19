@@ -76,10 +76,10 @@ constructor(
         }
     }
 
-    fun clickLike(postId: String) {
+    fun likePost(postId: String) {
         Log.e(TAG, "like: ")
         viewModelScope.launch(Dispatchers.IO) {
-            postRepository.likeClick(postId)
+            postRepository.likePost(postId)
         }
     }
 

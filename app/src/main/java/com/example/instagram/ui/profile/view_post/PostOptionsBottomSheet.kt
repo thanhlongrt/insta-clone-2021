@@ -1,5 +1,7 @@
 package com.example.instagram.ui.profile.view_post
 
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -8,11 +10,13 @@ import android.view.ViewGroup
 import android.view.WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import com.example.instagram.R
 import com.example.instagram.databinding.FragmentPostBottomSheetBinding
 import com.example.instagram.getFragmentNavController
 import com.example.instagram.ui.create.CreateViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.google.android.material.button.MaterialButton
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
@@ -29,18 +33,18 @@ class PostOptionsBottomSheet : BottomSheetDialogFragment() {
         fun newInstance() = BottomSheetDialogFragment()
     }
 
-    private var photoId: String? = null
+    private var postId: String? = null
 
-    private var photoPath: String? = null
+    private var mediaPath: String? = null
 
-    private val createViewModel: CreateViewModel by activityViewModels()
+    private val viewPostViewModel: ViewPostViewModel by viewModels()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            photoId = it.getString("photo_id")
-            photoPath = it.getString("photo_path")
+            postId = it.getString("post_id")
+            mediaPath = it.getString("path")
         }
     }
 
@@ -69,23 +73,34 @@ class PostOptionsBottomSheet : BottomSheetDialogFragment() {
         var deleteDialog: AlertDialog?
         binding?.delete?.setOnClickListener {
             val dialogBuilder = AlertDialog.Builder(requireContext())
-            deleteDialog = dialogBuilder.setTitle("Delete this post?")
-                .setMessage("This will permanently delete your post")
-                .setPositiveButton("Delete") { _, _ ->
-                    deletePhoto(photoId!!, photoPath!!)
-
-                }
-                .setNegativeButton("Don't delete") { dialog, _ ->
-                    dialog.dismiss()
-                }
+            val view = layoutInflater.inflate(R.layout.dialog_delete, null)
+            deleteDialog = dialogBuilder
+                .setView(view)
+//                .setTitle("Delete this post?")
+//                .setMessage("This will permanently delete your post")
+//                .setPositiveButton("Delete") { _, _ ->
+//                    deletePhoto(postId!!, mediaPath!!)
+//
+//                }
+//                .setNegativeButton("Don't delete") { dialog, _ ->
+//                    dialog.dismiss()
+//                }
                 .create()
+            deleteDialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            view.findViewById<MaterialButton>(R.id.deleteButton).setOnClickListener {
+                deletePhoto(postId!!, mediaPath!!)
+                deleteDialog?.dismiss()
+            }
+            view.findViewById<MaterialButton>(R.id.cancelButton).setOnClickListener {
+                deleteDialog?.dismiss()
+            }
             deleteDialog?.show()
         }
 
     }
 
     private fun deletePhoto(photoId: String, photoPath: String) {
-        createViewModel.deletePost(photoId, photoPath)
+        viewPostViewModel.deletePost(photoId, photoPath)
         getFragmentNavController(R.id.nav_host_fragment)?.navigateUp()
     }
 

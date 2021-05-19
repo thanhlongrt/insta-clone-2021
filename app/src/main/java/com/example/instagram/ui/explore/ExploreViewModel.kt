@@ -37,7 +37,6 @@ constructor(
         viewModelScope.launch {
             postRepository.getFeedPosts().collect {
                 _feedPosts.value = it
-//                    Log.e(TAG, "getAllPosts: ${it.status}")
             }
         }
     }

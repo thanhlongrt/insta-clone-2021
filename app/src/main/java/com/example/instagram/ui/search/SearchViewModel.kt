@@ -20,7 +20,9 @@ import com.google.firebase.database.ValueEventListener
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -84,6 +86,15 @@ constructor(
         }
     }
 
+    fun searchUserFlow(query: String) {
+        viewModelScope.launch(Dispatchers.IO){
+            userRepository.searchUserFlow(query).collect {
+                _searchUserResult.postValue(it)
+            }
+        }
+    }
+
+
     fun searchUser(query: String): LiveData<DataState<List<User>>> {
         Log.e(TAG, "searchUser: Searching for: $query")
         _searchUserResult.postValue(DataState.loading())
@@ -114,7 +125,7 @@ constructor(
     fun clickLike(postId: String) {
         Log.e(TAG, "like: ")
         viewModelScope.launch(Dispatchers.IO) {
-            postRepository.likeClick(postId)
+            postRepository.likePost(postId)
         }
     }
 

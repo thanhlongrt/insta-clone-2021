@@ -140,7 +140,6 @@ constructor(
         }
 
     suspend fun getCurrentUserFromFirebase() = callbackFlow<DataState<UserItem>> {
-        Log.e(TAG, "getCurrentUserFromFirebase: ")
         val userListener = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val user = snapshot.getValue(User::class.java)!!
@@ -165,4 +164,32 @@ constructor(
             userDao.deleteAllAndInsert(userCache)
         }
     }
+
+    fun searchUserFlow(query: String) = callbackFlow<DataState<List<User>>> {
+        val listener = object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val results = mutableListOf<User>()
+                for (item in snapshot.children) {
+                    val user = item.getValue(User::class.java)!!
+                    if (user.uid != currentUser!!.uid) {
+                        results.add(user)
+                    }
+                }
+                sendBlocking(DataState.success(results))
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                sendBlocking(DataState.error(null, error.message))
+            }
+        }
+
+        val userRef = firebaseService.allUsersDataReference()
+            .orderByChild("username")
+            .startAt(query)
+            .endAt(query + "\uf8ff")
+        userRef.addListenerForSingleValueEvent(listener)
+        awaitClose { userRef.removeEventListener(listener) }
+
+    }.catch { emit(DataState.error(null, it.message)) }
+        .onStart { emit(DataState.loading()) }
 }

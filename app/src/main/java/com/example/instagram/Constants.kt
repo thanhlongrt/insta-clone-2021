@@ -13,6 +13,8 @@ object Constants {
 
     const val KEY_URI = "KEY_URI"
 
+    const val KEY_IS_VIDEO = "KEY_IS_VIDEO"
+
     const val KEY_COMPRESSED_FILE_URI = "KEY_COMPRESSED_VIDEO_URI"
 
     const val KEY_POST_JSON = "KEY_POST_JSON"

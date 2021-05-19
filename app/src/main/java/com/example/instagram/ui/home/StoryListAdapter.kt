@@ -11,7 +11,7 @@ import com.example.instagram.model.UserStoryItem
  * Created by Thanh Long Nguyen on 4/28/2021
  */
 class StoryListAdapter(
-    private val userStoryItems: List<UserStoryItem>
+    private val userStoryItems: MutableList<UserStoryItem>
 ) : RecyclerView.Adapter<StoryListAdapter.ViewHolder>() {
 
     var onItemClick: ((Int) -> Unit)? = null
@@ -41,7 +41,7 @@ class StoryListAdapter(
     }
 
     fun addAll(userStoryItems: List<UserStoryItem>) {
-        (this.userStoryItems as MutableList).clear()
+        this.userStoryItems.clear()
         this.userStoryItems.addAll(userStoryItems)
         notifyDataSetChanged()
     }

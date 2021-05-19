@@ -56,6 +56,7 @@ class ViewUserPostListFragment : Fragment() {
     private var uid: String? = null
 
     private lateinit var postListAdapter: PostListAdapter
+    private lateinit var linearLayoutManager: LinearLayoutManager
 
     @Inject
     lateinit var cacheDataSourceFactory: CacheDataSourceFactory
@@ -80,6 +81,31 @@ class ViewUserPostListFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        setupControllers(view)
+
+        configObservers()
+    }
+
+    private fun configObservers() {
+        searchViewModel.otherUserPosts.observe(requireActivity(), {
+            when (it.status) {
+                SUCCESS -> {
+                    postListAdapter.addAll(it.data!!.reversed())
+                    lifecycleScope.launch {
+                        delay(100)
+                        Log.e(TAG, "onViewCreated: Scroll with offset to $position")
+                        linearLayoutManager.scrollToPositionWithOffset(position!!, 0)
+                    }
+                }
+            }
+        })
+    }
+
+    private fun setupControllers(view: View) {
+        binding?.backButton?.setOnClickListener {
+            getFragmentNavController(R.id.nav_host_fragment)?.navigateUp()
+        }
         postListAdapter = PostListAdapter(mutableListOf())
         postListAdapter.apply {
             onLikeClick = { position, post ->
@@ -107,7 +133,7 @@ class ViewUserPostListFragment : Fragment() {
             }
         }
 
-        val linearLayoutManager = LinearLayoutManager(view.context)
+        linearLayoutManager = LinearLayoutManager(view.context)
 
         binding?.userPostsRecyclerView?.apply {
             layoutManager = linearLayoutManager
@@ -119,25 +145,6 @@ class ViewUserPostListFragment : Fragment() {
             }
             setHasFixedSize(true)
         }
-
-        searchViewModel.otherUserPosts.observe(requireActivity(), {
-            when (it.status) {
-                SUCCESS -> {
-                    postListAdapter.addAll(it.data!!.reversed())
-                    lifecycleScope.launch {
-                        delay(100)
-                        Log.e(TAG, "onViewCreated: Scroll with offset to $position")
-                        linearLayoutManager.scrollToPositionWithOffset(position!!, 0)
-                    }
-                }
-                ERROR -> {
-                }
-                LOADING -> {
-                }
-                IDLE -> {
-                }
-            }
-        })
     }
 
     private fun sendLikePushNotification(post: PostItem) {

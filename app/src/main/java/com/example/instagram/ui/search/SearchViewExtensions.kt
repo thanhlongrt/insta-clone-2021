@@ -1,10 +1,10 @@
-package com.example.instagram.ui.explore
+package com.example.instagram.ui.search
 
 import androidx.appcompat.widget.SearchView
-import io.reactivex.rxjava3.core.Observable
-import io.reactivex.rxjava3.subjects.BehaviorSubject
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.channels.sendBlocking
+import kotlinx.coroutines.flow.*
 
 /**
  * Created by Thanh Long Nguyen on 4/18/2021
@@ -26,20 +26,36 @@ fun SearchView.getQueryTextChangeStateFlow(): StateFlow<String> {
     return query
 }
 
-fun SearchView.getQueryTextObservable(): Observable<String>{
-    val subject : BehaviorSubject<String> = BehaviorSubject.create()
-    subject.onNext("")
-
-    this.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+@ExperimentalCoroutinesApi
+fun SearchView.getQueryTextChangeCallbackFlow() = callbackFlow<String>{
+    val listener = object : SearchView.OnQueryTextListener {
         override fun onQueryTextSubmit(query: String?): Boolean {
-            subject.onComplete()
             return true
         }
 
         override fun onQueryTextChange(newText: String?): Boolean {
-            subject.onNext(newText)
+            sendBlocking(newText!!)
             return true
         }
-    })
-    return subject
-}
+    }
+    this@getQueryTextChangeCallbackFlow.setOnQueryTextListener(listener)
+    awaitClose {  }
+}.onStart { emit("") }
+
+//fun SearchView.getQueryTextObservable(): Observable<String>{
+//    val subject : BehaviorSubject<String> = BehaviorSubject.create()
+//    subject.onNext("")
+//
+//    this.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+//        override fun onQueryTextSubmit(query: String?): Boolean {
+//            subject.onComplete()
+//            return true
+//        }
+//
+//        override fun onQueryTextChange(newText: String?): Boolean {
+//            subject.onNext(newText)
+//            return true
+//        }
+//    })
+//    return subject
+//}

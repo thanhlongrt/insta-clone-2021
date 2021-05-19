@@ -38,7 +38,7 @@ class LoginFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_login, container, false)
         binding?.loginViewModel = loginViewModel
         return binding!!.root
@@ -47,14 +47,18 @@ class LoginFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        setupControllers()
+
+        configObservers(view)
+
+    }
+
+    private fun setupControllers() {
         binding?.navToSignup?.setOnClickListener {
             findNavController().navigate(R.id.action_loginFragment_to_signUpFragment)
         }
 
-        loginViewModel.loginFormState.observe(viewLifecycleOwner, Observer {
-            val loginFormState = it ?: return@Observer
-            binding?.login?.isEnabled = loginFormState.data!!
-        })
+
 
         binding?.email?.apply {
             afterTextChanged {
@@ -76,8 +80,15 @@ class LoginFragment : Fragment() {
                 false
             }
         }
+    }
 
-        loginViewModel.loginResult.observe(viewLifecycleOwner, Observer {
+    private fun configObservers(view: View) {
+        loginViewModel.loginFormState.observe(viewLifecycleOwner, Observer {
+            val loginFormState = it ?: return@Observer
+            binding?.login?.isEnabled = loginFormState.data!!
+        })
+
+        loginViewModel.loginResult.observe(viewLifecycleOwner, {
             when (it.status) {
                 Status.LOADING -> {
                     displayProgressBar(true)
@@ -93,7 +104,6 @@ class LoginFragment : Fragment() {
                 }
             }
         })
-
     }
 
     private fun displayProgressBar(isDisplayed: Boolean) {
