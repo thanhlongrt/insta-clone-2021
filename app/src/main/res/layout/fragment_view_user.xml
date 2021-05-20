@@ -24,9 +24,9 @@
 
             <ImageButton
                 android:id="@+id/backButton"
-                android:background="?attr/selectableItemBackgroundBorderless"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackgroundBorderless"
                 android:src="@drawable/ic_26_left_arrow" />
 
             <TextView
@@ -197,34 +197,39 @@
                             android:orientation="horizontal"
                             app:layout_constraintTop_toBottomOf="@+id/websiteTextView">
 
-                            <com.google.android.material.button.MaterialButton
-                                android:id="@+id/editProfileButton"
-                                style="@style/Widget.MaterialComponents.Button"
+                            <CheckBox
+                                android:id="@+id/followButton"
                                 android:layout_width="0dp"
-                                android:layout_height="40dp"
+                                android:layout_height="36dp"
                                 android:layout_marginEnd="8dp"
                                 android:layout_weight="1"
+                                android:background="@drawable/button_toggle_follow"
+                                android:button="@null"
+                                android:checked="@{viewmodel.otherUserLiveData.isFollowed}"
                                 android:gravity="center"
-                                android:text="@string/follow"
+                                android:onClick="@{() -> viewmodel.follow()}"
                                 android:textAlignment="center"
                                 android:textAllCaps="false"
-                                android:textColor="@color/black"
-                                android:textSize="12sp"
-                                android:textStyle="normal" />
+                                android:textColor="@drawable/button_follow_text_color_state"
+                                android:textSize="14sp"
+                                android:textStyle="normal"
+                                app:follow_state="@{viewmodel.otherUserLiveData.isFollowed}"
+                                tools:text="Follow" />
 
-                            <com.google.android.material.button.MaterialButton
-                                android:id="@+id/savedButton"
-                                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                            <CheckBox
+                                android:id="@+id/messageButton"
                                 android:layout_width="0dp"
-                                android:layout_height="40dp"
+                                android:layout_height="36dp"
                                 android:layout_marginStart="8dp"
                                 android:layout_weight="1"
+                                android:background="@drawable/button_outlined"
+                                android:button="@null"
                                 android:gravity="center"
                                 android:text="@string/message"
                                 android:textAlignment="center"
                                 android:textAllCaps="false"
                                 android:textColor="@color/black"
-                                android:textSize="12sp"
+                                android:textSize="14sp"
                                 android:textStyle="normal" />
                         </LinearLayout>
                     </androidx.constraintlayout.widget.ConstraintLayout>
@@ -233,6 +238,7 @@
 
                 <com.google.android.material.tabs.TabLayout
                     android:id="@+id/tabLayout"
+                    style="@style/Theme.Instagram.TabLayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
             </com.google.android.material.appbar.AppBarLayout>

@@ -2,10 +2,10 @@ package com.example.instagram.network.firebase
 
 import android.content.Context
 import android.net.Uri
-import com.example.instagram.utils.ImageUtils
 import com.example.instagram.network.entity.Comment
 import com.example.instagram.network.entity.Notification
 import com.example.instagram.network.entity.Post
+import com.example.instagram.utils.ImageUtils
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -30,6 +30,28 @@ constructor(
     private val firebaseDatabase: FirebaseDatabase,
     private val firebaseStorage: FirebaseStorage
 ) {
+
+    fun followUser(uid: String) {
+        userDataReference(uid).child("follower_count").setValue(ServerValue.increment(1))
+        val followerData = hashMapOf<String, Any>(currentFirebaseUser?.uid!! to true)
+        userDataReference(uid).child("followers").updateChildren(followerData)
+
+        userDataReference(currentFirebaseUser?.uid!!).child("following_count")
+            .setValue(ServerValue.increment(1))
+        val followingData = hashMapOf<String, Any>(uid to true)
+        userDataReference(currentFirebaseUser?.uid!!).child("following")
+            .updateChildren(followingData)
+    }
+
+    fun unFollow(uid: String) {
+        userDataReference(uid).child("follower_count").setValue(ServerValue.increment(-1))
+        userDataReference(uid).child("followers").child(currentFirebaseUser!!.uid).setValue(null)
+
+        userDataReference(currentFirebaseUser?.uid!!).child("following_count")
+            .setValue(ServerValue.increment(-1))
+        userDataReference(currentFirebaseUser?.uid!!).child("following").child(uid)
+            .setValue(null)
+    }
 
     fun getPostById(postId: String) = callbackFlow<Post?> {
         val postListener = object : ValueEventListener {

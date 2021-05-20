@@ -20,9 +20,7 @@ import com.google.firebase.database.ValueEventListener
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -65,6 +63,15 @@ constructor(
         }
     }
 
+    fun follow() {
+        val otherUser = otherUserLiveData.value!!
+        if (otherUser.isFollowed) {
+            userRepository.unfollow(otherUser.uid)
+        } else {
+            userRepository.followUser(otherUser.uid)
+        }
+    }
+
     fun getPostById(uid: String) {
         viewModelScope.launch {
             postRepository.getPostsByUser(uid).collect {
@@ -87,7 +94,7 @@ constructor(
     }
 
     fun searchUserFlow(query: String) {
-        viewModelScope.launch(Dispatchers.IO){
+        viewModelScope.launch(Dispatchers.IO) {
             userRepository.searchUserFlow(query).collect {
                 _searchUserResult.postValue(it)
             }

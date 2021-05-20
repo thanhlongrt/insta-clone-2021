@@ -16,10 +16,12 @@ data class User(
     var website: String = "",
     var profile_photo: String = "",
     var follower_count: Long = 0,
+    var followers: MutableMap<String, Boolean> = HashMap(),
     var following_count: Long = 0,
+    var following: MutableMap<String, Boolean> = HashMap(),
     var post_count: Long = 0
 ) {
-    fun toMap(): HashMap<String, Any>{
+    fun toMap(): HashMap<String, Any> {
         val data = HashMap<String, Any>()
         data["uid"] = uid
         data["email"] = email
@@ -28,11 +30,14 @@ data class User(
         data["bio"] = bio
         data["website"] = website
         data["profile_photo"] = profile_photo
-        data["followers"] = follower_count
-        data["following"] = following_count
+        data["follower_count"] = follower_count
+        data["followers"] = followers
+        data["following_count"] = following_count
+        data["following"] = following
         data["post_count"] = post_count
         return data
     }
+
     override fun toString(): String {
         return username
     }
@@ -50,7 +55,9 @@ class UserNetworkMapper @Inject constructor() : EntityMapper<User, UserItem> {
             avatarUrl = entity.profile_photo,
             postCount = entity.post_count,
             followerCount = entity.follower_count,
-            followingCount = entity.following_count
+            followers = entity.followers.keys.toMutableList(),
+            followingCount = entity.following_count,
+            following = entity.following.keys.toMutableList()
         )
     }
 

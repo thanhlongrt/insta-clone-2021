@@ -59,7 +59,17 @@ class ViewUserFragment : Fragment() {
 
     private fun setupControllers() {
         binding?.backButton?.setOnClickListener {
-            getFragmentNavController(R.id.nav_host_fragment)?.navigateUp()
+            getFragmentNavController(R.id.nav_host_fragment)?.popBackStack()
+        }
+
+        binding?.followButton?.apply {
+//            setOnClickListener {
+//                if (isChecked) {
+//                    text = "Following"
+//                } else {
+//                    text =
+//                }
+//            }
         }
 
         val fragments = listOf(

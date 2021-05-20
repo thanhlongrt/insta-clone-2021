@@ -42,6 +42,13 @@ constructor(
     val currentUser
         get() = firebaseService.currentFirebaseUser
 
+    fun followUser(uid: String){
+        firebaseService.followUser(uid)
+    }
+
+    fun unfollow(uid: String){
+        firebaseService.unFollow(uid)
+    }
 
     suspend fun createUser(email: String, password: String) = callbackFlow<DataState<Boolean>> {
         firebaseService.createUser(email, password).addOnCompleteListener {
@@ -98,6 +105,8 @@ constructor(
             override fun onDataChange(snapshot: DataSnapshot) {
                 val user = snapshot.getValue(User::class.java)!!
                 val userItem = userNetworkMapper.fromEntity(user)
+                Log.e(TAG, "onDataChange: ${userItem.followers}", )
+                userItem.isFollowed = userItem.followers.contains(currentUser!!.uid)
                 sendBlocking(DataState.success(userItem))
             }
 
@@ -105,7 +114,7 @@ constructor(
                 sendBlocking(DataState.error(null, error.message))
             }
         }
-        firebaseService.userDataReference(uid).addListenerForSingleValueEvent(userListener)
+        firebaseService.userDataReference(uid).addValueEventListener(userListener)
         awaitClose {
             firebaseService.userDataReference(uid).removeEventListener(userListener)
         }

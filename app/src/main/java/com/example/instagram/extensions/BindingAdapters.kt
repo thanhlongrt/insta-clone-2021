@@ -5,6 +5,7 @@ import android.os.Build
 import android.text.Html
 import android.text.method.LinkMovementMethod
 import android.view.View
+import android.widget.CheckBox
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.text.HtmlCompat
@@ -91,10 +92,19 @@ fun TextView.setWebLink(link: String?) {
         val html = "<a href=\'$link\'>$link</a>"
 //        val html = resources.getString(R.string.user_website, link)
         movementMethod = LinkMovementMethod.getInstance()
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            text = HtmlCompat.fromHtml(html, HtmlCompat.FROM_HTML_MODE_LEGACY)
+        text = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            HtmlCompat.fromHtml(html, HtmlCompat.FROM_HTML_MODE_LEGACY)
         } else {
-            text = Html.fromHtml(html)
+            Html.fromHtml(html)
         }
+    }
+}
+
+@BindingAdapter("follow_state")
+fun CheckBox.setFollowState(isFollowed: Boolean) {
+    text = if (isFollowed) {
+        context.getString(R.string.following)
+    } else {
+        resources.getString(R.string.follow)
     }
 }
