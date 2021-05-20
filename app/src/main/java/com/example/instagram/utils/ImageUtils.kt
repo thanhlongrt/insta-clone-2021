@@ -1,10 +1,9 @@
-package com.example.instagram
+package com.example.instagram.utils
 
 import android.app.Activity
 import android.content.ContentResolver
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.ImageDecoder
+import android.graphics.*
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
@@ -14,14 +13,30 @@ import android.view.WindowInsets
 import android.webkit.MimeTypeMap
 import java.io.ByteArrayOutputStream
 import java.util.*
+import kotlin.math.max
 
 /**
  * Created by Thanh Long Nguyen on 4/15/2021
  */
 object ImageUtils {
 
-    const val TYPE_PROFILE_IMAGE = 0
-    const val TYPE_PHOTO = 1
+    fun Bitmap.getCircularBitmap(config: Bitmap.Config = Bitmap.Config.ARGB_8888): Bitmap {
+        // circle configuration
+        val circlePaint = Paint().apply { isAntiAlias = true }
+        val circleRadius = max(width, height) / 2f
+
+        // output bitmap
+        val outputBitmapPaint =
+            Paint(circlePaint).apply { xfermode = PorterDuffXfermode(PorterDuff.Mode.SRC_IN) }
+        val outputBounds = Rect(0, 0, width, height)
+        val output = Bitmap.createBitmap(width, height, config)
+
+        return Canvas(output).run {
+            drawCircle(circleRadius, circleRadius, circleRadius, circlePaint)
+            drawBitmap(this@getCircularBitmap, outputBounds, outputBounds, outputBitmapPaint)
+            output
+        }
+    }
 
     fun compress(context: Context, photoUri: Uri): ByteArray {
         val bitmap = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
@@ -86,14 +101,14 @@ object ImageUtils {
 
     fun Uri.mimeType(contentResolver: ContentResolver)
             : String? {
-        if (scheme.equals(ContentResolver.SCHEME_CONTENT)) {
+        return if (scheme.equals(ContentResolver.SCHEME_CONTENT)) {
             // get (image/jpeg, video/mp4) from ContentResolver if uri scheme is "content://"
-            return contentResolver.getType(this)
+            contentResolver.getType(this)
         } else {
             // get (.jpeg, .mp4) from uri "file://example/example.mp4"
             val fileExtension = MimeTypeMap.getFileExtensionFromUrl(toString())
             // turn ".mp4" into "video/mp4"
-            return MimeTypeMap.getSingleton()
+            MimeTypeMap.getSingleton()
                 .getMimeTypeFromExtension(fileExtension.toLowerCase(Locale.US))
         }
     }

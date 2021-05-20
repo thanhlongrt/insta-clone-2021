@@ -9,12 +9,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS
 import androidx.appcompat.app.AlertDialog
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import com.example.instagram.R
 import com.example.instagram.databinding.FragmentPostBottomSheetBinding
-import com.example.instagram.getFragmentNavController
-import com.example.instagram.ui.create.CreateViewModel
+import com.example.instagram.extensions.getFragmentNavController
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.button.MaterialButton
 import dagger.hilt.android.AndroidEntryPoint

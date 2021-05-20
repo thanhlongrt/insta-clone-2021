@@ -1,4 +1,4 @@
-package com.example.instagram
+package com.example.instagram.utils
 
 import com.example.instagram.model.PostItem
 import com.example.instagram.network.entity.Post

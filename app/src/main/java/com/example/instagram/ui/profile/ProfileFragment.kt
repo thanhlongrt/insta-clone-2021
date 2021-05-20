@@ -1,10 +1,11 @@
 package com.example.instagram.ui.profile
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.view.*
-import androidx.appcompat.widget.Toolbar
+import android.view.LayoutInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -25,6 +26,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 @ExperimentalCoroutinesApi
 @AndroidEntryPoint
 class ProfileFragment : Fragment() {
+
     companion object {
         const val TAG = "ProfileFragment"
     }
@@ -47,12 +49,6 @@ class ProfileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-//        profileViewModel.currentUser.observe(requireActivity()) { user ->
-//            user?.let {
-//                requireActivity().findViewById<Toolbar>(R.id.tool_bar).title = it.username
-//            }
-//        }
-
         setupControllers()
 
     }
@@ -61,7 +57,7 @@ class ProfileFragment : Fragment() {
 
         binding?.toolBar?.inflateMenu(R.menu.menu_profile)
         binding?.toolBar?.setOnMenuItemClickListener { menuItem ->
-            when(menuItem.itemId){
+            when (menuItem.itemId) {
                 R.id.action_logout -> {
                     logout()
                     true

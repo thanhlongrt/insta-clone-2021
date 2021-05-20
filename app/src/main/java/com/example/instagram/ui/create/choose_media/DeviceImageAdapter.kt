@@ -19,12 +19,6 @@ class DeviceImageAdapter(
 
     var onItemSelected: ((GalleryMedia, Int) -> Unit)? = null
 
-    var previousSelectedItemPosition: Int = -1
-
-    init {
-        Log.e("DeviceImageAdapter", "previousSelectedItemPosition: $previousSelectedItemPosition", )
-    }
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding = ItemGridPhotoBinding.inflate(
             LayoutInflater.from(parent.context),
@@ -46,21 +40,6 @@ class DeviceImageAdapter(
 
     override fun getItemCount(): Int {
         return mediaList.size
-    }
-
-    fun select(position: Int) {
-        if (position == previousSelectedItemPosition) return
-
-        if (previousSelectedItemPosition!=-1){
-            val prevSelectedItem = mediaList[previousSelectedItemPosition]
-            prevSelectedItem.isSelected = !prevSelectedItem.isSelected
-            notifyItemChanged(previousSelectedItemPosition)
-        }
-
-        previousSelectedItemPosition = position
-
-        mediaList[position].isSelected = !mediaList[position].isSelected
-        notifyItemChanged(position)
     }
 
     fun addAll(list: List<GalleryMedia>) {

@@ -2,7 +2,7 @@ package com.example.instagram.network.firebase
 
 import android.content.Context
 import android.net.Uri
-import com.example.instagram.ImageUtils
+import com.example.instagram.utils.ImageUtils
 import com.example.instagram.network.entity.Comment
 import com.example.instagram.network.entity.Notification
 import com.example.instagram.network.entity.Post

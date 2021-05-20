@@ -1,7 +1,7 @@
 package com.example.instagram.di
 
 import android.content.Context
-import com.example.instagram.Constants.MAX_CACHE_SIZE
+import com.example.instagram.utils.Constants.MAX_CACHE_SIZE
 import com.example.instagram.ui.profile.view_post.CacheDataSourceFactory
 import com.google.android.exoplayer2.database.ExoDatabaseProvider
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter

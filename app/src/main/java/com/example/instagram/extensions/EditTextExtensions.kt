@@ -1,4 +1,4 @@
-package com.example.instagram.ui.login
+package com.example.instagram.extensions
 
 import android.text.Editable
 import android.text.TextWatcher

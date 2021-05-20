@@ -10,11 +10,11 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
-import com.example.instagram.Constants.KEY_URI
-import com.example.instagram.ImageUtils.getImageSize
+import com.example.instagram.utils.Constants.KEY_URI
+import com.example.instagram.utils.ImageUtils.getImageSize
 import com.example.instagram.R
 import com.example.instagram.databinding.FragmentPreviewPhotoBinding
-import com.example.instagram.getFragmentNavController
+import com.example.instagram.extensions.getFragmentNavController
 
 /**
  * Created by Thanh Long Nguyen on 4/14/2021

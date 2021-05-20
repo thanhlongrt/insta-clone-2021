@@ -62,12 +62,18 @@
     </fragment>
     <fragment
         android:id="@+id/chooseMediaFragment"
-        android:name="com.example.instagram.ui.create.choose_media.ChoosePhotoFragment"
+        android:name="com.example.instagram.ui.create.choose_media.ChooseMediaItemFragment"
         android:label="ChooseMediaFragment"
         tools:layout="@layout/fragment_choose_photo">
         <action
             android:id="@+id/action_chooseMediaFragment_to_albumBottomSheetFragment"
             app:destination="@id/albumBottomSheetFragment" />
+        <action
+            android:id="@+id/action_chooseMediaFragment_to_previewVideoFragment"
+            app:destination="@id/previewVideoFragment" />
+        <action
+            android:id="@+id/action_chooseMediaFragment_to_previewImageFragment"
+            app:destination="@id/previewImageFragment" />
     </fragment>
     <dialog
         android:id="@+id/albumBottomSheetFragment"

@@ -1,22 +1,16 @@
-package com.example.instagram
+package com.example.instagram.extensions
 
 import android.annotation.SuppressLint
-import android.net.Uri
 import android.os.Build
 import android.text.Html
 import android.text.method.LinkMovementMethod
-import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.text.HtmlCompat
 import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
-import com.google.android.exoplayer2.*
-import com.google.android.exoplayer2.source.ProgressiveMediaSource
-import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
-import com.google.android.exoplayer2.ui.PlayerView
-import com.google.android.exoplayer2.upstream.DefaultHttpDataSource
+import com.example.instagram.R
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -102,34 +96,5 @@ fun TextView.setWebLink(link: String?) {
         } else {
             text = Html.fromHtml(html)
         }
-        Log.e("BindingAdapters", "setWebLink: $text")
     }
-}
-
-@BindingAdapter("video_url")
-fun PlayerView.loadVideo(url: String?) {
-    Log.e("BindingAdapters", "loadVideo: starting...")
-    if (url == null) return
-    val player = SimpleExoPlayer.Builder(
-        context,
-        DefaultRenderersFactory(context)
-    )
-        .setTrackSelector(DefaultTrackSelector(context))
-        .setLoadControl(DefaultLoadControl())
-        .build()
-    player.playWhenReady = true
-    player.repeatMode = Player.REPEAT_MODE_ONE
-//    setKeepContentOnPlayerReset(true)
-    useController = false
-
-    val mediaItem = MediaItem.Builder().setUri(Uri.parse(url)).build()
-
-    val mediaSource = ProgressiveMediaSource.Factory(
-        DefaultHttpDataSource.Factory()
-    ).createMediaSource(mediaItem)
-
-    this.player = player
-    player.setMediaSource(mediaSource)
-    player.prepare()
-    Log.e("BindingAdapters", "loadVideo: ")
 }

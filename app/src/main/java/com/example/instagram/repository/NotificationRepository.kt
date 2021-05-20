@@ -1,7 +1,7 @@
 package com.example.instagram.repository
 
 import android.util.Log
-import com.example.instagram.Constants
+import com.example.instagram.utils.Constants
 import com.example.instagram.DataState
 import com.example.instagram.network.entity.*
 import com.example.instagram.network.firebase.FirebaseService

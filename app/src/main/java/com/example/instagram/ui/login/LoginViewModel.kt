@@ -7,11 +7,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.instagram.Constants
+import com.example.instagram.utils.Constants
 import com.example.instagram.DataState
 import com.example.instagram.Status
 import com.example.instagram.model.UserItem
-import com.example.instagram.network.entity.User
 import com.example.instagram.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers

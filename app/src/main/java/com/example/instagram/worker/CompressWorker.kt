@@ -12,10 +12,10 @@ import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.Data
 import androidx.work.WorkerParameters
-import com.example.instagram.Constants.KEY_COMPRESSED_FILE_URI
-import com.example.instagram.Constants.KEY_POST_JSON
-import com.example.instagram.Constants.KEY_URI
-import com.example.instagram.TypeConverters
+import com.example.instagram.utils.Constants.KEY_COMPRESSED_FILE_URI
+import com.example.instagram.utils.Constants.KEY_POST_JSON
+import com.example.instagram.utils.Constants.KEY_URI
+import com.example.instagram.utils.TypeConverters
 import com.iceteck.silicompressorr.SiliCompressor
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject

@@ -6,12 +6,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
+import androidx.navigation.navGraphViewModels
 import com.bumptech.glide.Glide
-import com.example.instagram.Constants.KEY_URI
+import com.example.instagram.utils.Constants.KEY_URI
 import com.example.instagram.R
 import com.example.instagram.databinding.FragmentAddNewStoryBinding
-import com.example.instagram.getFragmentNavController
+import com.example.instagram.extensions.getFragmentNavController
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
@@ -29,7 +29,7 @@ class AddNewStoryFragment : Fragment() {
 
     private var binding: FragmentAddNewStoryBinding? = null
 
-    private val createViewModel: CreateViewModel by activityViewModels()
+    private val createViewModel: CreateViewModel by navGraphViewModels(R.id.nav_create)
 
     private var storyUri: Uri? = null
 

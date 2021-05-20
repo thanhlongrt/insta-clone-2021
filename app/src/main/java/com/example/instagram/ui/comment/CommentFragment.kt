@@ -8,11 +8,11 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.instagram.Constants.KEY_POST_JSON
+import com.example.instagram.utils.Constants.KEY_POST_JSON
 import com.example.instagram.R
-import com.example.instagram.TypeConverters
+import com.example.instagram.utils.TypeConverters
 import com.example.instagram.databinding.FragmentCommentBinding
-import com.example.instagram.getFragmentNavController
+import com.example.instagram.extensions.getFragmentNavController
 import com.example.instagram.model.PostItem
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi

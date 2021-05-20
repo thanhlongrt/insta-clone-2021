@@ -6,9 +6,9 @@ import android.util.Log
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.example.instagram.Constants.KEY_COMPRESSED_FILE_URI
-import com.example.instagram.Constants.KEY_POST_JSON
-import com.example.instagram.TypeConverters
+import com.example.instagram.utils.Constants.KEY_COMPRESSED_FILE_URI
+import com.example.instagram.utils.Constants.KEY_POST_JSON
+import com.example.instagram.utils.TypeConverters
 import com.example.instagram.network.firebase.FirebaseService
 import com.google.firebase.database.ServerValue
 import com.google.firebase.storage.ktx.storageMetadata
@@ -18,7 +18,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
 
 /**
  * Created by Thanh Long Nguyen on 5/11/2021

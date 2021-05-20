@@ -1,4 +1,4 @@
-package com.example.instagram.ui.search
+package com.example.instagram.ui.explore.search
 
 import android.os.Bundle
 import android.util.Log
@@ -15,7 +15,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.instagram.R
 import com.example.instagram.Status.*
 import com.example.instagram.databinding.FragmentViewUserPostListBinding
-import com.example.instagram.getFragmentNavController
+import com.example.instagram.extensions.getFragmentNavController
 import com.example.instagram.model.PostItem
 import com.example.instagram.network.entity.Notification
 import com.example.instagram.ui.profile.view_post.CacheDataSourceFactory

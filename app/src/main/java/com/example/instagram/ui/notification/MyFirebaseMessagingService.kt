@@ -4,7 +4,7 @@ import android.app.NotificationManager
 import android.util.Log
 import androidx.core.content.ContextCompat
 import com.example.instagram.repository.NotificationRepository
-import com.example.instagram.sendNotification
+import com.example.instagram.extensions.sendNotification
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import dagger.hilt.android.AndroidEntryPoint

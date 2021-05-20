@@ -13,7 +13,7 @@ import com.bumptech.glide.Glide
 import com.example.instagram.R
 import com.example.instagram.Status
 import com.example.instagram.databinding.FragmentEditProfileBinding
-import com.example.instagram.getFragmentNavController
+import com.example.instagram.extensions.getFragmentNavController
 import com.example.instagram.ui.create.TakePhotoContract
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint

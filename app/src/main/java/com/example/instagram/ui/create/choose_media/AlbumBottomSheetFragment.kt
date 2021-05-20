@@ -4,11 +4,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.activityViewModels
+import androidx.navigation.navGraphViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.instagram.R
 import com.example.instagram.databinding.FragmentAlbumBottomSheetBinding
-import com.example.instagram.getFragmentNavController
+import com.example.instagram.extensions.getFragmentNavController
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -19,13 +19,13 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class AlbumBottomSheetFragment : BottomSheetDialogFragment() {
 
-    companion object{
+    companion object {
         private const val TAG = "AlbumBottomSheet"
     }
 
     private var binding: FragmentAlbumBottomSheetBinding? = null
 
-    private val chooseMediaViewModel: ChooseMediaViewModel by activityViewModels()
+    private val chooseMediaViewModel: ChooseMediaViewModel by navGraphViewModels(R.id.nav_create)
 
     private lateinit var albumAdapter: AlbumAdapter
 
@@ -54,7 +54,9 @@ class AlbumBottomSheetFragment : BottomSheetDialogFragment() {
         }
 
         chooseMediaViewModel.albumList.observe(requireActivity()) {
-            albumAdapter.addAll(it)
+            if (it != null) {
+                albumAdapter.addAll(it)
+            }
         }
 
 

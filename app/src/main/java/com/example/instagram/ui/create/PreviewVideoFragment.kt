@@ -11,11 +11,11 @@ import androidx.core.content.FileProvider
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import com.example.instagram.Constants.KEY_IS_VIDEO
-import com.example.instagram.Constants.KEY_URI
+import com.example.instagram.utils.Constants.KEY_IS_VIDEO
+import com.example.instagram.utils.Constants.KEY_URI
 import com.example.instagram.R
 import com.example.instagram.databinding.FragmentPreviewVideoBinding
-import com.example.instagram.getFragmentNavController
+import com.example.instagram.extensions.getFragmentNavController
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector

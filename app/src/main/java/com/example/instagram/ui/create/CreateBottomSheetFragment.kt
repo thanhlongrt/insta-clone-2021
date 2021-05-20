@@ -12,11 +12,13 @@ import android.view.WindowInsetsController
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
-import androidx.fragment.app.activityViewModels
-import com.example.instagram.Constants.KEY_URI
+import com.example.instagram.utils.Constants.KEY_ACTION
+import com.example.instagram.utils.Constants.KEY_URI
+import com.example.instagram.utils.Constants.PICK_PHOTO
+import com.example.instagram.utils.Constants.PICK_VIDEO
 import com.example.instagram.R
 import com.example.instagram.databinding.FragmentCreateNewBottomSheetBinding
-import com.example.instagram.getFragmentNavController
+import com.example.instagram.extensions.getFragmentNavController
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -28,13 +30,12 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 @ExperimentalCoroutinesApi
 @AndroidEntryPoint
 class CreateBottomSheetFragment : BottomSheetDialogFragment() {
+
     companion object {
         private const val TAG = "CreateBottomSheet"
     }
 
     private var binding: FragmentCreateNewBottomSheetBinding? = null
-
-    private val createViewModel: CreateViewModel by activityViewModels()
 
     private val newPhoto =
         registerForActivityResult(TakePhotoContract()) { uri ->
@@ -127,7 +128,12 @@ class CreateBottomSheetFragment : BottomSheetDialogFragment() {
 
         binding?.feedPost?.setOnClickListener {
 //            newPhoto.launch(Unit)
-            getFragmentNavController(R.id.nav_host_fragment)?.navigate(R.id.action_createBottomSheetFragment_to_chooseMediaFragment)
+            val bundle = bundleOf(KEY_ACTION to PICK_PHOTO)
+            getFragmentNavController(R.id.nav_host_fragment)
+                ?.navigate(
+                    R.id.action_createBottomSheetFragment_to_chooseMediaFragment,
+                    bundle
+                )
         }
 
         binding?.story?.setOnClickListener {
@@ -135,7 +141,13 @@ class CreateBottomSheetFragment : BottomSheetDialogFragment() {
         }
 
         binding?.reel?.setOnClickListener {
-            newVideo.launch(Unit)
+//            newVideo.launch(Unit)
+            val bundle = bundleOf(KEY_ACTION to PICK_VIDEO)
+            getFragmentNavController(R.id.nav_host_fragment)
+                ?.navigate(
+                    R.id.action_createBottomSheetFragment_to_chooseMediaFragment,
+                    bundle
+                )
         }
 
     }

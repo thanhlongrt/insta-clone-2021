@@ -14,7 +14,8 @@ import androidx.navigation.fragment.findNavController
 import com.example.instagram.R
 import com.example.instagram.Status
 import com.example.instagram.databinding.FragmentLoginBinding
-import com.example.instagram.ui.MainActivity
+import com.example.instagram.extensions.afterTextChanged
+import com.example.instagram.ui.main.MainActivity
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi

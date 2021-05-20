@@ -1,4 +1,4 @@
-package com.example.instagram.ui
+package com.example.instagram.ui.main
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

@@ -9,13 +9,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
+import androidx.navigation.navGraphViewModels
 import com.bumptech.glide.Glide
 import com.example.instagram.R
 import com.example.instagram.databinding.FragmentStoryBinding
-import com.example.instagram.getFragmentNavController
+import com.example.instagram.extensions.getFragmentNavController
 import com.example.instagram.model.UserStoryItem
-import com.example.instagram.setDate
+import com.example.instagram.extensions.setDate
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
@@ -33,7 +33,7 @@ class StoryFragment : Fragment(), StoryProgressView.StoriesListener {
 
     private var binding: FragmentStoryBinding? = null
 
-    private val homeViewModel: HomeViewModel by activityViewModels()
+    private val homeViewModel: HomeViewModel by navGraphViewModels(R.id.nav_home)
 
     private var position: Int? = null
 
@@ -49,13 +49,13 @@ class StoryFragment : Fragment(), StoryProgressView.StoriesListener {
         override fun onTouch(v: View?, event: MotionEvent?): Boolean {
             when (event?.action) {
                 MotionEvent.ACTION_DOWN -> {
-                    Log.e(TAG, "onTouch: Action Down", )
+                    Log.e(TAG, "onTouch: Action Down")
                     pressTime = System.currentTimeMillis()
                     binding?.progressBarContainer?.pause()
                     return false
                 }
                 MotionEvent.ACTION_UP -> {
-                    Log.e(TAG, "onTouch: Action Up", )
+                    Log.e(TAG, "onTouch: Action Up")
                     binding?.progressBarContainer?.resume()
                     return limit < System.currentTimeMillis() - pressTime
                 }

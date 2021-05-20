@@ -12,14 +12,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
+import androidx.navigation.navGraphViewModels
 import com.bumptech.glide.Glide
-import com.example.instagram.Constants.KEY_IS_VIDEO
-import com.example.instagram.Constants.KEY_URI
-import com.example.instagram.ImageUtils.mimeType
+import com.example.instagram.utils.Constants.KEY_IS_VIDEO
+import com.example.instagram.utils.Constants.KEY_URI
+import com.example.instagram.utils.ImageUtils.mimeType
 import com.example.instagram.R
 import com.example.instagram.databinding.FragmentCreateNewPostBinding
-import com.example.instagram.getFragmentNavController
+import com.example.instagram.extensions.getFragmentNavController
 import com.example.instagram.network.entity.Post
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -39,7 +39,7 @@ class CreateNewPostFragment : Fragment() {
 
     private var binding: FragmentCreateNewPostBinding? = null
 
-    private val createViewModel: CreateViewModel by activityViewModels()
+    private val createViewModel: CreateViewModel by navGraphViewModels(R.id.nav_create)
 
     private var uri: Uri? = null
     private var isVideo: Boolean = false

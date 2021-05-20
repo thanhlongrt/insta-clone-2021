@@ -8,11 +8,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import androidx.work.*
-import com.example.instagram.Constants.KEY_POST_JSON
-import com.example.instagram.Constants.KEY_URI
-import com.example.instagram.Constants.SAVE_POST_WORK_NAME
+import com.example.instagram.utils.Constants.KEY_POST_JSON
+import com.example.instagram.utils.Constants.KEY_URI
+import com.example.instagram.utils.Constants.SAVE_POST_WORK_NAME
 import com.example.instagram.DataState
-import com.example.instagram.TypeConverters
+import com.example.instagram.utils.TypeConverters
 import com.example.instagram.model.UserItem
 import com.example.instagram.network.entity.Post
 import com.example.instagram.repository.PostRepository

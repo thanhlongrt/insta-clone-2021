@@ -1,6 +1,6 @@
 package com.example.instagram.ui.profile.view_post
 
-import com.example.instagram.Constants.MAX_FILE_SIZE
+import com.example.instagram.utils.Constants.MAX_FILE_SIZE
 import com.google.android.exoplayer2.upstream.DataSource
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.upstream.FileDataSource

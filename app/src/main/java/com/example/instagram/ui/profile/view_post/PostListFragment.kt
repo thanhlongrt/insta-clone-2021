@@ -15,7 +15,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.instagram.R
 import com.example.instagram.Status.SUCCESS
 import com.example.instagram.databinding.FragmentPostListBinding
-import com.example.instagram.getFragmentNavController
+import com.example.instagram.extensions.getFragmentNavController
 import com.google.android.exoplayer2.DefaultLoadControl
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
@@ -46,7 +46,9 @@ class PostListFragment : Fragment() {
     private var binding: FragmentPostListBinding? = null
 
     private val viewPostViewModel: ViewPostViewModel by activityViewModels()
+
     private lateinit var postListAdapter: PostListAdapter
+
     private lateinit var linearLayoutManager: LinearLayoutManager
 
     private var position: Int? = null

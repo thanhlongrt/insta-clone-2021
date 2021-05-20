@@ -1,4 +1,4 @@
-package com.example.instagram.ui.search
+package com.example.instagram.ui.explore.search
 
 import android.util.Log
 import androidx.lifecycle.LiveData

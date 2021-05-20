@@ -1,4 +1,4 @@
-package com.example.instagram.ui.search
+package com.example.instagram.ui.explore.search
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.example.instagram.R
 import com.example.instagram.Status.*
 import com.example.instagram.databinding.FragmentViewUserPostGridListBinding
-import com.example.instagram.getFragmentNavController
+import com.example.instagram.extensions.getFragmentNavController
 import com.example.instagram.ui.profile.view_post.PostGridListAdapter
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -64,7 +64,10 @@ class ViewUserPostGridListFragment : Fragment() {
         postAdapter = PostGridListAdapter(mutableListOf())
         postAdapter.onItemClicked = {
             val bundle = bundleOf("position" to it, "uid" to uid)
-            getFragmentNavController(R.id.nav_host_fragment)?.navigate(R.id.action_otherUserFragment_to_otherUserPostsFragment, bundle)
+            getFragmentNavController(R.id.nav_host_fragment)?.navigate(
+                R.id.action_otherUserFragment_to_otherUserPostsFragment,
+                bundle
+            )
         }
         binding?.photoRecyclerView?.apply {
             layoutManager = GridLayoutManager(view.context, 3)
@@ -76,8 +79,10 @@ class ViewUserPostGridListFragment : Fragment() {
                 SUCCESS -> {
                     postAdapter.addAll(it.data!!.reversed())
                 }
-                ERROR -> {}
-                LOADING -> {}
+                ERROR -> {
+                }
+                LOADING -> {
+                }
             }
         })
 

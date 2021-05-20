@@ -1,4 +1,4 @@
-package com.example.instagram.ui.search
+package com.example.instagram.extensions
 
 import androidx.appcompat.widget.SearchView
 import kotlinx.coroutines.ExperimentalCoroutinesApi

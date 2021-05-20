@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.example.instagram.R
 import com.example.instagram.Status.SUCCESS
 import com.example.instagram.databinding.FragmentPostGridListBinding
-import com.example.instagram.getFragmentNavController
+import com.example.instagram.extensions.getFragmentNavController
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 /**

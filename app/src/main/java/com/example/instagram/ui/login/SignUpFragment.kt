@@ -13,7 +13,8 @@ import androidx.lifecycle.Observer
 import com.example.instagram.R
 import com.example.instagram.Status
 import com.example.instagram.databinding.FragmentSignUpBinding
-import com.example.instagram.ui.MainActivity
+import com.example.instagram.extensions.afterTextChanged
+import com.example.instagram.ui.main.MainActivity
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi

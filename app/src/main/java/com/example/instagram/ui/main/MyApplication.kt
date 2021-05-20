@@ -1,4 +1,4 @@
-package com.example.instagram
+package com.example.instagram.ui.main
 
 import android.app.Application
 import androidx.hilt.work.HiltWorkerFactory

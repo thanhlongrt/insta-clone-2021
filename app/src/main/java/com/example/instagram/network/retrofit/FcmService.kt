@@ -1,6 +1,6 @@
 package com.example.instagram.network.retrofit
 
-import com.example.instagram.Constants
+import com.example.instagram.utils.Constants
 import com.example.instagram.network.entity.FcmMessage
 import com.example.instagram.network.entity.FcmResponse
 import retrofit2.Response

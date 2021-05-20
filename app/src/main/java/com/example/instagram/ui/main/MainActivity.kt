@@ -1,9 +1,8 @@
-package com.example.instagram.ui
+package com.example.instagram.ui.main
 
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
-import android.util.TypedValue
 import android.view.View
 import android.view.WindowInsets
 import android.view.WindowInsetsController
@@ -14,10 +13,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.LiveData
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
-import androidx.navigation.ui.setupActionBarWithNavController
 import com.example.instagram.R
 import com.example.instagram.databinding.ActivityMainBinding
-import com.example.instagram.setupWithNavController
+import com.example.instagram.extensions.setupWithNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -47,8 +45,6 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         mainViewModel.getCurrentUserData()
-
-//        setSupportActionBar(binding.toolBar)
 
         if (savedInstanceState == null) {
             setupBottomNavigationBar()
@@ -99,47 +95,11 @@ class MainActivity : AppCompatActivity() {
         destination: NavDestination,
         navController: NavController
     ) {
-//        binding.toolBar.title = when (destination.id) {
-//            R.id.homeFragment -> "Instagram"
-//            R.id.notificationFragment -> "Notifications"
-//            R.id.userPostsFragment -> "Posts"
-//            R.id.editProfileFragment -> "Edit Profile"
-//            R.id.createNewPostFragment -> "New post"
-//            else -> ""
-//        }
-//
         if (destination.id == R.id.storyFragment) {
             hideUIs()
         } else {
             showUIs()
         }
-//
-//        binding.searchViewHolder.setOnClickListener {
-//            navController.navigate(R.id.action_exploreFragment_to_searchFragment)
-//        }
-//        if (destination.id == R.id.exploreFragment) {
-//            binding.searchViewHolder.visibility = View.VISIBLE
-//
-//        } else {
-//            binding.searchViewHolder.visibility = View.GONE
-//
-//        }
-//
-//        val searchEditText =
-//            binding.searchView.findViewById(androidx.appcompat.R.id.search_src_text) as EditText
-//        searchEditText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
-//        if (destination.id == R.id.searchFragment) {
-//            binding.searchView.visibility = View.VISIBLE
-//            searchEditText.requestFocus()
-//            showKeyboard(searchEditText)
-//        } else {
-//            binding.searchView.visibility = View.GONE
-//        }
-//
-//        binding.bottomNavView.visibility =
-//            if (destination.id == R.id.commentFragment ||
-//                destination.id == R.id.storyFragment
-//            ) View.GONE else View.VISIBLE
     }
 
     private fun showKeyboard(searchEditText: EditText) {

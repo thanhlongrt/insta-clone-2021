@@ -1,16 +1,15 @@
-package com.example.instagram.ui.search
+package com.example.instagram.ui.explore.search
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.widget.Toolbar
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.example.instagram.R
 import com.example.instagram.databinding.FragmentViewUserBinding
-import com.example.instagram.getFragmentNavController
+import com.example.instagram.extensions.getFragmentNavController
 import com.example.instagram.ui.profile.view_post.PostGridListFragment
 import com.example.instagram.ui.profile.view_post.ViewPagerAdapter
 import com.google.android.material.tabs.TabLayoutMediator

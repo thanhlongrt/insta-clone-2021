@@ -5,6 +5,7 @@ package com.example.instagram.ui.create.choose_media
  */
 class Album(
     val id: String,
-    val title: String
+    val title: String,
+    val mediaList: MutableList<GalleryMedia> = mutableListOf()
 ) {
 }

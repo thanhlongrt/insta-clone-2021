@@ -5,13 +5,16 @@ import android.content.ContentUris
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.example.instagram.MyApplication
+import com.example.instagram.ui.main.MyApplication
+import com.example.instagram.extensions.notifyObserver
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 /**
@@ -26,28 +29,51 @@ class ChooseMediaViewModel
 
     companion object {
         private const val TAG = "ChooseMediaViewModel"
-        val DEFAULT_ALBUM = Album("galleryId", "Gallery")
+        private val DEFAULT_PHOTO_ALBUM = Album("default_photo_album_id", "Gallery")
+        private val DEFAULT_VIDEO_ALBUM = Album("default_video_album_id", "Gallery")
     }
 
-    private val allMedias: MutableLiveData<List<GalleryMedia>> = MutableLiveData(listOf())
+    val albumList: MutableLiveData<List<Album>> = MutableLiveData()
 
-    val albumList: MutableLiveData<List<Album>> = MutableLiveData(listOf(DEFAULT_ALBUM))
+    var selectedAlbum: MutableLiveData<Album> = MutableLiveData()
 
-    var selectedAlbum: MutableLiveData<Album> = MutableLiveData(DEFAULT_ALBUM)
+    var selectedMedia: MutableLiveData<GalleryMedia> = MutableLiveData()
 
-    val mediaFromSelectedAlbum: MutableLiveData<List<GalleryMedia>> = MutableLiveData(listOf())
+    var previousSelectedMediaPosition: Int? = null
+
+    fun clear(){
+        selectedMedia.value = null
+        selectedAlbum.value = null
+        previousSelectedMediaPosition = null
+        albumList.value = null
+    }
+
+    fun selectMedia(position: Int) {
+        Log.e(TAG, "selectMedia: ${selectedAlbum.value}")
+        if (selectedAlbum.value == null) return
+        if (previousSelectedMediaPosition != null &&
+            previousSelectedMediaPosition!! < selectedAlbum.value!!.mediaList.size
+        ) {
+            selectedAlbum.value!!.mediaList[previousSelectedMediaPosition!!].isSelected = false
+        }
+        selectedAlbum.value!!.mediaList[position].isSelected = true
+        selectedMedia.value = selectedAlbum.value!!.mediaList[position]
+        previousSelectedMediaPosition = position
+
+        // notify observer that some items in this album are selected/unselected
+        selectedAlbum.notifyObserver()
+    }
 
     fun selectAlbum(albumId: String) {
-        if (albumId == selectedAlbum.value!!.id) return
-        if (albumId == DEFAULT_ALBUM.id) {
-            selectedAlbum.value = albumList.value!!.first()
-            mediaFromSelectedAlbum.value = allMedias.value
-        } else {
-            selectedAlbum.value = albumList.value!!.firstOrNull { it.id == albumId } ?: return
-            val mediaByAlbum = allMedias.value!!.groupBy { it.albumId }
-            mediaFromSelectedAlbum.value = mediaByAlbum[albumId]!!.toList()
+        if (albumId == selectedAlbum.value?.id) return
+
+        // unselect all items before switch to new album
+        if (selectedAlbum.value != null) {
+            selectedAlbum.value!!.mediaList.forEach { it.isSelected = false }
         }
-        allMedias.value?.forEach { it.isSelected = false }
+
+        selectedAlbum.value = albumList.value?.first { it.id == albumId }
+        selectMedia(0) // select first item as default
 
     }
 
@@ -90,7 +116,7 @@ class ChooseMediaViewModel
                 val bucketNameColumn =
                     cursor.getColumnIndexOrThrow(MediaStore.Images.Media.BUCKET_DISPLAY_NAME)
 
-                val foundAlbums = HashMap<String, Album>()
+                val albumsFromGallery = HashMap<String, Album>()
                 val photosFromGallery = mutableListOf<GalleryMedia>()
 
                 while (cursor.moveToNext()) {
@@ -102,7 +128,7 @@ class ChooseMediaViewModel
                             MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
                             id
                         )
-                    foundAlbums[bucketId] = Album(bucketId, bucketName)
+                    albumsFromGallery[bucketId] = Album(bucketId, bucketName)
 
                     photosFromGallery.add(
                         GalleryMedia(
@@ -113,12 +139,25 @@ class ChooseMediaViewModel
                         )
                     )
                 }
+                Log.e(TAG, "loadDeviceImages: photosFromGallery: ${photosFromGallery.size}")
 
-                val foundAlbumList = foundAlbums.values.toMutableList()
-                foundAlbumList.add(0, DEFAULT_ALBUM)
-                allMedias.postValue(photosFromGallery)
-                mediaFromSelectedAlbum.postValue(photosFromGallery)
-                albumList.postValue(foundAlbumList.toList())
+                // add photo into its album
+                photosFromGallery.forEach {
+                    albumsFromGallery[it.albumId]!!.mediaList.add(it)
+                }
+
+                // add all photos into DEFAULT ALBUM
+                DEFAULT_PHOTO_ALBUM.mediaList.clear()
+                DEFAULT_PHOTO_ALBUM.mediaList.addAll(photosFromGallery)
+
+                // add default album which contains all photos
+                val albumFromGalleryList = albumsFromGallery.values.toMutableList()
+                albumFromGalleryList.add(0, DEFAULT_PHOTO_ALBUM)
+
+                withContext(Dispatchers.Main) {
+                    albumList.value = albumFromGalleryList.toList()
+                    selectAlbum(DEFAULT_PHOTO_ALBUM.id)
+                }
             }
         }
     }
@@ -161,7 +200,7 @@ class ChooseMediaViewModel
                 val bucketColumn =
                     cursor.getColumnIndexOrThrow(MediaStore.Video.Media.BUCKET_DISPLAY_NAME)
 
-                val foundAlbumsMap = HashMap<String, Album>()
+                val albumFromGallery = HashMap<String, Album>()
                 val videosFromGallery = mutableListOf<GalleryMedia>()
 
                 while (cursor.moveToNext()) {
@@ -174,7 +213,7 @@ class ChooseMediaViewModel
                             id
                         )
 
-                    foundAlbumsMap[bucketId] = Album(bucketId, bucketName)
+                    albumFromGallery[bucketId] = Album(bucketId, bucketName)
                     videosFromGallery.add(
                         GalleryMedia(
                             contentUri,
@@ -183,6 +222,28 @@ class ChooseMediaViewModel
                             isVideo = true
                         )
                     )
+                }
+                Log.e(TAG, "loadDeviceVideos: videoFromGallery: ${videosFromGallery.size}")
+
+                // add video into its album
+                videosFromGallery.forEach {
+                    albumFromGallery[it.albumId]!!.mediaList.add(it)
+                }
+
+                // add all photos into DEFAULT ALBUM
+                DEFAULT_VIDEO_ALBUM.mediaList.clear()
+                DEFAULT_VIDEO_ALBUM.mediaList.addAll(videosFromGallery)
+
+                // add default album which contains all photos
+                val albumFromGalleryList = albumFromGallery.values.toMutableList()
+                albumFromGalleryList.add(
+                    0,
+                    DEFAULT_VIDEO_ALBUM
+                ) // add default album which contains all photos
+
+                withContext(Dispatchers.Main) {
+                    albumList.value = albumFromGalleryList
+                    selectAlbum(DEFAULT_VIDEO_ALBUM.id)
                 }
             }
         }

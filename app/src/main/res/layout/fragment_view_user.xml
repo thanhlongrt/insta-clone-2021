@@ -9,7 +9,7 @@
 
         <variable
             name="viewmodel"
-            type="com.example.instagram.ui.search.SearchViewModel" />
+            type="com.example.instagram.ui.explore.search.SearchViewModel" />
     </data>
 
     <LinearLayout

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.instagram
+package com.example.instagram.extensions
 
 import android.content.Intent
 import android.util.SparseArray
@@ -28,6 +28,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import androidx.navigation.fragment.NavHostFragment
+import com.example.instagram.R
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 /**
