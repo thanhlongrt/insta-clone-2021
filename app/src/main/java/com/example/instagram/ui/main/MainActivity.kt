@@ -63,46 +63,7 @@ class MainActivity : AppCompatActivity() {
             configUi(destination, navController)
         }
 
-
-
-//        if (savedInstanceState == null) {
-//            setupBottomNavigationBar()
-//        }
-
     }
-
-    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
-        super.onRestoreInstanceState(savedInstanceState)
-//        setupBottomNavigationBar()
-    }
-
-//    private fun setupBottomNavigationBar() {
-//        val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottom_nav_view)
-//
-//        val navGraphIds = listOf(
-//            R.navigation.nav_home,
-//            R.navigation.nav_explore,
-//            R.navigation.nav_reel,
-//            R.navigation.nav_notification,
-//            R.navigation.nav_profile,
-//        )
-//
-//        // Setup the bottom navigation view with a list of navigation graphs
-//        val controller = bottomNavigationView.setupWithNavController(
-//            navGraphIds = navGraphIds,
-//            fragmentManager = supportFragmentManager,
-//            containerId = R.id.nav_host_fragment,
-//            intent = intent
-//        )
-//
-//        // Whenever the selected controller changes, setup the action bar.
-//        controller.observe(this, { navController ->
-////            setupActionBarWithNavController(navController)
-//
-//        })
-//        currentNavigationController = controller
-//
-//    }
 
     private fun configUi(
         destination: NavDestination,
@@ -126,6 +87,7 @@ class MainActivity : AppCompatActivity() {
         } else {
             window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_VISIBLE
         }
+        binding.bottomNavView.visibility = View.VISIBLE
         useLightStatusBar()
     }
 
@@ -135,6 +97,7 @@ class MainActivity : AppCompatActivity() {
         } else {
             window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN
         }
+        binding.bottomNavView.visibility = View.GONE
     }
 
     private fun useLightStatusBar() {

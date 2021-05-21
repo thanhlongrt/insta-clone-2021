@@ -69,7 +69,7 @@ class NotificationFragment : Fragment() {
 
         notificationViewModel.notifications.observe(requireActivity()) {
             if (it.status == Status.SUCCESS) {
-                notificationAdapter.addAll(it.data!!)
+                notificationAdapter.addAll(it.data!!.reversed())
             }
         }
 

@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.instagram.utils.Constants.KEY_POST_JSON
@@ -31,7 +32,7 @@ class CommentFragment : Fragment() {
 
     private var binding: FragmentCommentBinding? = null
 
-    private val commentViewModel: CommentViewModel by viewModels()
+    private val commentViewModel: CommentViewModel by activityViewModels()
 
     private var postItem: PostItem? = null
 

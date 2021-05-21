@@ -32,6 +32,7 @@
     <string name="advanced_settings">Advanced settings</string>
     <string name="posts">Posts</string>
     <string name="following">Following</string>
+    <string name="notifications">Notifications</string>
     <plurals name="likeCount">
         <item quantity="one">%s like</item>
         <item quantity="other">%s likes</item>

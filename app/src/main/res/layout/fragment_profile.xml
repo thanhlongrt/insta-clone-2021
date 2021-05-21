@@ -85,7 +85,7 @@
                                 android:layout_height="96dp"
                                 android:layout_marginStart="16dp"
                                 android:layout_marginTop="14dp"
-                                android:src="@mipmap/ic_launcher_round"
+                                tools:src="@mipmap/ic_launcher_round"
                                 app:image_url="@{viewModel.currentUser.avatarUrl}"
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintTop_toTopOf="parent" />

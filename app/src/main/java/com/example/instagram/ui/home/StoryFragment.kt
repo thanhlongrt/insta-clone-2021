@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.navGraphViewModels
 import com.bumptech.glide.Glide
 import com.example.instagram.R
@@ -33,7 +34,7 @@ class StoryFragment : Fragment(), StoryProgressView.StoriesListener {
 
     private var binding: FragmentStoryBinding? = null
 
-    private val homeViewModel: HomeViewModel by navGraphViewModels(R.id.nav_home)
+    private val homeViewModel: HomeViewModel by activityViewModels()
 
     private var position: Int? = null
 
