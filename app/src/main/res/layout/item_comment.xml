@@ -64,6 +64,7 @@
                 android:orientation="horizontal">
 
                 <TextView
+                    style="@style/TextAppearance.MaterialComponents.Caption"
                     android:id="@+id/date"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -73,6 +74,7 @@
                     tools:text="date" />
 
                 <TextView
+                    style="@style/TextAppearance.MaterialComponents.Caption"
                     android:id="@+id/likeCount"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -83,6 +85,7 @@
                     tools:text="Like count" />
 
                 <TextView
+                    style="@style/TextAppearance.MaterialComponents.Caption"
                     android:id="@+id/reply"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

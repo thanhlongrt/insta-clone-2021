@@ -13,9 +13,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.LiveData
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.setupWithNavController
 import com.example.instagram.R
 import com.example.instagram.databinding.ActivityMainBinding
-import com.example.instagram.extensions.setupWithNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -34,6 +35,8 @@ class MainActivity : AppCompatActivity() {
 
     private val mainViewModel: MainViewModel by viewModels()
 
+    private lateinit var navController: NavController
+
     override fun onStart() {
         super.onStart()
         useLightStatusBar()
@@ -46,50 +49,60 @@ class MainActivity : AppCompatActivity() {
 
         mainViewModel.getCurrentUserData()
 
-        if (savedInstanceState == null) {
-            setupBottomNavigationBar()
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+        navController = navHostFragment.navController
+
+        binding.bottomNavView.setupWithNavController(navController)
+
+        navController.addOnDestinationChangedListener { navController, destination, _ ->
+            Log.e(
+                TAG,
+                "setupBottomNavigationBar: ${resources.getResourceName(destination.id)}",
+            )
+            configUi(destination, navController)
         }
+
+
+
+//        if (savedInstanceState == null) {
+//            setupBottomNavigationBar()
+//        }
 
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
-        setupBottomNavigationBar()
+//        setupBottomNavigationBar()
     }
 
-    private fun setupBottomNavigationBar() {
-        val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottom_nav_view)
-
-        val navGraphIds = listOf(
-            R.navigation.nav_home,
-            R.navigation.nav_explore,
-            R.navigation.nav_reel,
-            R.navigation.nav_notification,
-            R.navigation.nav_profile,
-        )
-
-        // Setup the bottom navigation view with a list of navigation graphs
-        val controller = bottomNavigationView.setupWithNavController(
-            navGraphIds = navGraphIds,
-            fragmentManager = supportFragmentManager,
-            containerId = R.id.nav_host_fragment,
-            intent = intent
-        )
-
-        // Whenever the selected controller changes, setup the action bar.
-        controller.observe(this, { navController ->
-//            setupActionBarWithNavController(navController)
-            navController.addOnDestinationChangedListener { navController, destination, _ ->
-                Log.e(
-                    TAG,
-                    "setupBottomNavigationBar: ${resources.getResourceName(destination.id)}",
-                )
-                configUi(destination, navController)
-            }
-        })
-        currentNavigationController = controller
-
-    }
+//    private fun setupBottomNavigationBar() {
+//        val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottom_nav_view)
+//
+//        val navGraphIds = listOf(
+//            R.navigation.nav_home,
+//            R.navigation.nav_explore,
+//            R.navigation.nav_reel,
+//            R.navigation.nav_notification,
+//            R.navigation.nav_profile,
+//        )
+//
+//        // Setup the bottom navigation view with a list of navigation graphs
+//        val controller = bottomNavigationView.setupWithNavController(
+//            navGraphIds = navGraphIds,
+//            fragmentManager = supportFragmentManager,
+//            containerId = R.id.nav_host_fragment,
+//            intent = intent
+//        )
+//
+//        // Whenever the selected controller changes, setup the action bar.
+//        controller.observe(this, { navController ->
+////            setupActionBarWithNavController(navController)
+//
+//        })
+//        currentNavigationController = controller
+//
+//    }
 
     private fun configUi(
         destination: NavDestination,

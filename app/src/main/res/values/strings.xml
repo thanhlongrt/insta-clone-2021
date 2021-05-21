@@ -33,8 +33,8 @@
     <string name="posts">Posts</string>
     <string name="following">Following</string>
     <plurals name="likeCount">
-        <item quantity="one">%d like</item>
-        <item quantity="other">%d likes</item>
+        <item quantity="one">%s like</item>
+        <item quantity="other">%s likes</item>
     </plurals>
     <plurals name="dateInSecond">
         <item quantity="one">%d second ago</item>
@@ -55,5 +55,9 @@
     <plurals name="dateInWeek">
         <item quantity="one">%d week ago</item>
         <item quantity="other">%d weeks ago</item>
+    </plurals>
+    <plurals name="commentCount">
+        <item quantity="one">View %s comment</item>
+        <item quantity="other">View all %s comments</item>
     </plurals>
 </resources>

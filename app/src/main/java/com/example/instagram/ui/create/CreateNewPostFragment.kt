@@ -12,6 +12,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.navigation.navGraphViewModels
 import com.bumptech.glide.Glide
 import com.example.instagram.utils.Constants.KEY_IS_VIDEO
@@ -39,7 +40,7 @@ class CreateNewPostFragment : Fragment() {
 
     private var binding: FragmentCreateNewPostBinding? = null
 
-    private val createViewModel: CreateViewModel by navGraphViewModels(R.id.nav_create)
+    private val createViewModel: CreateViewModel by viewModels()
 
     private var uri: Uri? = null
     private var isVideo: Boolean = false

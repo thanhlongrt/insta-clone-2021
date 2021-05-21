@@ -21,13 +21,9 @@ import com.example.instagram.ui.profile.view_post.CacheDataSourceFactory
 import com.example.instagram.ui.profile.view_post.PostListAdapter
 import com.example.instagram.utils.Constants.KEY_POST_JSON
 import com.example.instagram.utils.TypeConverters
-import com.google.android.exoplayer2.DefaultLoadControl
-import com.google.android.exoplayer2.MediaItem
-import com.google.android.exoplayer2.Player
-import com.google.android.exoplayer2.SimpleExoPlayer
+import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
-import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
 import com.google.android.exoplayer2.ui.PlayerView
 import com.google.android.exoplayer2.util.MimeTypes
 import dagger.hilt.android.AndroidEntryPoint
@@ -41,7 +37,7 @@ import javax.inject.Inject
  */
 @ExperimentalCoroutinesApi
 @AndroidEntryPoint
-class HomeFragment : Fragment() {
+class HomeFragment : Fragment(), Player.EventListener {
     companion object {
         private const val TAG = "HomeFragment"
     }
@@ -122,7 +118,7 @@ class HomeFragment : Fragment() {
                     sendLikePushNotification(post)
                 }
                 homeViewModel.likePost(post.postId)
-                onLikeClick(position)
+                like(position)
             }
 
             onCommentClick = { postItem ->
@@ -210,8 +206,7 @@ class HomeFragment : Fragment() {
         playerView.apply {
             setKeepContentOnPlayerReset(true)
             useController = true
-            player = this.player
-            resizeMode = AspectRatioFrameLayout.RESIZE_MODE_ZOOM
+            player = this@HomeFragment.player
         }
         val mediaItem =
             MediaItem.Builder()

@@ -93,7 +93,7 @@ class PostListFragment : Fragment() {
 
             onLikeClick = { position, post ->
                 viewPostViewModel.like(post.postId)
-                onLikeClick(position)
+                like(position)
             }
             onCommentClick = { postId ->
                 val bundle = bundleOf("postId" to postId)
@@ -104,7 +104,7 @@ class PostListFragment : Fragment() {
             }
 
             onViewAttachToWindow = { playerView, url ->
-                if (player == null) {
+                if (exoPlayer == null) {
                     this@PostListFragment.initPlayer(playerView, url)
                 }
             }
@@ -148,10 +148,10 @@ class PostListFragment : Fragment() {
         binding = null
     }
 
-    private var player: SimpleExoPlayer? = null
-    fun initPlayer(playerView: PlayerView, videoUrl: String) {
+    private var exoPlayer: SimpleExoPlayer? = null
+    private fun initPlayer(playerView: PlayerView, videoUrl: String) {
         val context = playerView.context
-        player = SimpleExoPlayer.Builder(
+        exoPlayer = SimpleExoPlayer.Builder(
             context,
         )
             .setLoadControl(DefaultLoadControl())
@@ -161,8 +161,7 @@ class PostListFragment : Fragment() {
 
         playerView.setKeepContentOnPlayerReset(true)
         playerView.useController = true
-        playerView.player = this.player
-        playerView.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_ZOOM
+        playerView.player = this.exoPlayer
         val mediaItem =
             MediaItem.Builder()
                 .setUri(videoUrl)
@@ -173,7 +172,7 @@ class PostListFragment : Fragment() {
             cacheDataSourceFactory
         ).createMediaSource(mediaItem)
 
-        player?.apply {
+        exoPlayer?.apply {
             playWhenReady = true
             repeatMode = Player.REPEAT_MODE_ONE
 
@@ -183,9 +182,9 @@ class PostListFragment : Fragment() {
     }
 
     private fun releasePlayer() {
-        player?.let { player ->
+        exoPlayer?.let { player ->
             player.release()
-            this.player = null
+            this.exoPlayer = null
         }
     }
 }

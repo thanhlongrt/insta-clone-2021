@@ -59,8 +59,8 @@ dependencies {
 
     implementation 'androidx.viewpager2:viewpager2:1.0.0'
 
-    implementation 'androidx.navigation:navigation-fragment-ktx:2.3.5'
-    implementation 'androidx.navigation:navigation-ui-ktx:2.3.5'
+    implementation 'androidx.navigation:navigation-fragment-ktx:2.4.0-alpha01'
+    implementation 'androidx.navigation:navigation-ui-ktx:2.4.0-alpha01'
 
     implementation 'de.hdodenhof:circleimageview:3.1.0'
 
@@ -85,11 +85,11 @@ dependencies {
 
     // Firebase
     implementation platform('com.google.firebase:firebase-bom:26.7.0')
-    implementation 'com.google.firebase:firebase-core:18.0.3'
-    implementation 'com.google.firebase:firebase-auth:20.0.4'
-    implementation 'com.google.firebase:firebase-storage-ktx:19.2.2'
-    implementation 'com.google.firebase:firebase-database-ktx:19.7.0'
-    implementation 'com.google.firebase:firebase-messaging:21.1.0'
+    implementation 'com.google.firebase:firebase-core:19.0.0'
+    implementation 'com.google.firebase:firebase-auth:21.0.1'
+    implementation 'com.google.firebase:firebase-storage-ktx:20.0.0'
+    implementation 'com.google.firebase:firebase-database-ktx:20.0.0'
+    implementation 'com.google.firebase:firebase-messaging:22.0.0'
     implementation 'com.google.firebase:firebase-iid:21.1.0'
 
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.3"

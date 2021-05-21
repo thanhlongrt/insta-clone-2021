@@ -12,6 +12,7 @@ import androidx.core.text.HtmlCompat
 import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
 import com.example.instagram.R
+import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -35,9 +36,25 @@ fun TextView.setLikeCount(likeCount: Long) {
         }
         else -> {
             visibility = View.VISIBLE
-            text = resources.getQuantityString(R.plurals.likeCount, likeCount.toInt(), likeCount)
+            val likeCountString = NumberFormat.getInstance().format(likeCount)
+            text =
+                resources.getQuantityString(
+                    R.plurals.likeCount,
+                    likeCount.toInt(),
+                    likeCountString
+                )
         }
     }
+}
+
+@BindingAdapter("set_comment_count")
+fun TextView.setCommentCount(commentCount: Long) {
+    val commentCountString = NumberFormat.getInstance().format(commentCount)
+    text = resources.getQuantityString(
+        R.plurals.commentCount,
+        commentCount.toInt(),
+        commentCountString
+    )
 }
 
 @SuppressLint("SimpleDateFormat")

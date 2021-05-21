@@ -20,10 +20,7 @@ import com.example.instagram.model.PostItem
 import com.example.instagram.network.entity.Notification
 import com.example.instagram.ui.profile.view_post.CacheDataSourceFactory
 import com.example.instagram.ui.profile.view_post.PostListAdapter
-import com.google.android.exoplayer2.DefaultLoadControl
-import com.google.android.exoplayer2.MediaItem
-import com.google.android.exoplayer2.Player
-import com.google.android.exoplayer2.SimpleExoPlayer
+import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
@@ -41,7 +38,7 @@ import javax.inject.Inject
 
 @ExperimentalCoroutinesApi
 @AndroidEntryPoint
-class ViewUserPostListFragment : Fragment() {
+class ViewUserPostListFragment : Fragment(), Player.EventListener {
 
     companion object {
         private const val TAG = "ViewUserPostsFragment"
@@ -113,7 +110,7 @@ class ViewUserPostListFragment : Fragment() {
                     sendLikePushNotification(post)
                 }
                 searchViewModel.clickLike(post.postId)
-                postListAdapter.onLikeClick(position)
+                postListAdapter.like(position)
             }
             onCommentClick = { postId ->
                 val bundle = bundleOf("postId" to postId)
@@ -123,7 +120,7 @@ class ViewUserPostListFragment : Fragment() {
                 )
             }
             onViewAttachToWindow = { playerView, url ->
-                if (player == null) {
+                if (exoPlayer == null) {
                     this@ViewUserPostListFragment.initPlayer(playerView, url)
                 }
             }
@@ -173,10 +170,10 @@ class ViewUserPostListFragment : Fragment() {
         binding = null
     }
 
-    private var player: SimpleExoPlayer? = null
+    private var exoPlayer: SimpleExoPlayer? = null
     private fun initPlayer(playerView: PlayerView, videoUrl: String) {
         val context = playerView.context
-        player = SimpleExoPlayer.Builder(
+        exoPlayer = SimpleExoPlayer.Builder(
             context,
         )
             .setLoadControl(DefaultLoadControl())
@@ -186,8 +183,7 @@ class ViewUserPostListFragment : Fragment() {
 
         playerView.setKeepContentOnPlayerReset(true)
         playerView.useController = true
-        playerView.player = this.player
-        playerView.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_ZOOM
+        playerView.player = this.exoPlayer
         val mediaItem =
             MediaItem.Builder()
                 .setUri(videoUrl)
@@ -198,7 +194,7 @@ class ViewUserPostListFragment : Fragment() {
             cacheDataSourceFactory
         ).createMediaSource(mediaItem)
 
-        player?.apply {
+        exoPlayer?.apply {
             playWhenReady = true
             repeatMode = Player.REPEAT_MODE_ONE
 
@@ -208,9 +204,9 @@ class ViewUserPostListFragment : Fragment() {
     }
 
     private fun releasePlayer() {
-        player?.let { player ->
+        exoPlayer?.let { player ->
             player.release()
-            this.player = null
+            this.exoPlayer = null
         }
     }
 

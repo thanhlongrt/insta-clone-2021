@@ -1,5 +1,6 @@
 package com.example.instagram.ui.profile.view_post
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -85,7 +86,7 @@ class PostListAdapter(
         notifyDataSetChanged()
     }
 
-    fun onLikeClick(position: Int) {
+    fun like(position: Int) {
         val postItem = posts[position]
         if (postItem.isLiked) {
             postItem.likeCount--
