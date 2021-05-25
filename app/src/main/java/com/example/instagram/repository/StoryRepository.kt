@@ -2,7 +2,6 @@ package com.example.instagram.repository
 
 import android.content.Context
 import android.net.Uri
-import android.util.Log
 import com.example.instagram.DataState
 import com.example.instagram.Status
 import com.example.instagram.model.StoryItem
@@ -39,10 +38,11 @@ constructor(
     }
 
     suspend fun getUserStories(): Flow<DataState<List<UserStoryItem>>> = flow {
-        getStoriesFromFirebase().collect { storyResult ->
-            val storiesByUid = storyResult.data!!.groupBy { it.uid }
+        firebaseService.getStoriesFromFirebase().collect { storyResult ->
+            val storyItems = storyResult!!.map { storyNetworkMapper.fromEntity(it) }
+            val storyItemsByUid = storyItems.groupBy { it.uid }
             val userStoryItems = mutableListOf<UserStoryItem>()
-            for (entry in storiesByUid) {
+            for (entry in storyItemsByUid) {
                 val item = UserStoryItem(
                     uid = entry.key,
                     username = entry.value[0].username,
@@ -66,26 +66,6 @@ constructor(
             DataState.success(stories.map { userStoryCacheMapper.fromEntity(it) })
         } ?: DataState.error(null, "getStoriesCache: Error")
 
-    private suspend fun getStoriesFromFirebase() = callbackFlow<DataState<List<StoryItem>>> {
-        val storyListener = object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val networkStories = snapshot.children.map {
-                    it.getValue(Story::class.java)
-                }
-                val storyItems = networkStories.map { storyNetworkMapper.fromEntity(it!!) }
-                this@callbackFlow.sendBlocking(DataState.success(storyItems))
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-                this@callbackFlow.sendBlocking(DataState.error(null, error.message))
-            }
-        }
-        firebaseService.storyDataReference.addValueEventListener(storyListener)
-        awaitClose {
-            firebaseService.storyDataReference.removeEventListener(storyListener)
-        }
-    }
-
     private suspend fun uploadPhoto(
         context: Context,
         uri: Uri,
@@ -106,7 +86,7 @@ constructor(
         path: String,
         storyData: HashMap<String, Any>
     ) =
-        uploadPhoto(context, uri, path).collect { downloadUrlResult ->
+        uploadPhoto(context, uri, path).collectLatest { downloadUrlResult ->
             if (downloadUrlResult.status == Status.SUCCESS) {
                 storyData["photo_url"] = downloadUrlResult.data!!
                 firebaseService.saveStoryData(storyData)

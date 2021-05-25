@@ -40,7 +40,7 @@ constructor(
     fun getUploadedPosts() {
         viewModelScope.launch(Dispatchers.IO) {
             currentUserUid?.let { uid ->
-                postRepository.getPostsByUser(uid).collect {
+                postRepository.getPostsByUserFromFirebase(uid).collect {
                     _userPosts.postValue(it)
                 }
             }

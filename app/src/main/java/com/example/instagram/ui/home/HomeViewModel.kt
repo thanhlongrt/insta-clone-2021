@@ -70,7 +70,7 @@ constructor(
 
     fun getAllPosts() {
         viewModelScope.launch(Dispatchers.IO) {
-            postRepository.getFeedPosts().collect {
+            postRepository.fetchFeedPosts().collect {
                 _feedPosts.postValue(it)
             }
         }

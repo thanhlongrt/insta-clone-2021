@@ -19,6 +19,7 @@ import com.example.instagram.Status
 import com.example.instagram.databinding.FragmentSearchBinding
 import com.example.instagram.extensions.getFragmentNavController
 import com.example.instagram.extensions.getQueryTextChangeStateFlow
+import com.example.instagram.model.UserItem
 import com.example.instagram.network.entity.User
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -43,8 +44,6 @@ class SearchFragment : Fragment() {
     }
 
     private var binding: FragmentSearchBinding? = null
-
-    private lateinit var searchView: SearchView
 
     private val searchViewModel: SearchViewModel by viewModels()
 
@@ -113,27 +112,12 @@ class SearchFragment : Fragment() {
         }
 
         val recentSearch = mutableListOf(
-            User(username = "user1", display_name = "User 1"),
-            User(username = "user2", display_name = "User 2"),
-            User(username = "user3", display_name = "User 3"),
-            User(username = "user4", display_name = "User 4"),
+            UserItem(username = "user1", displayName = "User 1"),
+            UserItem(username = "user2", displayName = "User 2"),
+            UserItem(username = "user3", displayName = "User 3"),
+            UserItem(username = "user4", displayName = "User 4"),
         )
         searchResultAdapter.addAll(recentSearch)
-
-        //        searchView.getQueryTextObservable()
-        //            .debounce(300, TimeUnit.MILLISECONDS)
-        //            .filter { query ->
-        //                query.length > 1
-        //            }
-        //            .distinctUntilChanged()
-        //            .observeOn(AndroidSchedulers.mainThread())
-        //            .subscribe { query ->
-        //                if (query.isNotBlank()) {
-        //                    searchViewModel.searchUser(query)
-        //                } else {
-        //                    searchResultAdapter.addAll(recentSearch)
-        //                }
-        //            }
 
         lifecycleScope.launch {
             binding!!.searchView.getQueryTextChangeStateFlow()
@@ -143,8 +127,7 @@ class SearchFragment : Fragment() {
                 }
                 .distinctUntilChanged()
                 .collectLatest { query ->
-    //                    Log.e(TAG, "onViewCreated: collectLatest: $query", )
-                    searchViewModel.searchUserFlow(query)
+                    searchViewModel.searchForUser(query)
                 }
         }
 

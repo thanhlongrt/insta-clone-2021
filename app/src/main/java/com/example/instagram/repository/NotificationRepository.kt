@@ -1,7 +1,6 @@
 package com.example.instagram.repository
 
 import android.util.Log
-import com.example.instagram.utils.Constants
 import com.example.instagram.DataState
 import com.example.instagram.network.entity.*
 import com.example.instagram.network.firebase.FirebaseService
@@ -9,16 +8,14 @@ import com.example.instagram.network.retrofit.FcmService
 import com.example.instagram.room.dao.NotificationDao
 import com.example.instagram.room.dao.StringKeyValueDao
 import com.example.instagram.room.entity.StringKeyValuePair
+import com.example.instagram.utils.Constants
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.channels.sendBlocking
-import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 
 /**
@@ -51,7 +48,7 @@ constructor(
         stringKeyValueDao.insert(StringKeyValuePair(Constants.FCM_TOKEN, token))
 
     suspend fun sendPushNotification(notification: Notification) {
-        getUserFcmToken(notification.uid).collect { token ->
+        firebaseService.getUserFcmToken(notification.uid).collect { token ->
             Log.e(TAG, "sendPushNotification: token: $token")
             token?.let {
                 val fcmMessage = FcmMessage(
@@ -68,7 +65,7 @@ constructor(
                 fcmService.sendPushNotification(fcmMessage).run {
                     if (isSuccessful) {
                         Log.e(TAG, "sendPushNotification: ${body()?.success}")
-                        saveNotification(notification)
+                        firebaseService.saveNotification(notification)
                         notificationDao.insertNotification(notification)
                     }
                 }
@@ -76,52 +73,9 @@ constructor(
         }
     }
 
-    private fun saveNotification(
-        notification: Notification
-    ) {
-        firebaseService.saveNotification(notification)
-    }
-
-    private fun getUserFcmToken(uid: String) = callbackFlow<String?> {
-        val tokenRef = firebaseService.userFcmTokenReference(uid)
-        val tokenListener = object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val token = snapshot.getValue(FcmToken::class.java)!!
-                Log.e(TAG, "onDataChange: ")
-                this@callbackFlow.sendBlocking(token.token)
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-                Log.e(TAG, "onCancelled: ")
-                this@callbackFlow.sendBlocking(null)
-            }
-        }
-
-        tokenRef.addListenerForSingleValueEvent(tokenListener)
-        awaitClose {
-            tokenRef.removeEventListener(tokenListener)
-        }
-    }.catch {
-        Log.e(TAG, "getUserFcmToken: failed: ${it.message}")
-    }
-
-    fun getNotification() = callbackFlow<DataState<List<Notification>>> {
-        currentUserUid?.let { uid ->
-            val notificationRef = firebaseService.notificationReference.child(uid)
-            val listener = object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    val notifications =
-                        snapshot.children.mapNotNull { it.getValue(Notification::class.java) }
-                    this@callbackFlow.sendBlocking(DataState.success(notifications))
-                }
-
-                override fun onCancelled(error: DatabaseError) {
-                    this@callbackFlow.sendBlocking(DataState.error(null, error.message))
-                }
-
-            }
-            notificationRef.addValueEventListener(listener)
-            awaitClose { notificationRef.removeEventListener(listener) }
+    fun getNotification() = flow<DataState<List<Notification>>> {
+        firebaseService.getNotifications().collect{
+            emit(DataState.success(it!!))
         }
     }.onStart {
         getNotificationCache()?.let { emit(it) }

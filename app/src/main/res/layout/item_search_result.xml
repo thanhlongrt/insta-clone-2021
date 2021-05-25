@@ -34,7 +34,7 @@
     </LinearLayout>
 
     <ImageView
-        android:id="@+id/cancel_button"
+        android:id="@+id/deleteButton"
         android:layout_width="10dp"
         android:layout_height="match_parent"
         android:layout_margin="12dp"

@@ -35,7 +35,7 @@ constructor(
     fun getAllPosts() {
         _feedPosts.postValue(DataState.loading())
         viewModelScope.launch {
-            postRepository.getFeedPosts().collect {
+            postRepository.fetchFeedPosts().collect {
                 _feedPosts.value = it
             }
         }
